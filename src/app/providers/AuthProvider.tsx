@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -11,11 +11,9 @@ const AUTH_STORAGE_KEY = "shabakat-auth";
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    setIsAuthenticated(window.localStorage.getItem(AUTH_STORAGE_KEY) === "true");
-  }, []);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => typeof window !== "undefined" && window.localStorage.getItem(AUTH_STORAGE_KEY) === "true",
+  );
 
   async function login(email: string, password: string) {
     if (!email.trim() || !password.trim()) {

@@ -6,7 +6,11 @@ import { ProtectedRoute } from "./ProtectedRoute";
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
-const NotificationsPage = lazy(() => import("../features/notifications/pages/NotificationsPage"));
+const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
+const PricingSettingPage = lazy(() => import("../features/settings/pages/PricingSettingPage"));
+const TriggerMessagePage = lazy(() => import("../features/settings/pages/TriggerMessagePage"));
+const TriggerDatePage = lazy(() => import("../features/settings/pages/TriggerDatePage"));
+const LanguageSettingPage = lazy(() => import("../features/settings/pages/LanguageSettingPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 
 function ShellLayout() {
@@ -41,7 +45,11 @@ export function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings/pricing/:field" element={<PricingSettingPage />} />
+          <Route path="/settings/trigger-date" element={<TriggerDatePage />} />
+          <Route path="/settings/trigger-message" element={<TriggerMessagePage />} />
+          <Route path="/settings/language" element={<LanguageSettingPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
