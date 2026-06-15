@@ -1,0 +1,49 @@
+import { Bell, Menu, Search } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { routeTitles } from "../../shared/data/mockData";
+import { Avatar } from "../../shared/components/Avatar";
+
+export interface TopNavigationProps {
+  onMenuClick: () => void;
+}
+
+export function TopNavigation({ onMenuClick }: Readonly<TopNavigationProps>) {
+  const location = useLocation();
+  const current = routeTitles[location.pathname] ?? routeTitles["/dashboard"];
+
+  return (
+    <header
+      className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-white/8 bg-background/85 px-4 backdrop-blur-xl md:px-6"
+      style={{ borderColor: "var(--border)" }}
+    >
+      <button
+        onClick={onMenuClick}
+        className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+        aria-label="Open navigation"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <div className="min-w-0">
+        <h1 className="truncate text-base font-semibold text-foreground">{current.title}</h1>
+        <p className="hidden text-xs text-muted-foreground sm:block">{current.subtitle}</p>
+      </div>
+
+      <div className="ml-auto flex items-center gap-2">
+        <div className="relative hidden md:block">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Quick search..."
+            className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pl-9 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+          />
+        </div>
+        <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground" aria-label="Notifications">
+          <Bell className="h-5 w-5" />
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
+        </button>
+        <Avatar name="Karim El-Nour" />
+      </div>
+    </header>
+  );
+}
