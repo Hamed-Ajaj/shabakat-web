@@ -1,10 +1,12 @@
 import { Bell, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "../../components/ui/sidebar";
+import { useAuth } from "../../providers/AuthProvider";
 import { routeTitles } from "../../shared/data/mockData";
 import { Avatar } from "../../shared/components/Avatar";
 
 export function TopNavigation() {
+  const { session } = useAuth();
   const location = useLocation();
   const current = routeTitles[location.pathname] ?? routeTitles["/dashboard"];
 
@@ -33,7 +35,7 @@ export function TopNavigation() {
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
         </button>
-        <Avatar name="Karim El-Nour" />
+        <Avatar name={session?.fullName ?? "Workspace User"} />
       </div>
     </header>
   );

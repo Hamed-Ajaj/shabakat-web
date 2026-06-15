@@ -1,19 +1,34 @@
 import { flexRender, getCoreRowModel, getSortedRowModel, type SortingState, useReactTable } from "@tanstack/react-table";
 import { useState } from "react";
 import { SectionCard } from "../../../shared/components/SectionCard";
-import type { Subscriber } from "../../../shared/types/domain";
-import { subscriberColumns } from "./subscriberColumns";
+import type { SubscriberRow } from "../types";
+import { createSubscriberColumns } from "./subscriberColumns";
 
 export interface SubscribersTableProps {
-  data: Subscriber[];
+  data: SubscriberRow[];
+  error: string;
+  isLoading: boolean;
+  canDelete: boolean;
+  onDelete: (subscriber: SubscriberRow) => void;
+  onEdit: (subscriber: SubscriberRow) => void;
+  onView: (subscriber: SubscriberRow) => void;
 }
 
-export function SubscribersTable({ data }: Readonly<SubscribersTableProps>) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: "amount", desc: true }]);
+export function SubscribersTable({
+  data,
+  error,
+  isLoading,
+  canDelete,
+  onDelete,
+  onEdit,
+  onView,
+}: Readonly<SubscribersTableProps>) {
+  const [sorting, setSorting] = useState<SortingState>([{ id: "amountDue", desc: true }]);
+  const columns = createSubscriberColumns({ canDelete, onDelete, onEdit, onView });
 
   const table = useReactTable({
     data,
-    columns: subscriberColumns,
+    columns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -22,6 +37,19 @@ export function SubscribersTable({ data }: Readonly<SubscribersTableProps>) {
 
   return (
     <SectionCard className="overflow-hidden">
+      {isLoading ? (
+        <div className="px-4 py-10 text-sm text-muted-foreground">Loading subscribers...</div>
+      ) : null}
+
+      {!isLoading && error ? (
+        <div className="px-4 py-10 text-sm text-red-300">{error}</div>
+      ) : null}
+
+      {!isLoading && !error && data.length === 0 ? (
+        <div className="px-4 py-10 text-sm text-muted-foreground">No subscribers matched the current filters.</div>
+      ) : null}
+
+      {!isLoading && !error && data.length > 0 ? (
       <div className="overflow-x-auto">
         <table className="w-full min-w-[860px]">
           <thead>
@@ -49,6 +77,7 @@ export function SubscribersTable({ data }: Readonly<SubscribersTableProps>) {
           </tbody>
         </table>
       </div>
+      ) : null}
     </SectionCard>
   );
 }

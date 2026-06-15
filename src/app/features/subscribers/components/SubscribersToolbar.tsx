@@ -1,12 +1,14 @@
-import type { Status } from "../../../shared/types/domain";
+import { Button } from "../../../components/ui/button";
+import type { SubscriberBillingStatus } from "../types";
 
 export interface SubscribersToolbarProps {
   search: string;
-  status: "all" | Status;
+  status: "all" | SubscriberBillingStatus;
   total: number;
   filteredCount: number;
   onSearchChange: (value: string) => void;
-  onStatusChange: (value: "all" | Status) => void;
+  onStatusChange: (value: "all" | SubscriberBillingStatus) => void;
+  onCreateClick: () => void;
 }
 
 export function SubscribersToolbar({
@@ -16,6 +18,7 @@ export function SubscribersToolbar({
   filteredCount,
   onSearchChange,
   onStatusChange,
+  onCreateClick,
 }: Readonly<SubscribersToolbarProps>) {
   return (
     <div className="space-y-4">
@@ -44,12 +47,13 @@ export function SubscribersToolbar({
           ))}
         </div>
 
-        <button
-          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+        <Button
+          onClick={onCreateClick}
+          className="rounded-xl px-4 py-2.5 text-sm font-medium"
           style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}
         >
           Add Subscriber
-        </button>
+        </Button>
       </div>
 
       <p className="text-xs text-muted-foreground">{filteredCount} of {total} subscribers</p>

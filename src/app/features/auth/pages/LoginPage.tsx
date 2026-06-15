@@ -1,11 +1,11 @@
 import { AlertCircle, ArrowRight } from "lucide-react";
-import { FormEvent, useState, useTransition } from "react";
+import { FormEvent, useEffect, useState, useTransition } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../providers/AuthProvider";
 import { AppLogo } from "../../../shared/components/AppLogo";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { hasHydrated, isAuthenticated, isLoggingIn, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isPending, startTransition] = useTransition();
@@ -13,6 +13,12 @@ export default function LoginPage() {
 
   const redirectTo =
     (location.state as { from?: string } | null)?.from ?? "/dashboard";
+
+  useEffect(() => {
+    if (hasHydrated && isAuthenticated) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [hasHydrated, isAuthenticated, navigate, redirectTo]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +81,7 @@ export default function LoginPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="owner@shabakat.app"
+                placeholder="owner@nour.com"
                 className="w-full rounded-2xl border border-white/8 bg-secondary px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
               />
             </div>
@@ -88,9 +94,13 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Password123!"
                 className="w-full rounded-2xl border border-white/8 bg-secondary px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
               />
+            </div>
+
+            <div className="rounded-2xl border border-white/8 bg-secondary/60 px-4 py-3 text-xs text-muted-foreground">
+              Seeded local account: <span className="font-medium text-foreground">owner@nour.com</span> / <span className="font-medium text-foreground">Password123!</span>
             </div>
 
             {error ? (
@@ -102,11 +112,11 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || isLoggingIn}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
               style={{ boxShadow: "0 0 20px rgba(245,192,0,0.22)" }}
             >
-              {isPending ? "Signing in..." : "Enter workspace"}
+              {isPending || isLoggingIn ? "Signing in..." : "Enter workspace"}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
