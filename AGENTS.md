@@ -1,39 +1,32 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This is a Vite + React + TypeScript frontend. The app entry is [`src/main.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/main.tsx), which mounts [`src/app/App.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/app/App.tsx). Route definitions live in `src/app/routes/`, auth state in `src/app/providers/`, the reusable shell in `src/app/shell/`, shared UI/data/types in `src/app/shared/`, and feature pages in `src/app/features/<feature>/`. Current feature areas are `auth`, `dashboard`, `subscribers`, `invoices`, and `notifications`. Global styles remain in `src/styles/`.
+This is a Vite + React + TypeScript app. Entry starts at [`src/main.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/main.tsx) and mounts [`src/app/App.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/app/App.tsx). Keep product code under `src/app/`: `features/` for route-level domains, `routes/` for router setup, `providers/` for app state, `shell/` for layout, and `shared/` for reusable domain UI/data/types. shadcn support folders live in `src/hooks/` and `src/lib/`. Shared primitives are in `src/app/components/ui/`. Global styling stays in `src/styles/`.
 
 ## Build, Test, and Development Commands
-Use `pnpm`; this repo keeps `pnpm-lock.yaml` and `pnpm-workspace.yaml`.
+Use `pnpm`.
 
 - `pnpm install`: install and sync dependencies.
-- `pnpm dev`: start the Vite dev server.
+- `pnpm dev`: run the local Vite server.
 - `pnpm build`: create the production bundle in `dist/`.
-- `pnpm preview`: serve the production build locally.
-- `pnpm typecheck`: run TypeScript without emitting files.
+- `pnpm preview`: serve the built app locally.
+- `pnpm typecheck`: run TypeScript checks.
+- `pnpm lint`: run ESLint across the repo.
 
 ## Coding Style & Naming Conventions
-Keep code feature-first and modular. Avoid rebuilding large page files; extract shared parts into `shared/` and feature-specific parts into that feature’s `components/` folder.
+Favor feature-first structure over large page files. Put route-specific UI inside that feature’s `components/` folder; move cross-feature pieces into `shared/`.
 
-- Use `PascalCase` for components, pages, and exported types.
-- Use `camelCase` for functions, variables, and props.
-- Use descriptive file names such as `SubscribersPage.tsx`, `AuthProvider.tsx`, and `subscriberColumns.tsx`.
+- Use `PascalCase` for components, pages, and providers.
+- Use `camelCase` for variables, functions, and props.
+- Use descriptive filenames such as `SettingsPage.tsx`, `SettingsProvider.tsx`, and `subscriberColumns.tsx`.
 
-Prefer functional React components, route-driven navigation with `react-router-dom`, and explicit local types. TanStack Table is used for subscriber table behavior, so column definitions should stay isolated from page layout code.
+Prefer functional React components, explicit local types, and route-driven navigation with `react-router-dom`. TanStack Table is used for subscribers, so column definitions should stay separate from page layout code.
 
 ## Testing Guidelines
-There is no dedicated test runner yet. Before opening a PR, run `pnpm typecheck` and `pnpm build`, then verify the main routes in `pnpm dev`:
-
-- `/login`
-- `/dashboard`
-- `/subscribers`
-- `/invoices`
-- `/notifications`
-
-If you add tests later, place them next to the feature they cover and name them `*.test.tsx`.
+There is no dedicated automated test suite yet. Before opening a PR, run `pnpm lint`, `pnpm typecheck`, and `pnpm build`, then verify the main routes in `pnpm dev`: `/login`, `/dashboard`, `/subscribers`, `/invoices`, and `/settings`. If tests are added later, place them near the feature they cover and use `*.test.tsx`.
 
 ## Commit & Pull Request Guidelines
-The git history is still minimal, so use short imperative commits such as `refactor: split dashboard into feature modules` or `feat: add login route and auth shell`. PRs should include a concise summary, linked task or issue, and screenshots for UI changes across desktop and mobile.
+Use short imperative commits such as `refactor: migrate shell to shadcn sidebar` or `feat: add settings detail routes`. PRs should include a concise summary, linked work item, and screenshots for UI changes on desktop and mobile.
 
 ## Configuration Notes
-Do not remove the React or Tailwind plugins from `vite.config.ts`. If you touch routing, auth, or table behavior, update this guide so the documented structure stays accurate.
+Keep Vite, Tailwind, and shadcn aliases aligned across `vite.config.ts`, `tsconfig.json`, and `components.json`. The settings UI mirrors the mobile product, but only pricing, language, trigger date, and trigger message currently map to the backend `CompanyPreferences` contract; notification toggles are still web-local.

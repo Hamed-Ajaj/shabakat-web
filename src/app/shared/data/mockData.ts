@@ -1,4 +1,4 @@
-import { Bell, FileText, LayoutDashboard, Users } from "lucide-react";
+import { FileText, LayoutDashboard, Settings, Users } from "lucide-react";
 import type { NavigationItem, RevenuePoint, Subscriber } from "../types/domain";
 
 export const subscribers: Subscriber[] = [
@@ -32,12 +32,19 @@ export const navigationItems: NavigationItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/subscribers", label: "Subscribers", icon: Users },
   { to: "/invoices", label: "Invoices", icon: FileText },
-  { to: "/notifications", label: "Notifications", icon: Bell, badge: 8 },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export const routeTitles: Record<string, { title: string; subtitle: string }> = {
   "/dashboard": { title: "Dashboard", subtitle: "Operations snapshot for El-Nour Generators" },
   "/subscribers": { title: "Subscribers", subtitle: "Search, sort, and manage monthly accounts" },
   "/invoices": { title: "Invoices", subtitle: "Generate printable billing statements" },
-  "/notifications": { title: "Notifications", subtitle: "Track reminders across unpaid accounts" },
+  "/settings": { title: "Settings", subtitle: "Preferences, pricing, and notification defaults" },
+  "/settings/pricing/price-per-kilowatt": { title: "Price per Kilowatt", subtitle: "Edit default and customer-type kilowatt pricing" },
+  "/settings/pricing/price-per-amp": { title: "Price per Amp", subtitle: "Edit default and customer-type amp pricing" },
+  "/settings/pricing/fixed-charge": { title: "Fixed Charge", subtitle: "Edit fixed charges by tier" },
+  "/settings/pricing/tva": { title: "TVA (%)", subtitle: "Edit tax values by tier" },
+  "/settings/trigger-date": { title: "Trigger Date", subtitle: "Choose the billing reminder day of month" },
+  "/settings/trigger-message": { title: "Trigger Message", subtitle: "Update the default billing reminder copy" },
+  "/settings/language": { title: "Language", subtitle: "Set the notification language" },
 };

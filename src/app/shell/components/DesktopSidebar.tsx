@@ -1,5 +1,18 @@
 import { LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "../../components/ui/sidebar";
 import { useAuth } from "../../providers/AuthProvider";
 import { navigationItems } from "../../shared/data/mockData";
 import { AppLogo } from "../../shared/components/AppLogo";
@@ -9,47 +22,47 @@ export function DesktopSidebar() {
   const { logout } = useAuth();
 
   return (
-    <aside className="flex h-dvh w-64 flex-col border-r border-white/8 bg-sidebar px-4 py-5">
-      <AppLogo />
+    <Sidebar>
+      <SidebarHeader className="px-4 py-5">
+        <AppLogo />
+      </SidebarHeader>
 
-      <div className="mt-8 flex-1 space-y-6">
-        <div>
-          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+      <SidebarContent className="px-2">
+        <SidebarGroup>
+          <SidebarGroupLabel className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
             Main Menu
-          </p>
-          <nav className="space-y-1.5">
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1.5">
             {navigationItems.map(({ to, icon: Icon, label, badge }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all ${
-                    isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span>{label}</span>
-                    {badge ? (
-                      <span
-                        className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold ${
-                          isActive ? "bg-black/15 text-primary-foreground" : "bg-red-500 text-white"
-                        }`}
-                      >
-                        {badge}
+              <SidebarMenuItem key={to}>
+                <NavLink to={to}>
+                  {({ isActive }) => (
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className="h-11 rounded-xl px-3 text-sm text-muted-foreground data-[active=true]:bg-primary data-[active=true]:text-primary-foreground hover:bg-white/5 hover:text-foreground"
+                    >
+                      <span>
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                        {badge ? (
+                          <SidebarMenuBadge className={isActive ? "rounded-full bg-black/15 px-1 text-primary-foreground" : "rounded-full bg-red-500 px-1 text-white"}>
+                            {badge}
+                          </SidebarMenuBadge>
+                        ) : null}
                       </span>
-                    ) : null}
-                  </>
-                )}
-              </NavLink>
+                    </SidebarMenuButton>
+                  )}
+                </NavLink>
+              </SidebarMenuItem>
             ))}
-          </nav>
-        </div>
-      </div>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      <div className="space-y-4 border-t border-white/8 pt-4">
+      <SidebarFooter className="border-t border-white/8 px-4 py-4">
         <div className="flex items-center gap-3">
           <Avatar name="Karim El-Nour" size="md" />
           <div className="min-w-0">
@@ -64,7 +77,7 @@ export function DesktopSidebar() {
           <LogOut className="h-4 w-4" />
           Log out
         </button>
-      </div>
-    </aside>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

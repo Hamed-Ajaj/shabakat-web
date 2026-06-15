@@ -1,13 +1,10 @@
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { SidebarTrigger } from "../../components/ui/sidebar";
 import { routeTitles } from "../../shared/data/mockData";
 import { Avatar } from "../../shared/components/Avatar";
 
-export interface TopNavigationProps {
-  onMenuClick: () => void;
-}
-
-export function TopNavigation({ onMenuClick }: Readonly<TopNavigationProps>) {
+export function TopNavigation() {
   const location = useLocation();
   const current = routeTitles[location.pathname] ?? routeTitles["/dashboard"];
 
@@ -16,13 +13,7 @@ export function TopNavigation({ onMenuClick }: Readonly<TopNavigationProps>) {
       className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-white/8 bg-background/85 px-4 backdrop-blur-xl md:px-6"
       style={{ borderColor: "var(--border)" }}
     >
-      <button
-        onClick={onMenuClick}
-        className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground md:hidden"
-        aria-label="Open navigation"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      <SidebarTrigger className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground md:hidden" />
 
       <div className="min-w-0">
         <h1 className="truncate text-base font-semibold text-foreground">{current.title}</h1>

@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowRight, ShieldCheck } from "lucide-react";
+import { AlertCircle, ArrowRight } from "lucide-react";
 import { FormEvent, useState, useTransition } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../providers/AuthProvider";
