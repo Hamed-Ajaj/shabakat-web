@@ -4,6 +4,7 @@ import { AppShell } from "../shell/AppShell";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
+const AreasPage = lazy(() => import("../features/areas/pages/AreasPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
 const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
@@ -43,6 +44,7 @@ export function AppRoutes() {
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/areas" element={<AreasPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/settings" element={<SettingsPage />} />

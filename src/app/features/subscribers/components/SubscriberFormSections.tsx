@@ -17,14 +17,15 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
-import type { AreaOption, LookupOption } from "../subscribersApi";
+import type { AreaRecord } from "../../areas/types";
+import type { LookupOption } from "../subscribersApi";
 import type {
   CreateSubscriberFormInput,
   CreateSubscriberFormValues,
 } from "../schema";
 
 interface SubscriberDetailsSectionProps {
-  areas: AreaOption[];
+  areas: AreaRecord[];
   customerRelations: LookupOption[];
   customerTypes: LookupOption[];
   form: UseFormReturn<

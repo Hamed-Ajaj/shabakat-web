@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
+import { useAreasQuery } from "../../areas/queries";
 import { mapFormValuesToSubscriberPayload, mapSubscriberDetailToFormInput } from "../formMappers";
-import { useSubscriberAreasQuery, useSubscriberDetailQuery } from "../queries";
+import { useSubscriberDetailQuery } from "../queries";
 import { useUpdateSubscriberMutation } from "../mutations";
 import { defaultSubscriberFormValues, type CreateSubscriberFormInput, type CreateSubscriberFormValues } from "../schema";
 import { SubscriberFormSheet } from "./SubscriberFormSheet";
@@ -18,7 +19,7 @@ export function EditSubscriberSheet({
   onOpenChange,
 }: Readonly<EditSubscriberSheetProps>) {
   const detailQuery = useSubscriberDetailQuery(subscriberId ?? undefined);
-  const areasQuery = useSubscriberAreasQuery();
+  const areasQuery = useAreasQuery();
   const updateSubscriber = useUpdateSubscriberMutation(subscriberId ?? "");
 
   const initialValues = useMemo<CreateSubscriberFormInput>(() => {

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
+import { useAreasQuery } from "../../areas/queries";
 import { CreateSubscriberSheet } from "../components/CreateSubscriberSheet";
 import { DeleteSubscriberDialog } from "../components/DeleteSubscriberDialog";
 import { EditSubscriberSheet } from "../components/EditSubscriberSheet";
@@ -7,7 +8,6 @@ import { SubscriberDetailsSheet } from "../components/SubscriberDetailsSheet";
 import { SubscribersTable } from "../components/SubscribersTable";
 import { SubscribersToolbar } from "../components/SubscribersToolbar";
 import {
-  useSubscriberAreasQuery,
   useSubscribersQuery,
 } from "../queries";
 import type {
@@ -54,7 +54,7 @@ export default function SubscribersPage() {
     isFetching,
     isLoading,
   } = useSubscribersQuery(filters);
-  const areasQuery = useSubscriberAreasQuery();
+  const areasQuery = useAreasQuery();
   const canDelete = session?.role === "Owner" || session?.role === "Admin";
   const subscribers = subscribersPage?.data ?? [];
 

@@ -34,13 +34,6 @@ interface PagedResponse<TData> {
   hasNextPage: boolean;
 }
 
-export interface AreaOption {
-  id: string;
-  name: string;
-  customerCount: number;
-  createdAt: string;
-}
-
 export interface LookupOption {
   value: number;
   label: string;
@@ -126,10 +119,6 @@ export async function fetchSubscribers(
     pageSize: response.pageSize,
     totalCount: response.totalCount,
   };
-}
-
-export function fetchAreas(token: string) {
-  return apiRequest<AreaOption[]>("/api/v1/areas", undefined, token);
 }
 
 export function fetchCustomerTypes(token: string) {
