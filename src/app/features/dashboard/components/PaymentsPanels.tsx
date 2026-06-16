@@ -64,7 +64,7 @@ export function UpcomingDuePanel() {
         ))}
       </div>
 
-      <LinkButton to="/notifications">Send reminders</LinkButton>
+      <LinkButton to="/settings">Send reminders</LinkButton>
     </SectionCard>
   );
 }

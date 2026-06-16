@@ -1,12 +1,26 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Avatar } from "../../../shared/components/Avatar";
 import { StatusBadge } from "../../../shared/components/StatusBadge";
-import type { Subscriber } from "../../../shared/types/domain";
+import type { SubscriberRow } from "../types";
+import { SubscriberRowActions } from "./SubscriberRowActions";
 
-const columnHelper = createColumnHelper<Subscriber>();
+const columnHelper = createColumnHelper<SubscriberRow>();
 
-export const subscriberColumns = [
+interface SubscriberColumnsOptions {
+  canDelete: boolean;
+  onDelete: (subscriber: SubscriberRow) => void;
+  onEdit: (subscriber: SubscriberRow) => void;
+  onView: (subscriber: SubscriberRow) => void;
+}
+
+export function createSubscriberColumns({
+  canDelete,
+  onDelete,
+  onEdit,
+  onView,
+}: Readonly<SubscriberColumnsOptions>) {
+  return [
   columnHelper.accessor("name", {
     header: ({ column }) => (
       <button className="inline-flex items-center gap-1" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -29,8 +43,8 @@ export const subscriberColumns = [
     header: "Area",
     cell: (info) => <span className="text-sm text-foreground">{info.getValue()}</span>,
   }),
-  columnHelper.accessor("ampere", {
-    header: "Ampere",
+  columnHelper.accessor("planLabel", {
+    header: "Plan",
     cell: (info) => <span className="font-mono text-sm font-bold text-primary">{info.getValue()}</span>,
   }),
   columnHelper.accessor("subscriptionDate", {
@@ -41,22 +55,26 @@ export const subscriberColumns = [
     header: "Status",
     cell: (info) => <StatusBadge status={info.getValue()} />,
   }),
-  columnHelper.accessor("amount", {
+  columnHelper.accessor("amountDue", {
     header: ({ column }) => (
       <button className="inline-flex items-center gap-1" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        Amount
+        Amount Due
         <ArrowUpDown className="h-3.5 w-3.5" />
       </button>
     ),
-    cell: (info) => <span className="font-mono text-sm font-semibold text-foreground">${info.getValue()}</span>,
+    cell: (info) => <span className="font-mono text-sm font-semibold text-foreground">${info.getValue().toLocaleString()}</span>,
   }),
   columnHelper.display({
     id: "actions",
     header: "",
-    cell: () => (
-      <button className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground" aria-label="More actions">
-        <MoreHorizontal className="h-4 w-4" />
-      </button>
+    cell: ({ row }) => (
+      <SubscriberRowActions
+        canDelete={canDelete}
+        onDelete={() => onDelete(row.original)}
+        onEdit={() => onEdit(row.original)}
+        onView={() => onView(row.original)}
+      />
     ),
   }),
 ];
+}

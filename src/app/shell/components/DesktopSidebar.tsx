@@ -19,7 +19,10 @@ import { AppLogo } from "../../shared/components/AppLogo";
 import { Avatar } from "../../shared/components/Avatar";
 
 export function DesktopSidebar() {
-  const { logout } = useAuth();
+  const { logout, session } = useAuth();
+  const displayName = session?.fullName ?? "Workspace User";
+  const displayRole = session?.role ?? "Member";
+  const displayCompany = session?.companyName ?? "Shabakat";
 
   return (
     <Sidebar>
@@ -64,10 +67,10 @@ export function DesktopSidebar() {
 
       <SidebarFooter className="border-t border-white/8 px-4 py-4">
         <div className="flex items-center gap-3">
-          <Avatar name="Karim El-Nour" size="md" />
+          <Avatar name={displayName} size="md" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">Karim El-Nour</p>
-            <p className="text-xs text-muted-foreground">Owner · Hamra</p>
+            <p className="truncate text-sm font-medium text-foreground">{displayName}</p>
+            <p className="truncate text-xs text-muted-foreground">{displayRole} · {displayCompany}</p>
           </div>
         </div>
         <button
