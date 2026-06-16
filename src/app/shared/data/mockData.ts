@@ -1,4 +1,4 @@
-import { FileText, LayoutDashboard, Settings, Users } from "lucide-react";
+import { FileText, LayoutDashboard, MapPinned, Settings, Users } from "lucide-react";
 import type { NavigationItem, RevenuePoint, Subscriber } from "../types/domain";
 
 export const subscribers: Subscriber[] = [
@@ -30,6 +30,7 @@ export const revenueData: RevenuePoint[] = [
 
 export const navigationItems: NavigationItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/areas", label: "Areas", icon: MapPinned },
   { to: "/subscribers", label: "Subscribers", icon: Users },
   { to: "/invoices", label: "Invoices", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -37,6 +38,7 @@ export const navigationItems: NavigationItem[] = [
 
 export const routeTitles: Record<string, { title: string; subtitle: string }> = {
   "/dashboard": { title: "Dashboard", subtitle: "Operations snapshot for El-Nour Generators" },
+  "/areas": { title: "Areas", subtitle: "Organize subscriber groups and manage area assignments" },
   "/subscribers": { title: "Subscribers", subtitle: "Search, sort, and manage monthly accounts" },
   "/invoices": { title: "Invoices", subtitle: "Generate printable billing statements" },
   "/settings": { title: "Settings", subtitle: "Preferences, pricing, and notification defaults" },

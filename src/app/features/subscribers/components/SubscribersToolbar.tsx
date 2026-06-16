@@ -6,12 +6,12 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
-import type { AreaOption } from "../subscribersApi";
+import type { AreaRecord } from "../../areas/types";
 import type { SubscriberSearchField } from "../types";
 
 export interface SubscribersToolbarProps {
   areaId: string;
-  areas: AreaOption[];
+  areas: AreaRecord[];
   isFetching: boolean;
   searchField: SubscriberSearchField;
   searchTerm: string;

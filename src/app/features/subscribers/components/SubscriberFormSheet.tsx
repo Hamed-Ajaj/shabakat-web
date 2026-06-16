@@ -15,11 +15,11 @@ import {
   SheetTitle,
 } from "../../../components/ui/sheet";
 import {
-  useSubscriberAreasQuery,
   useSubscriberCustomerRelationsQuery,
   useSubscriberCustomerTypesQuery,
   useSubscriberPlanTypesQuery,
 } from "../queries";
+import { useAreasQuery } from "../../areas/queries";
 import {
   createSubscriberSchema,
   defaultSubscriberFormValues,
@@ -66,7 +66,7 @@ export function SubscriberFormSheet({
     resolver: standardSchemaResolver(createSubscriberSchema),
     values: initialValues,
   });
-  const areasQuery = useSubscriberAreasQuery();
+  const areasQuery = useAreasQuery();
   const customerTypesQuery = useSubscriberCustomerTypesQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
