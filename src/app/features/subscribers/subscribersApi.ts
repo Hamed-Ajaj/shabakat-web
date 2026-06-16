@@ -2,6 +2,8 @@ import { apiRequest } from "../../shared/api/client";
 import type {
   SubscriberBillingStatus,
   SubscriberDetail,
+  SubscribersPageData,
+  SubscribersQueryFilters,
   SubscriberRow,
 } from "./types";
 
@@ -91,45 +93,39 @@ interface CustomerDetailResponse {
   paidThisMonth: boolean;
 }
 
-async function fetchAllCustomers(token: string) {
-  const pageSize = 100;
-  let pageNumber = 1;
-  let hasNextPage = true;
-  const customers: CustomerSummaryResponse[] = [];
+export async function fetchSubscribers(
+  filters: SubscribersQueryFilters,
+  token: string,
+): Promise<SubscribersPageData> {
+  const params = new URLSearchParams({
+    pageNumber: String(filters.pageIndex + 1),
+    pageSize: String(filters.pageSize),
+  });
 
-  while (hasNextPage) {
-    const response = await apiRequest<PagedResponse<CustomerSummaryResponse>>(
-      `/api/v1/customers?pageNumber=${pageNumber}&pageSize=${pageSize}`,
-      undefined,
-      token,
-    );
-
-    customers.push(...response.data);
-    hasNextPage = response.hasNextPage;
-    pageNumber += 1;
+  const searchTerm = filters.searchTerm.trim();
+  if (searchTerm) {
+    params.set(filters.searchField, searchTerm);
   }
 
-  return customers;
-}
+  if (filters.areaId) {
+    params.set("areaId", filters.areaId);
+  }
 
-export async function fetchSubscribers(token: string): Promise<SubscriberRow[]> {
-  const customers = await fetchAllCustomers(token);
+  const response = await apiRequest<PagedResponse<CustomerSummaryResponse>>(
+    `/api/v1/customers?${params.toString()}`,
+    undefined,
+    token,
+  );
 
-  return customers.map((customer) => ({
-    id: customer.id,
-    name: customer.name,
-    phone: customer.phone || "Not set",
-    area: customer.areaName || "Unassigned",
-    planLabel:
-      customer.plan === "Ampere"
-        ? `${formatNumber(customer.planValue)} A`
-        : `${formatNumber(customer.planValue)} kW`,
-    subscriptionDate: formatDate(customer.subscriptionDate),
-    status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
-    amountDue: customer.amountDue,
-    customerStatus: customer.customerStatus,
-    customerType: customer.customerType,
-  }));
+  return {
+    data: response.data.map(mapCustomerSummaryToSubscriberRow),
+    hasNextPage: response.hasNextPage,
+    hasPreviousPage: response.hasPreviousPage,
+    pageCount: response.totalPages,
+    pageNumber: response.pageNumber,
+    pageSize: response.pageSize,
+    totalCount: response.totalCount,
+  };
 }
 
 export function fetchAreas(token: string) {
@@ -247,6 +243,24 @@ function formatDate(value: string) {
     month: "short",
     year: "numeric",
   }).format(date);
+}
+
+function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): SubscriberRow {
+  return {
+    id: customer.id,
+    name: customer.name,
+    phone: customer.phone || "Not set",
+    area: customer.areaName || "Unassigned",
+    planLabel:
+      customer.plan === "Ampere"
+        ? `${formatNumber(customer.planValue)} A`
+        : `${formatNumber(customer.planValue)} kW`,
+    subscriptionDate: formatDate(customer.subscriptionDate),
+    status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
+    amountDue: customer.amountDue,
+    customerStatus: customer.customerStatus,
+    customerType: customer.customerType,
+  };
 }
 
 function formatDateTime(value: string) {

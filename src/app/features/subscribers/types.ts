@@ -1,5 +1,7 @@
 export type SubscriberBillingStatus = "paid" | "unpaid" | "overdue";
 
+export type SubscriberSearchField = "name" | "phone";
+
 export interface SubscriberRow {
   id: string;
   name: string;
@@ -36,4 +38,22 @@ export interface SubscriberDetail {
   totalPaid: number;
   totalOutstanding: number;
   paidThisMonth: boolean;
+}
+
+export interface SubscribersQueryFilters {
+  areaId: string;
+  pageIndex: number;
+  pageSize: number;
+  searchField: SubscriberSearchField;
+  searchTerm: string;
+}
+
+export interface SubscribersPageData {
+  data: SubscriberRow[];
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  pageCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
 }

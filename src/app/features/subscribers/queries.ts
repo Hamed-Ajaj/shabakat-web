@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../providers/AuthProvider";
 import {
   fetchAreas,
@@ -8,10 +8,12 @@ import {
   fetchSubscriberDetail,
   fetchSubscribers,
 } from "./subscribersApi";
+import type { SubscribersQueryFilters } from "./types";
 
 export const subscriberQueryKeys = {
   all: ["subscribers"] as const,
-  company: (companyId?: string) => ["subscribers", companyId] as const,
+  company: (companyId?: string, filters?: SubscribersQueryFilters) =>
+    ["subscribers", companyId, filters] as const,
   detail: (id?: string) => ["subscriber-detail", id] as const,
   areas: (companyId?: string) => ["subscriber-areas", companyId] as const,
   customerTypes: ["subscriber-customer-types"] as const,
@@ -19,13 +21,14 @@ export const subscriberQueryKeys = {
   customerRelations: ["subscriber-customer-relations"] as const,
 };
 
-export function useSubscribersQuery() {
+export function useSubscribersQuery(filters: SubscribersQueryFilters) {
   const { session } = useAuth();
 
   return useQuery({
-    queryKey: subscriberQueryKeys.company(session?.companyId),
-    queryFn: () => fetchSubscribers(session?.token ?? ""),
+    queryKey: subscriberQueryKeys.company(session?.companyId, filters),
+    queryFn: () => fetchSubscribers(filters, session?.token ?? ""),
     enabled: Boolean(session?.token),
+    placeholderData: keepPreviousData,
   });
 }
 

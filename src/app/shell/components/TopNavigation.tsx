@@ -1,4 +1,4 @@
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "../../components/ui/sidebar";
 import { useAuth } from "../../providers/AuthProvider";
@@ -18,8 +18,12 @@ export function TopNavigation() {
       <SidebarTrigger className="rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground md:hidden" />
 
       <div className="min-w-0">
-        <h1 className="truncate text-base font-semibold text-foreground">{current.title}</h1>
-        <p className="hidden text-xs text-muted-foreground sm:block">{current.subtitle}</p>
+        <h1 className="truncate text-base font-semibold text-foreground">
+          {current.title}
+        </h1>
+        <p className="hidden text-xs text-muted-foreground sm:block">
+          {current.subtitle}
+        </p>
       </div>
 
       <div className="ml-auto flex items-center gap-2">
@@ -31,10 +35,6 @@ export function TopNavigation() {
             className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pl-9 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
-        <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground" aria-label="Notifications">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />
-        </button>
         <Avatar name={session?.fullName ?? "Workspace User"} />
       </div>
     </header>
