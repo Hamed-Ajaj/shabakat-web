@@ -1,14 +1,19 @@
 import { Bell, CalendarDays, CirclePercent, Languages, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
 import packageJson from "../../../../../package.json";
 import { useSettings } from "../../../providers/SettingsProvider";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { NotificationToggleRow } from "../components/NotificationToggleRow";
 import { SettingRowLink } from "../components/SettingRowLink";
 import { SettingsSection } from "../components/SettingsSection";
 import { ThemeSelector } from "../components/ThemeSelector";
+import { useCompanyPreferencesQuery } from "../queries";
+import { getLanguageLabel } from "../settingsMeta";
 
 export default function SettingsPage() {
   const { preferences, resolvedTheme, updateNotification } = useSettings();
-  const triggerDateLabel = `${preferences.triggerDate}${getOrdinal(preferences.triggerDate)} of month`;
+  const preferencesQuery = useCompanyPreferencesQuery();
+  const companyPreferences = preferencesQuery.data;
+  const triggerDateLabel = companyPreferences ? `${companyPreferences.triggerDate}${getOrdinal(companyPreferences.triggerDate)} of month` : undefined;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -28,13 +33,21 @@ export default function SettingsPage() {
       </SettingsSection>
 
       <SettingsSection title="Company Preferences">
-        <SettingRowLink to="/settings/pricing/price-per-kilowatt" icon={<Zap className="h-4 w-4" />} label="Price per Kilowatt" value={`${preferences.pricing.pricePerKilowat.base}`} />
-        <SettingRowLink to="/settings/pricing/price-per-amp" icon={<Zap className="h-4 w-4" />} label="Price per Amp" value={`${preferences.pricing.pricePerAmp.base}`} />
-        <SettingRowLink to="/settings/pricing/fixed-charge" icon={<Wallet className="h-4 w-4" />} label="Fixed Charge" value={`${preferences.pricing.fixedCharge.base}`} />
-        <SettingRowLink to="/settings/pricing/tva" icon={<CirclePercent className="h-4 w-4" />} label="TVA (%)" value={`${preferences.pricing.tva.base}%`} />
-        <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label="Language" value={preferences.language} />
-        <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label="Trigger Date" value={triggerDateLabel} />
-        <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label="Trigger Message" value={preferences.triggerMessage || "Not set"} />
+        {preferencesQuery.isLoading ? (
+          <SettingsLoadingRows />
+        ) : preferencesQuery.error instanceof Error ? (
+          <div className="px-4 py-4 text-sm text-red-300">{preferencesQuery.error.message}</div>
+        ) : (
+          <>
+            <SettingRowLink to="/settings/pricing/price-per-kilowatt" icon={<Zap className="h-4 w-4" />} label="Price per Kilowatt" value={companyPreferences ? `${companyPreferences.pricing.pricePerKilowat.base}` : "Not configured"} />
+            <SettingRowLink to="/settings/pricing/price-per-amp" icon={<Zap className="h-4 w-4" />} label="Price per Amp" value={companyPreferences ? `${companyPreferences.pricing.pricePerAmp.base}` : "Not configured"} />
+            <SettingRowLink to="/settings/pricing/fixed-charge" icon={<Wallet className="h-4 w-4" />} label="Fixed Charge" value={companyPreferences ? `${companyPreferences.pricing.fixedCharge.base}` : "Not configured"} />
+            <SettingRowLink to="/settings/pricing/tva" icon={<CirclePercent className="h-4 w-4" />} label="TVA (%)" value={companyPreferences ? `${companyPreferences.pricing.tva.base}%` : "Not configured"} />
+            <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label="Language" value={companyPreferences ? getLanguageLabel(companyPreferences.language) : "Not configured"} />
+            <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label="Trigger Date" value={triggerDateLabel ?? "Not configured"} />
+            <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label="Trigger Message" value={companyPreferences?.triggerMessage || "Not set"} />
+          </>
+        )}
       </SettingsSection>
 
       <SettingsSection title="Notifications">
@@ -74,6 +87,19 @@ export default function SettingsPage() {
       </SettingsSection>
     </div>
   );
+}
+
+function SettingsLoadingRows() {
+  return Array.from({ length: 7 }).map((_, index) => (
+    <div key={index} className="flex items-center gap-3 border-b border-black/5 px-4 py-4 last:border-b-0 dark:border-white/8">
+      <Skeleton className="h-8 w-8 rounded-full" />
+      <div className="min-w-0 flex-1">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="mt-2 h-3 w-28" />
+      </div>
+      <Skeleton className="h-4 w-4" />
+    </div>
+  ));
 }
 
 function getOrdinal(day: number) {

@@ -1,4 +1,4 @@
-import { apiRequest } from "../../shared/api/client";
+import { apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
 import { formatDate, formatDateTime } from "./utils";
 import type {
   InvoiceCustomerOption,
@@ -224,6 +224,21 @@ export function deleteInvoice(id: string, token: string) {
     },
     token,
   );
+}
+
+export async function fetchPrintableInvoiceHtml(id: string, token: string) {
+  const response = await fetch(`${apiBaseUrl}/api/v1/invoices/print/${id}`, {
+    headers: {
+      Accept: "text/html",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw await toApiErrorResponse(response);
+  }
+
+  return response.text();
 }
 
 function mapInvoiceRow(invoice: InvoiceSummaryResponse): InvoiceRow {

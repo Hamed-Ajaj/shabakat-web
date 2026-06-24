@@ -13,8 +13,8 @@ import { RecordPaymentDialog } from "../components/RecordPaymentDialog";
 import { DeleteInvoiceDialog } from "../components/DeleteInvoiceDialog";
 import type { InvoiceRow, InvoiceStatus } from "../types";
 import { useInvoiceCustomerOptionsQuery, invoiceQueryKeys } from "../queries";
-import { fetchInvoiceDetail } from "../invoicesApi";
-import { printInvoice } from "../utils";
+import { fetchPrintableInvoiceHtml } from "../invoicesApi";
+import { printInvoiceHtml } from "../utils";
 
 type InvoiceDialogMode = "bulk" | "create" | "delete" | "pay" | "view" | null;
 
@@ -58,20 +58,20 @@ export default function InvoicesPage() {
 
   async function handlePrint(invoice: InvoiceRow) {
     try {
-      if (!session?.companyName || !session?.token) {
+      if (!session?.token) {
         throw new Error("You must be logged in to print invoices.");
       }
 
-      const detail = await queryClient.fetchQuery({
-        queryKey: invoiceQueryKeys.detail(invoice.id),
-        queryFn: () => fetchInvoiceDetail(invoice.id, session.token),
+      const html = await queryClient.fetchQuery({
+        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html"],
+        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token),
       });
 
-      if (!detail) {
-        throw new Error("Invoice details are unavailable for printing.");
+      if (!html) {
+        throw new Error("Printable invoice HTML is unavailable.");
       }
 
-      printInvoice(detail, session.companyName);
+      printInvoiceHtml(html);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to print invoice.");
     }

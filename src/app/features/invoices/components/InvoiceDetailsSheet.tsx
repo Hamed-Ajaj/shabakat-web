@@ -5,8 +5,10 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../../../components/ui/sheet";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useAuth } from "../../../providers/AuthProvider";
-import { useInvoiceDetailQuery } from "../queries";
-import { formatCurrency, printInvoice } from "../utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchPrintableInvoiceHtml } from "../invoicesApi";
+import { invoiceQueryKeys, useInvoiceDetailQuery } from "../queries";
+import { formatCurrency, printInvoiceHtml } from "../utils";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 
 interface InvoiceDetailsSheetProps {
@@ -23,16 +25,26 @@ export function InvoiceDetailsSheet({
   onPayClick,
 }: Readonly<InvoiceDetailsSheetProps>) {
   const { session } = useAuth();
+  const queryClient = useQueryClient();
   const detailQuery = useInvoiceDetailQuery(invoiceId ?? undefined);
   const invoice = detailQuery.data;
 
-  function handlePrint() {
-    if (!invoice || !session?.companyName) {
+  async function handlePrint() {
+    if (!invoice || !session?.token) {
       return;
     }
 
     try {
-      printInvoice(invoice, session.companyName);
+      const html = await queryClient.fetchQuery({
+        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html"],
+        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token),
+      });
+
+      if (!html) {
+        throw new Error("Printable invoice HTML is unavailable.");
+      }
+
+      printInvoiceHtml(html);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Unable to print invoice.");
     }
