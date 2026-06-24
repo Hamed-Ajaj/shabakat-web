@@ -55,7 +55,7 @@ export async function apiRequest<TResponse>(
   return (await response.json()) as TResponse;
 }
 
-async function toApiError(response: Response) {
+export async function toApiErrorResponse(response: Response) {
   let payload: ProblemDetails | undefined;
 
   try {
@@ -73,4 +73,8 @@ async function toApiError(response: Response) {
     response.status,
     payload?.errors,
   );
+}
+
+async function toApiError(response: Response) {
+  return toApiErrorResponse(response);
 }
