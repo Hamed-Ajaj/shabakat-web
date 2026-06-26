@@ -1,4 +1,4 @@
-import { FileText, LayoutDashboard, MapPinned, Settings, Users } from "lucide-react";
+import { FileText, LayoutDashboard, MapPinned, Settings, Users, Wallet } from "lucide-react";
 import type { NavigationItem, RevenuePoint, Subscriber } from "../types/domain";
 
 export const subscribers: Subscriber[] = [
@@ -33,6 +33,7 @@ export const navigationItems: NavigationItem[] = [
   { to: "/areas", label: "Areas", icon: MapPinned },
   { to: "/subscribers", label: "Subscribers", icon: Users },
   { to: "/invoices", label: "Invoices", icon: FileText },
+  { to: "/expenses", label: "Expenses", icon: Wallet },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -41,6 +42,7 @@ export const routeTitles: Record<string, { title: string; subtitle: string }> = 
   "/areas": { title: "Areas", subtitle: "Organize subscriber groups and manage area assignments" },
   "/subscribers": { title: "Subscribers", subtitle: "Search, sort, and manage monthly accounts" },
   "/invoices": { title: "Invoices", subtitle: "Generate printable billing statements" },
+  "/expenses": { title: "Expenses", subtitle: "Track fuel, maintenance, payroll, and other operating costs" },
   "/settings": { title: "Settings", subtitle: "Preferences, pricing, and notification defaults" },
   "/settings/pricing/price-per-kilowatt": { title: "Price per Kilowatt", subtitle: "Edit default and customer-type kilowatt pricing" },
   "/settings/pricing/price-per-amp": { title: "Price per Amp", subtitle: "Edit default and customer-type amp pricing" },
