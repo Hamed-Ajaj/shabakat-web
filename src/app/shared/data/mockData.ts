@@ -51,4 +51,5 @@ export const routeTitles: Record<string, { title: string; subtitle: string }> = 
   "/settings/trigger-date": { title: "Trigger Date", subtitle: "Choose the billing reminder day of month" },
   "/settings/trigger-message": { title: "Trigger Message", subtitle: "Update the default billing reminder copy" },
   "/settings/language": { title: "Language", subtitle: "Set the notification language" },
+  "/settings/whatsapp": { title: "WhatsApp Connection", subtitle: "Manage QR pairing and live Evolution API session state" },
 };
