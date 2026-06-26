@@ -19,6 +19,7 @@ interface GetPreferencesResponse {
   industrialFixedCharge: number;
   industrialTVA: number;
   language: "en" | "ar";
+  dueDate: number;
   triggerDate: number;
   triggerMessage: string | null;
 }
@@ -79,6 +80,7 @@ export function mapPreferencesToPayload(preferences: CompanyPreferences): Compan
     industrialFixedCharge: preferences.pricing.fixedCharge.industrial,
     industrialTVA: preferences.pricing.tva.industrial,
     language: preferences.language,
+    dueDate: preferences.dueDate,
     triggerDate: preferences.triggerDate,
     triggerMessage: preferences.triggerMessage.trim() ? preferences.triggerMessage.trim() : null,
   };
@@ -87,6 +89,7 @@ export function mapPreferencesToPayload(preferences: CompanyPreferences): Compan
 export function mapPreferencesResponse(response: GetPreferencesResponse): CompanyPreferences {
   return {
     language: response.language,
+    dueDate: response.dueDate,
     triggerDate: response.triggerDate,
     triggerMessage: response.triggerMessage ?? "",
     pricing: {
