@@ -2,6 +2,7 @@ import type { CompanyPreferences } from "./types";
 
 export const defaultCompanyPreferences: CompanyPreferences = {
   language: "en",
+  dueDate: 31,
   triggerDate: 1,
   triggerMessage: "",
   pricing: {

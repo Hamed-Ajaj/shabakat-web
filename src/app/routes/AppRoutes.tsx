@@ -7,6 +7,7 @@ const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPa
 const AreasPage = lazy(() => import("../features/areas/pages/AreasPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
+const ExpensesPage = lazy(() => import("../features/expenses/pages/ExpensesPage"));
 const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
 const PricingSettingPage = lazy(() => import("../features/settings/pages/PricingSettingPage"));
 const TriggerMessagePage = lazy(() => import("../features/settings/pages/TriggerMessagePage"));
@@ -47,6 +48,7 @@ export function AppRoutes() {
           <Route path="/areas" element={<AreasPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/pricing/:field" element={<PricingSettingPage />} />
           <Route path="/settings/trigger-date" element={<TriggerDatePage />} />

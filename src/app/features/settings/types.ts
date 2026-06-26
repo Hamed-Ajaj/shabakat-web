@@ -13,6 +13,7 @@ export interface PricingValues {
 
 export interface CompanyPreferences {
   language: CompanyLanguage;
+  dueDate: number;
   triggerDate: number;
   triggerMessage: string;
   pricing: Record<PricingField, PricingValues>;
@@ -36,6 +37,7 @@ export interface CompanyPreferencesPayload {
   industrialFixedCharge: number;
   industrialTVA: number;
   language: CompanyLanguage;
+  dueDate: number;
   triggerDate: number;
   triggerMessage: string | null;
 }
