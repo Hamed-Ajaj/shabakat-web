@@ -13,6 +13,7 @@ const PricingSettingPage = lazy(() => import("../features/settings/pages/Pricing
 const TriggerMessagePage = lazy(() => import("../features/settings/pages/TriggerMessagePage"));
 const TriggerDatePage = lazy(() => import("../features/settings/pages/TriggerDatePage"));
 const LanguageSettingPage = lazy(() => import("../features/settings/pages/LanguageSettingPage"));
+const WhatsAppConnectionPage = lazy(() => import("../features/settings/pages/WhatsAppConnectionPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 
 function ShellLayout() {
@@ -54,6 +55,7 @@ export function AppRoutes() {
           <Route path="/settings/trigger-date" element={<TriggerDatePage />} />
           <Route path="/settings/trigger-message" element={<TriggerMessagePage />} />
           <Route path="/settings/language" element={<LanguageSettingPage />} />
+          <Route path="/settings/whatsapp" element={<WhatsAppConnectionPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
