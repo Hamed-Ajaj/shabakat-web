@@ -10,11 +10,11 @@ const chartColors = ["#f5c000", "#22c55e", "#fb7185", "#60a5fa", "#c084fc"];
 
 export function RevenueChartCard({ summary }: Readonly<RevenueChartCardProps>) {
   const chartData = [
-    { label: "Billed", value: summary.totalBilledThisMonth },
-    { label: "Collected", value: summary.totalCollectedThisMonth },
+    { label: "Billed", value: summary.totalBilledAllTime },
+    { label: "Collected", value: summary.totalCollectedAllTime },
     { label: "Outstanding", value: summary.totalOutstandingAllTime },
-    { label: "Expenses", value: summary.totalExpensesThisMonth },
-    { label: "Net", value: summary.netIncomeThisMonth },
+    { label: "Expenses", value: summary.totalExpensesAllTime },
+    { label: "Net", value: summary.netIncomeAllTime },
   ];
 
   const expenseData = [
@@ -28,8 +28,8 @@ export function RevenueChartCard({ summary }: Readonly<RevenueChartCardProps>) {
     <SectionCard className="p-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Monthly Finance Snapshot</h2>
-          <p className="text-xs text-muted-foreground">Live billing, collection, expense, and net totals for current month.</p>
+          <h2 className="text-lg font-semibold text-foreground">Finance Snapshot</h2>
+          <p className="text-xs text-muted-foreground">All-time billing, collection, expense, and net totals for the current company.</p>
         </div>
         <div className="flex items-center gap-5 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Revenue vs cash flow</span>

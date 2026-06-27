@@ -1,5 +1,6 @@
 export type InvoiceStatus = "Unpaid" | "PartiallyPaid" | "Paid";
 export type PaymentMethod = "Cash" | "Wish";
+export type InvoiceCustomerPlan = "Ampere" | "Kilowatt" | "FixedKilowatt";
 
 export interface InvoiceRow {
   id: string;
@@ -53,6 +54,7 @@ export interface InvoiceDetail {
 export interface InvoiceCustomerOption {
   id: string;
   name: string;
+  plan: InvoiceCustomerPlan;
 }
 
 export interface InvoicesQueryFilters {

@@ -2,6 +2,7 @@ import { apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/cli
 import { formatDate, formatDateTime } from "./utils";
 import type {
   InvoiceCustomerOption,
+  InvoiceCustomerPlan,
   InvoiceDetail,
   InvoicePayment,
   InvoicesPageData,
@@ -56,6 +57,7 @@ interface PagedResponse<T> {
 interface CustomerSummaryResponse {
   id: string;
   name: string;
+  plan: InvoiceCustomerPlan;
 }
 
 interface MessageResponse {
@@ -70,6 +72,9 @@ interface BulkCreateInvoiceResponse {
 
 export interface CreateInvoicePayload {
   customerId: string;
+  notes?: string;
+  paymentAmount?: number;
+  paymentMethod?: PaymentMethod;
 }
 
 export interface RecordPaymentPayload {
@@ -157,6 +162,7 @@ export async function fetchInvoiceCustomerOptions(token: string): Promise<Invoic
   return response.data.map((customer) => ({
     id: customer.id,
     name: customer.name,
+    plan: customer.plan,
   }));
 }
 

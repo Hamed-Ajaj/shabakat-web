@@ -151,7 +151,9 @@ export function SubscriberDetailsSection({
         helperText={
           selectedPlan === "Ampere"
             ? "Contracted amperes for prepaid billing."
-            : "Contracted kilowatt reading plan."
+            : selectedPlan === "FixedKilowatt"
+              ? "Prepaid counter plan handled through invoice top-ups."
+              : "Monthly meter-based kilowatt plan."
         }
         label="Plan Value"
         name="planValue"

@@ -55,9 +55,9 @@ export default function DashboardPage() {
               accentClassName="text-foreground"
             />
             <MetricCard
-              label="Collected This Month"
-              value={formatCurrency(summaryQuery.data.totalCollectedThisMonth)}
-              hint={`${summaryQuery.data.collectionRate.toFixed(0)}% of ${formatCurrency(summaryQuery.data.totalBilledThisMonth)}`}
+              label="Collected All Time"
+              value={formatCurrency(summaryQuery.data.totalCollectedAllTime)}
+              hint={`${summaryQuery.data.collectionRate.toFixed(0)}% of ${formatCurrency(summaryQuery.data.totalBilledAllTime)}`}
               icon={UserCheck}
               accentClassName="text-emerald-400"
             />
@@ -72,8 +72,8 @@ export default function DashboardPage() {
             <SectionCard className="border-primary/30 bg-primary p-5 text-primary-foreground shadow-[0_0_30px_rgba(245,192,0,0.18)]">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-foreground/70">Net Income</p>
-                  <p className="mt-2 font-mono text-3xl font-bold">{formatCurrency(summaryQuery.data.netIncomeThisMonth)}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-foreground/70">Net Income All Time</p>
+                  <p className="mt-2 font-mono text-3xl font-bold">{formatCurrency(summaryQuery.data.netIncomeAllTime)}</p>
                   <p className="mt-1 flex items-center gap-1 text-xs text-primary-foreground/70">
                     <ArrowUpRight className="h-3 w-3" />
                     {formatCurrency(summaryQuery.data.totalOutstandingAllTime)} outstanding

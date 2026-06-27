@@ -45,7 +45,7 @@ export interface CreateSubscriberPayload {
   address?: string;
   areaId?: string;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   subscriptionDate?: string;
   customerRelation?: "Friend" | "Family" | "Owner" | "Other";
@@ -71,7 +71,7 @@ interface CustomerDetailResponse {
   phone: string | null;
   address: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   areaName: string | null;
   customerStatus: string;
@@ -243,7 +243,9 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     planLabel:
       customer.plan === "Ampere"
         ? `${formatNumber(customer.planValue)} A`
-        : `${formatNumber(customer.planValue)} kW`,
+        : customer.plan === "FixedKilowatt"
+          ? `${formatNumber(customer.planValue)} kW prepaid`
+          : `${formatNumber(customer.planValue)} kW`,
     subscriptionDate: formatDate(customer.subscriptionDate),
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,

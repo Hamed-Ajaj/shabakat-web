@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "../../../components/ui/dialog";
 import { Form } from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -38,14 +39,36 @@ export function CreateInvoiceDialog({
     resolver: standardSchemaResolver(createInvoiceSchema),
     defaultValues: {
       customerId: "",
+      customerPlan: undefined,
+      notes: "",
+      paymentAmount: Number.NaN,
+      paymentMethod: undefined,
     },
   });
+  const isFixedKilowatt = form.watch("customerPlan") === "FixedKilowatt";
 
   async function handleSubmit(values: CreateInvoiceFormValues) {
-    await createInvoice.mutateAsync(values.customerId);
+    await createInvoice.mutateAsync({
+      customerId: values.customerId,
+      notes: values.notes || undefined,
+      paymentAmount:
+        values.customerPlan === "FixedKilowatt"
+          ? values.paymentAmount
+          : undefined,
+      paymentMethod:
+        values.customerPlan === "FixedKilowatt"
+          ? values.paymentMethod
+          : undefined,
+    });
     toast.success("Invoice created successfully.");
     onOpenChange(false);
-    form.reset({ customerId: "" });
+    form.reset({
+      customerId: "",
+      customerPlan: undefined,
+      notes: "",
+      paymentAmount: Number.NaN,
+      paymentMethod: undefined,
+    });
   }
 
   return (
@@ -55,7 +78,13 @@ export function CreateInvoiceDialog({
         onOpenChange(nextOpen);
         if (!nextOpen) {
           createInvoice.reset();
-          form.reset({ customerId: "" });
+          form.reset({
+            customerId: "",
+            customerPlan: undefined,
+            notes: "",
+            paymentAmount: Number.NaN,
+            paymentMethod: undefined,
+          });
         }
       }}
     >
@@ -71,7 +100,25 @@ export function CreateInvoiceDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Customer</label>
-              <Select value={form.watch("customerId") || undefined} onValueChange={(value) => form.setValue("customerId", value, { shouldValidate: true })}>
+              <Select
+                value={form.watch("customerId") || undefined}
+                onValueChange={(value) => {
+                  const customer = (customersQuery.data ?? []).find(
+                    (item) => item.id === value,
+                  );
+
+                  form.setValue("customerId", value, { shouldValidate: true });
+                  form.setValue("customerPlan", customer?.plan, {
+                    shouldValidate: true,
+                  });
+
+                  if (customer?.plan !== "FixedKilowatt") {
+                    form.setValue("paymentAmount", Number.NaN);
+                    form.setValue("paymentMethod", undefined);
+                    form.setValue("notes", "");
+                  }
+                }}
+              >
                 <SelectTrigger className="rounded-xl border-white/8 bg-card">
                   <SelectValue placeholder={customersQuery.isLoading ? "Loading customers..." : "Select customer"} />
                 </SelectTrigger>
@@ -85,6 +132,61 @@ export function CreateInvoiceDialog({
               </Select>
               {form.formState.errors.customerId ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.customerId.message}</p> : null}
             </div>
+
+            {isFixedKilowatt ? (
+              <>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Payment Amount</label>
+                  <Input
+                    inputMode="decimal"
+                    step="0.01"
+                    type="number"
+                    {...form.register("paymentAmount")}
+                  />
+                  {form.formState.errors.paymentAmount ? (
+                    <p className="mt-2 text-sm text-red-300">
+                      {form.formState.errors.paymentAmount.message}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Payment Method</label>
+                  <Select
+                    value={form.watch("paymentMethod")}
+                    onValueChange={(value) =>
+                      form.setValue("paymentMethod", value as "Cash" | "Wish", {
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    <SelectTrigger className="rounded-xl border-white/8 bg-card">
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cash">Cash</SelectItem>
+                      <SelectItem value="Wish">Wish</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.paymentMethod ? (
+                    <p className="mt-2 text-sm text-red-300">
+                      {form.formState.errors.paymentMethod.message}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
+                  <Input
+                    placeholder="Counter payment"
+                    {...form.register("notes")}
+                  />
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    FixedKilowatt creates a paid invoice and credits kWh immediately.
+                  </p>
+                </div>
+              </>
+            ) : null}
 
             {customersQuery.error instanceof Error ? (
               <p className="text-sm text-red-300">{customersQuery.error.message}</p>

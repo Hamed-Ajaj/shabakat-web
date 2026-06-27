@@ -7,6 +7,7 @@ import {
   fetchSubscriberDetail,
   fetchSubscribers,
 } from "./subscribersApi";
+import { fetchMeterReadings } from "./meterReadingsApi";
 import type { SubscribersQueryFilters } from "./types";
 
 export const subscriberQueryKeys = {
@@ -17,6 +18,7 @@ export const subscriberQueryKeys = {
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
   customerRelations: ["subscriber-customer-relations"] as const,
+  meterReadings: (id?: string) => ["subscriber-meter-readings", id] as const,
 };
 
 export function useSubscribersQuery(filters: SubscribersQueryFilters) {
@@ -37,6 +39,16 @@ export function useSubscriberDetailQuery(id?: string) {
     queryKey: subscriberQueryKeys.detail(id),
     queryFn: () => fetchSubscriberDetail(id ?? "", session?.token ?? ""),
     enabled: Boolean(session?.token && id),
+  });
+}
+
+export function useSubscriberMeterReadingsQuery(id?: string, enabled = true) {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: subscriberQueryKeys.meterReadings(id),
+    queryFn: () => fetchMeterReadings(id ?? "", session?.token ?? ""),
+    enabled: Boolean(session?.token && id && enabled),
   });
 }
 
