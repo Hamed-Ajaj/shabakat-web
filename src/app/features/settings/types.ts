@@ -19,6 +19,11 @@ export interface CompanyPreferences {
   pricing: Record<PricingField, PricingValues>;
 }
 
+export interface CompanyProfile {
+  name: string;
+  logoUrl: string | null;
+}
+
 export interface CompanyPreferencesPayload {
   pricePerKilowat: number;
   pricePerAmp: number;

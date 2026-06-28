@@ -240,12 +240,7 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     name: customer.name,
     phone: customer.phone || "Not set",
     area: customer.areaName || "Unassigned",
-    planLabel:
-      customer.plan === "Ampere"
-        ? `${formatNumber(customer.planValue)} A`
-        : customer.plan === "FixedKilowatt"
-          ? `${formatNumber(customer.planValue)} kW prepaid`
-          : `${formatNumber(customer.planValue)} kW`,
+    planLabel: formatPlanLabel(customer.plan, customer.planValue),
     subscriptionDate: formatDate(customer.subscriptionDate),
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,
@@ -264,6 +259,14 @@ function formatDateTime(value: string) {
 
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function formatPlanLabel(plan: CustomerSummaryResponse["plan"], planValue: number) {
+  if (plan === "Ampere") {
+    return `Ampere · ${formatNumber(planValue)} A`;
+  }
+
+  return `${plan} · ${formatNumber(planValue)}`;
 }
 
 function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {

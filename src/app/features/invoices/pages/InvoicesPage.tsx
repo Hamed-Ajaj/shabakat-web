@@ -3,6 +3,7 @@ import type { PaginationState } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useCompanyPreferencesQuery } from "../../settings/queries";
 import { useInvoicesQuery } from "../queries";
 import { InvoiceDetailsSheet } from "../components/InvoiceDetailsSheet";
 import { InvoicesTable } from "../components/InvoicesTable";
@@ -20,6 +21,7 @@ type InvoiceDialogMode = "bulk" | "create" | "delete" | "pay" | "view" | null;
 
 export default function InvoicesPage() {
   const { session } = useAuth();
+  const preferencesQuery = useCompanyPreferencesQuery();
   const queryClient = useQueryClient();
   const [dialogMode, setDialogMode] = useState<InvoiceDialogMode>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRow | null>(null);
@@ -45,6 +47,7 @@ export default function InvoicesPage() {
 
   const invoicesPage = invoicesQuery.data;
   const invoices = invoicesPage?.data ?? [];
+  const printLanguage = preferencesQuery.data?.language ?? "en";
 
   function openDialog(mode: Exclude<InvoiceDialogMode, null>, invoice: InvoiceRow | null = null) {
     setSelectedInvoice(invoice);
@@ -63,8 +66,8 @@ export default function InvoicesPage() {
       }
 
       const html = await queryClient.fetchQuery({
-        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html"],
-        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token),
+        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html", printLanguage],
+        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token, printLanguage),
       });
 
       if (!html) {
