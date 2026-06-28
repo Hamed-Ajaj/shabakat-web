@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ export function DeleteMeterReadingDialog({
   readingLabel,
   onOpenChange,
 }: Readonly<DeleteMeterReadingDialogProps>) {
+  const { t } = useI18n();
   const deleteReading = useDeleteMeterReadingMutation(customerId);
 
   async function handleDelete() {
@@ -34,7 +36,7 @@ export function DeleteMeterReadingDialog({
     }
 
     await deleteReading.mutateAsync(readingId);
-    toast.success("Meter reading deleted successfully.");
+    toast.success(t("subscribers.meterReading.delete.success"));
     onOpenChange(false);
   }
 
@@ -50,16 +52,18 @@ export function DeleteMeterReadingDialog({
     <AlertDialog open={open} onOpenChange={handleDialogChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Meter Reading</AlertDialogTitle>
+          <AlertDialogTitle>{t("subscribers.meterReading.delete.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Delete {readingLabel || "this reading"}? Use this only to correct a mistaken entry before recording the right one.
+            {t("subscribers.meterReading.delete.description", {
+              label: readingLabel || t("subscribers.meterReading.delete.fallbackLabel"),
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {deleteReading.error instanceof Error ? (
           <p className="text-sm text-red-300">{deleteReading.error.message}</p>
         ) : null}
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("subscribers.actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-red-500 text-white hover:bg-red-500/90"
             onClick={(event) => {
@@ -67,7 +71,7 @@ export function DeleteMeterReadingDialog({
               void handleDelete();
             }}
           >
-            {deleteReading.isPending ? "Deleting..." : "Delete"}
+            {deleteReading.isPending ? t("subscribers.actions.deleting") : t("subscribers.actions.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

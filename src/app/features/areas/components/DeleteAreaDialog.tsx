@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,7 @@ export function DeleteAreaDialog({
   open,
   onOpenChange,
 }: Readonly<DeleteAreaDialogProps>) {
+  const { t } = useI18n();
   const deleteArea = useDeleteAreaMutation();
 
   async function handleDelete() {
@@ -31,7 +33,7 @@ export function DeleteAreaDialog({
     }
 
     await deleteArea.mutateAsync(area.id);
-    toast.success("Area deleted successfully.");
+    toast.success(t("areas.delete.success"));
     onOpenChange(false);
   }
 
@@ -47,16 +49,18 @@ export function DeleteAreaDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Area</AlertDialogTitle>
+          <AlertDialogTitle>{t("areas.delete.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Delete {area?.name || "this area"}? The backend blocks deletion if subscribers are still assigned to it.
+            {t("areas.delete.description", {
+              name: area?.name || t("areas.delete.fallbackName"),
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {deleteArea.error instanceof Error ? (
           <p className="text-sm text-red-300">{deleteArea.error.message}</p>
         ) : null}
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("areas.actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-red-500 text-white hover:bg-red-500/90"
             onClick={(event) => {
@@ -64,7 +68,7 @@ export function DeleteAreaDialog({
               void handleDelete();
             }}
           >
-            {deleteArea.isPending ? "Deleting..." : "Delete"}
+            {deleteArea.isPending ? t("areas.actions.deleting") : t("areas.actions.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,7 @@ export function BulkCreateInvoicesDialog({
   open,
   onOpenChange,
 }: Readonly<BulkCreateInvoicesDialogProps>) {
+  const { t } = useI18n();
   const bulkCreate = useBulkCreateInvoicesMutation();
 
   async function handleConfirm() {
@@ -41,9 +43,9 @@ export function BulkCreateInvoicesDialog({
     >
       <AlertDialogContent className="border-white/8 bg-background">
         <AlertDialogHeader>
-          <AlertDialogTitle>Bulk Generate Invoices</AlertDialogTitle>
+          <AlertDialogTitle>{t("invoices.bulk.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Create invoices for all eligible active customers for current billing period. This runs on backend billing rules.
+            {t("invoices.bulk.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -52,12 +54,12 @@ export function BulkCreateInvoicesDialog({
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button type="button" variant="outline">
-              Cancel
+              {t("invoices.actions.cancel")}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button type="button" onClick={handleConfirm} disabled={bulkCreate.isPending}>
-              {bulkCreate.isPending ? "Generating..." : "Generate"}
+              {bulkCreate.isPending ? t("invoices.actions.generating") : t("invoices.actions.generate")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

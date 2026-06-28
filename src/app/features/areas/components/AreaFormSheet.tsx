@@ -3,6 +3,7 @@ import { MapPinned, LoaderCircle } from "lucide-react";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Form,
   FormControl,
@@ -50,6 +51,7 @@ export function AreaFormSheet({
   onOpenChange,
   onSubmit,
 }: Readonly<AreaFormSheetProps>) {
+  const { isRtl, t } = useI18n();
   const initialValues = useMemo(
     () => values ?? defaultAreaFormValues,
     [values],
@@ -71,7 +73,7 @@ export function AreaFormSheet({
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
-        side="right"
+        side={isRtl ? "right" : "left"}
         className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-lg"
       >
         <SheetHeader className="border-b border-white/8 px-6 py-5">
@@ -90,9 +92,9 @@ export function AreaFormSheet({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area Name</FormLabel>
+                    <FormLabel>{t("areas.form.field.name")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Abou Samra - Main Street" {...field} />
+                      <Input placeholder={t("areas.form.placeholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,7 +104,7 @@ export function AreaFormSheet({
               <SheetFooter className="border-t border-white/8 px-0 pt-5">
                 <div className="flex w-full items-center justify-between gap-3">
                   <div className="text-sm text-muted-foreground">
-                    Area names are shared across subscriber forms and filters.
+                    {t("areas.form.helper")}
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -111,7 +113,7 @@ export function AreaFormSheet({
                       variant="outline"
                       onClick={() => handleOpenChange(false)}
                     >
-                      Cancel
+                      {t("areas.actions.cancel")}
                     </Button>
                     <Button type="submit" disabled={pending}>
                       {pending ? (

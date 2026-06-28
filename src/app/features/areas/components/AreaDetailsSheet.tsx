@@ -1,4 +1,5 @@
 import { Calendar, MapPinned, UsersRound } from "lucide-react";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Sheet,
   SheetContent,
@@ -20,18 +21,20 @@ export function AreaDetailsSheet({
   open,
   onOpenChange,
 }: Readonly<AreaDetailsSheetProps>) {
+  const { formatDate, isRtl, t } = useI18n();
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="right"
+        side={isRtl ? "right" : "left"}
         className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-xl"
       >
         <SheetHeader className="border-b border-white/8 px-6 py-5">
           <SheetTitle className="text-xl text-foreground">
-            {area?.name ?? "Area Details"}
+            {area?.name ?? t("areas.actions.viewDetails")}
           </SheetTitle>
           <SheetDescription>
-            Review subscriber usage and creation metadata for this area.
+            {t("areas.details.description")}
           </SheetDescription>
         </SheetHeader>
 
@@ -40,33 +43,33 @@ export function AreaDetailsSheet({
             <>
               <div className="grid gap-4 md:grid-cols-2">
                 <MetricCard
-                  label="Subscribers"
-                  value={String(area.customerCount)}
+                  label={t("areas.details.subscribers")}
+                  value={t(area.customerCount === 1 ? "areas.subscriberCount" : "areas.subscriberCount_plural", { count: area.customerCount })}
                 />
-                <MetricCard label="Created" value={area.createdAtLabel} />
+                <MetricCard label={t("areas.details.created")} value={formatDate(area.createdAt)} />
               </div>
 
               <SectionCard className="space-y-4 p-5">
                 <DetailRow
                   icon={MapPinned}
-                  label="Area Name"
+                  label={t("areas.details.name")}
                   value={area.name}
                 />
                 <DetailRow
                   icon={UsersRound}
-                  label="Assigned Subscribers"
-                  value={`${area.customerCount}`}
+                  label={t("areas.details.assignedSubscribers")}
+                  value={t(area.customerCount === 1 ? "areas.subscriberCount" : "areas.subscriberCount_plural", { count: area.customerCount })}
                 />
                 <DetailRow
                   icon={Calendar}
-                  label="Created At"
-                  value={area.createdAtLabel}
+                  label={t("areas.details.createdAt")}
+                  value={formatDate(area.createdAt)}
                 />
               </SectionCard>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Select an area to view its details.
+              {t("areas.details.empty")}
             </p>
           )}
         </div>

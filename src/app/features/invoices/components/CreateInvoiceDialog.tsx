@@ -3,6 +3,7 @@ import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export function CreateInvoiceDialog({
   open,
   onOpenChange,
 }: Readonly<CreateInvoiceDialogProps>) {
+  const { t } = useI18n();
   const createInvoice = useCreateInvoiceMutation();
   const customersQuery = useInvoiceCustomerOptionsQuery();
   const form = useForm<CreateInvoiceFormInput, undefined, CreateInvoiceFormValues>({
@@ -60,7 +62,7 @@ export function CreateInvoiceDialog({
           ? values.paymentMethod
           : undefined,
     });
-    toast.success("Invoice created successfully.");
+    toast.success(t("invoices.create.success"));
     onOpenChange(false);
     form.reset({
       customerId: "",
@@ -90,16 +92,16 @@ export function CreateInvoiceDialog({
     >
       <DialogContent className="border-white/8 bg-background sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create Invoice</DialogTitle>
+          <DialogTitle>{t("invoices.create.title")}</DialogTitle>
           <DialogDescription>
-            Generate one invoice from backend billing rules for a selected customer.
+            {t("invoices.create.description")}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Customer</label>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.customer")}</label>
               <Select
                 value={form.watch("customerId") || undefined}
                 onValueChange={(value) => {
@@ -120,7 +122,7 @@ export function CreateInvoiceDialog({
                 }}
               >
                 <SelectTrigger className="rounded-xl border-white/8 bg-card">
-                  <SelectValue placeholder={customersQuery.isLoading ? "Loading customers..." : "Select customer"} />
+                  <SelectValue placeholder={customersQuery.isLoading ? t("invoices.create.loadingCustomers") : t("invoices.create.customerPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(customersQuery.data ?? []).map((customer) => (
@@ -136,7 +138,7 @@ export function CreateInvoiceDialog({
             {isFixedKilowatt ? (
               <>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Payment Amount</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.paymentAmount")}</label>
                   <Input
                     inputMode="decimal"
                     step="0.01"
@@ -151,7 +153,7 @@ export function CreateInvoiceDialog({
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Payment Method</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.paymentMethod")}</label>
                   <Select
                     value={form.watch("paymentMethod")}
                     onValueChange={(value) =>
@@ -161,11 +163,11 @@ export function CreateInvoiceDialog({
                     }
                   >
                     <SelectTrigger className="rounded-xl border-white/8 bg-card">
-                      <SelectValue placeholder="Select payment method" />
+                      <SelectValue placeholder={t("invoices.create.paymentMethodPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Cash">Cash</SelectItem>
-                      <SelectItem value="Wish">Wish</SelectItem>
+                      <SelectItem value="Cash">{t("invoices.paymentMethod.cash")}</SelectItem>
+                      <SelectItem value="Wish">{t("invoices.paymentMethod.wish")}</SelectItem>
                     </SelectContent>
                   </Select>
                   {form.formState.errors.paymentMethod ? (
@@ -176,13 +178,13 @@ export function CreateInvoiceDialog({
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.notes")}</label>
                   <Input
-                    placeholder="Counter payment"
+                    placeholder={t("invoices.create.notesPlaceholder")}
                     {...form.register("notes")}
                   />
                   <p className="mt-2 text-xs text-muted-foreground">
-                    FixedKilowatt creates a paid invoice and credits kWh immediately.
+                    {t("invoices.create.fixedKilowattHelp")}
                   </p>
                 </div>
               </>
@@ -197,11 +199,11 @@ export function CreateInvoiceDialog({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t("invoices.actions.cancel")}
               </Button>
               <Button type="submit" disabled={createInvoice.isPending || customersQuery.isLoading}>
                 {createInvoice.isPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
-                Create Invoice
+                {t("invoices.actions.create")}
               </Button>
             </DialogFooter>
           </form>

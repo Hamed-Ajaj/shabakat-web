@@ -1,6 +1,9 @@
 import { Zap } from "lucide-react";
+import { useI18n } from "../../providers/I18nProvider";
 
 export function AppLogo() {
+  const { t } = useI18n();
+
   return (
     <div className="flex items-center gap-2.5">
       <div
@@ -10,8 +13,8 @@ export function AppLogo() {
         <Zap className="h-5 w-5" fill="currentColor" />
       </div>
       <div>
-        <p className="text-sm font-bold leading-tight text-foreground">Shabakat</p>
-        <p className="text-xs leading-tight text-muted-foreground">Generator operations</p>
+        <p className="text-sm font-bold leading-tight text-foreground">{t("shell.appName")}</p>
+        <p className="text-xs leading-tight text-muted-foreground">{t("shell.appTagline")}</p>
       </div>
     </div>
   );

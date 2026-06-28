@@ -2,28 +2,33 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { InvoiceRowActions } from "./InvoiceRowActions";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 import type { InvoiceRow } from "../types";
-import { formatCurrency } from "../utils";
 
 const columnHelper = createColumnHelper<InvoiceRow>();
 
 interface InvoiceColumnsOptions {
   canDelete: boolean;
+  formatCurrency: (value: number) => string;
+  formatDate: (value: string) => string;
   onDelete: (invoice: InvoiceRow) => void;
   onPay: (invoice: InvoiceRow) => void;
   onPrint: (invoice: InvoiceRow) => void;
+  t: (key: any, values?: Record<string, string | number>) => string;
   onView: (invoice: InvoiceRow) => void;
 }
 
 export function createInvoiceColumns({
   canDelete,
+  formatCurrency,
+  formatDate,
   onDelete,
   onPay,
   onPrint,
+  t,
   onView,
 }: InvoiceColumnsOptions) {
   return [
     columnHelper.accessor("invoiceNumber", {
-      header: "Invoice #",
+      header: t("invoices.table.invoiceNumber"),
       cell: (info) => (
         <button
           type="button"
@@ -35,28 +40,28 @@ export function createInvoiceColumns({
       ),
     }),
     columnHelper.accessor("customerName", {
-      header: "Customer",
+      header: t("invoices.table.customer"),
       cell: (info) => (
         <div>
           <p className="font-medium text-foreground">{info.getValue()}</p>
-          <p className="text-xs text-muted-foreground">Issued {info.row.original.issueDateLabel}</p>
+          <p className="text-xs text-muted-foreground">{t("invoices.table.issued", { date: formatDate(info.row.original.issueDate) })}</p>
         </div>
       ),
     }),
     columnHelper.accessor("invoiceStatus", {
-      header: "Status",
+      header: t("invoices.table.status"),
       cell: (info) => <InvoiceStatusBadge status={info.getValue()} />,
     }),
-    columnHelper.accessor("dueDateLabel", {
-      header: "Due Date",
-      cell: (info) => <span className="text-sm text-foreground">{info.getValue()}</span>,
+    columnHelper.accessor("dueDate", {
+      header: t("invoices.table.dueDate"),
+      cell: (info) => <span className="text-sm text-foreground">{formatDate(info.getValue())}</span>,
     }),
     columnHelper.accessor("totalAmount", {
-      header: "Total",
+      header: t("invoices.table.total"),
       cell: (info) => <span className="font-mono text-sm font-semibold text-foreground">{formatCurrency(info.getValue())}</span>,
     }),
     columnHelper.accessor("amountDue", {
-      header: "Amount Due",
+      header: t("invoices.table.amountDue"),
       cell: (info) => <span className="font-mono text-sm font-semibold text-primary">{formatCurrency(info.getValue())}</span>,
     }),
     columnHelper.display({

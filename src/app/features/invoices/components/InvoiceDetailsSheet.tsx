@@ -5,10 +5,12 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../../../components/ui/sheet";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { fetchPrintableInvoiceHtml } from "../invoicesApi";
 import { invoiceQueryKeys, useInvoiceDetailQuery } from "../queries";
 import { formatCurrency, printInvoiceHtml } from "../utils";
+import { getPaymentMethodLabel } from "../invoiceLabels";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 
 interface InvoiceDetailsSheetProps {
@@ -25,6 +27,7 @@ export function InvoiceDetailsSheet({
   onPayClick,
 }: Readonly<InvoiceDetailsSheetProps>) {
   const { session } = useAuth();
+  const { formatDate, isRtl, t } = useI18n();
   const queryClient = useQueryClient();
   const detailQuery = useInvoiceDetailQuery(invoiceId ?? undefined);
   const invoice = detailQuery.data;
@@ -41,24 +44,24 @@ export function InvoiceDetailsSheet({
       });
 
       if (!html) {
-        throw new Error("Printable invoice HTML is unavailable.");
+        throw new Error(t("invoices.error.printUnavailable"));
       }
 
       printInvoiceHtml(html);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to print invoice.");
+      toast.error(error instanceof Error ? error.message : t("invoices.error.printFailed"));
     }
   }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-2xl">
+      <SheetContent side={isRtl ? "right" : "left"} className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-2xl">
         <SheetHeader className="border-b border-white/8 px-6 py-5">
           <SheetTitle className="text-xl text-foreground">
-            {invoice ? `Invoice #${invoice.invoiceNumber}` : "Invoice Details"}
+            {invoice ? `${t("invoices.table.invoiceNumber")} ${invoice.invoiceNumber}` : t("invoices.details.invoiceDetails")}
           </SheetTitle>
           <SheetDescription>
-            Review billing totals, payment history, and print server-backed invoice data.
+            {t("invoices.details.description")}
           </SheetDescription>
         </SheetHeader>
 
@@ -71,45 +74,45 @@ export function InvoiceDetailsSheet({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-lg font-semibold text-foreground">{invoice.customerName}</p>
-                  <p className="text-sm text-muted-foreground">Created {invoice.createdAtLabel}</p>
+                  <p className="text-sm text-muted-foreground">{t("invoices.details.created", { date: formatDate(invoice.createdAt) })}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <InvoiceStatusBadge status={invoice.invoiceStatus} />
                   <Button type="button" variant="outline" onClick={handlePrint}>
-                    Print
+                    {t("invoices.actions.print")}
                   </Button>
                   {invoice.invoiceStatus !== "Paid" ? (
                     <Button type="button" onClick={onPayClick}>
-                      Record Payment
+                      {t("invoices.actions.recordPayment")}
                     </Button>
                   ) : null}
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <MetricCard label="Total Amount" value={formatCurrency(invoice.totalAmount)} />
-                <MetricCard label="Paid Amount" value={formatCurrency(invoice.paidAmount)} />
-                <MetricCard label="Amount Due" value={formatCurrency(invoice.amountDue)} />
+                <MetricCard label={t("invoices.details.totalAmount")} value={formatCurrency(invoice.totalAmount)} />
+                <MetricCard label={t("invoices.details.paidAmount")} value={formatCurrency(invoice.paidAmount)} />
+                <MetricCard label={t("invoices.details.amountDue")} value={formatCurrency(invoice.amountDue)} />
               </div>
 
               <SectionCard className="space-y-4 p-5">
-                <DetailRow icon={ReceiptText} label="Invoice Number" value={`#${invoice.invoiceNumber}`} />
-                <DetailRow icon={Calendar} label="Issue Date" value={invoice.issueDateLabel} />
-                <DetailRow icon={Calendar} label="Due Date" value={invoice.dueDateLabel} />
-                <DetailRow icon={CircleDollarSign} label="Fixed Charge" value={formatCurrency(invoice.fixedCharge)} />
-                <DetailRow icon={ReceiptText} label="TVA" value={`${invoice.tva}%`} />
-                <DetailRow icon={Calendar} label="Last Updated" value={invoice.updatedAtLabel} />
+                <DetailRow icon={ReceiptText} label={t("invoices.details.invoiceNumber")} value={`#${invoice.invoiceNumber}`} />
+                <DetailRow icon={Calendar} label={t("invoices.details.issueDate")} value={formatDate(invoice.issueDate)} />
+                <DetailRow icon={Calendar} label={t("invoices.details.dueDate")} value={formatDate(invoice.dueDate)} />
+                <DetailRow icon={CircleDollarSign} label={t("invoices.details.fixedCharge")} value={formatCurrency(invoice.fixedCharge)} />
+                <DetailRow icon={ReceiptText} label={t("invoices.details.tva")} value={`${invoice.tva}%`} />
+                <DetailRow icon={Calendar} label={t("invoices.details.lastUpdated")} value={formatDate(invoice.updatedAt)} />
               </SectionCard>
 
               <SectionCard className="space-y-4 p-5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Payments</h3>
-                  <span className="text-xs text-muted-foreground">{invoice.payments.length} payment{invoice.payments.length === 1 ? "" : "s"}</span>
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">{t("invoices.details.payments")}</h3>
+                  <span className="text-xs text-muted-foreground">{t(invoice.payments.length === 1 ? "invoices.details.paymentsCount" : "invoices.details.paymentsCount_plural", { count: invoice.payments.length })}</span>
                 </div>
 
                 {invoice.payments.length === 0 ? (
                   <p className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-6 text-sm text-muted-foreground">
-                    No payments recorded yet.
+                    {t("invoices.details.noPayments")}
                   </p>
                 ) : (
                   <div className="space-y-3">
@@ -118,11 +121,11 @@ export function InvoiceDetailsSheet({
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <p className="font-medium text-foreground">{formatCurrency(payment.amount)}</p>
-                            <p className="text-xs text-muted-foreground">{payment.paymentDateLabel}</p>
+                            <p className="text-xs text-muted-foreground">{formatDate(payment.paymentDate)}</p>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <CreditCard className="h-4 w-4 text-primary" />
-                            {payment.paymentMethod}
+                            {t(getPaymentMethodLabel(payment.paymentMethod))}
                           </div>
                         </div>
                         {payment.notes ? <p className="mt-2 text-sm text-muted-foreground">{payment.notes}</p> : null}

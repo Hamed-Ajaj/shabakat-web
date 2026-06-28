@@ -1,5 +1,6 @@
 import { useWatch, type UseFormReturn } from "react-hook-form";
 import { Checkbox } from "../../../components/ui/checkbox";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   FormControl,
   FormDescription,
@@ -18,6 +19,7 @@ import {
 } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import type { AreaRecord } from "../../areas/types";
+import { getSubscriberCustomerTypeLabel, getSubscriberPlanLabel, getSubscriberRelationLabel } from "../subscriberLabels";
 import type { LookupOption } from "../subscribersApi";
 import type {
   CreateSubscriberFormInput,
@@ -43,6 +45,7 @@ export function SubscriberDetailsSection({
   form,
   planTypes,
 }: Readonly<SubscriberDetailsSectionProps>) {
+  const { t } = useI18n();
   const selectedPlan = useWatch({
     control: form.control,
     name: "plan",
@@ -55,9 +58,9 @@ export function SubscriberDetailsSection({
         name="name"
         render={({ field }) => (
           <FormItem className="md:col-span-2">
-            <FormLabel>Name</FormLabel>
+            <FormLabel>{t("subscribers.form.name")}</FormLabel>
             <FormControl>
-              <Input placeholder="محمد علي" {...field} />
+              <Input placeholder={t("subscribers.form.namePlaceholder")} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -69,11 +72,11 @@ export function SubscriberDetailsSection({
         name="phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Phone</FormLabel>
+            <FormLabel>{t("subscribers.form.phone")}</FormLabel>
             <FormControl>
-              <Input placeholder="03100004" type="tel" {...field} />
+              <Input placeholder={t("subscribers.form.phonePlaceholder")} type="tel" {...field} />
             </FormControl>
-            <FormDescription>Optional.</FormDescription>
+            <FormDescription>{t("subscribers.form.optional")}</FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -84,12 +87,12 @@ export function SubscriberDetailsSection({
         name="subscriptionDate"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Subscription Date</FormLabel>
+            <FormLabel>{t("subscribers.form.subscriptionDate")}</FormLabel>
             <FormControl>
               <Input type="date" {...field} />
             </FormControl>
             <FormDescription>
-              Optional. Defaults to today if omitted.
+              {t("subscribers.form.subscriptionDateHelp")}
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -101,17 +104,17 @@ export function SubscriberDetailsSection({
         name="customerType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Customer Type</FormLabel>
+            <FormLabel>{t("subscribers.customerType.label")}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select customer type" />
+                  <SelectValue placeholder={t("subscribers.form.customerTypePlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
                 {customerTypes.map((option) => (
                   <SelectItem key={option.label} value={option.label}>
-                    {option.label}
+                    {t(getSubscriberCustomerTypeLabel(option.label as "Residential" | "Commercial" | "Industrial"))}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -126,17 +129,17 @@ export function SubscriberDetailsSection({
         name="plan"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Plan Type</FormLabel>
+            <FormLabel>{t("subscribers.form.plan")}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select plan" />
+                  <SelectValue placeholder={t("subscribers.form.planPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
                 {planTypes.map((option) => (
                   <SelectItem key={option.label} value={option.label}>
-                    {option.label}
+                    {t(getSubscriberPlanLabel(option.label as "Ampere" | "Kilowatt" | "FixedKilowatt"))}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -150,12 +153,12 @@ export function SubscriberDetailsSection({
         form={form}
         helperText={
           selectedPlan === "Ampere"
-            ? "Contracted amperes for prepaid billing."
+            ? t("subscribers.form.planHelp.ampere")
             : selectedPlan === "FixedKilowatt"
-              ? "Prepaid counter plan handled through invoice top-ups."
-              : "Monthly meter-based kilowatt plan."
+              ? t("subscribers.form.planHelp.fixedKilowatt")
+              : t("subscribers.form.planHelp.kilowatt")
         }
-        label="Plan Value"
+        label={t("subscribers.form.planValue")}
         name="planValue"
         placeholder={selectedPlan === "Ampere" ? "5" : "25"}
       />
@@ -165,11 +168,11 @@ export function SubscriberDetailsSection({
         name="areaId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Area</FormLabel>
+            <FormLabel>{t("subscribers.form.area")}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value || ""}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Optional area" />
+                  <SelectValue placeholder={t("subscribers.form.areaPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
@@ -181,7 +184,7 @@ export function SubscriberDetailsSection({
               </SelectContent>
             </Select>
             <FormDescription className="min-h-10">
-              Optional area assignment for grouping and filtering.
+              {t("subscribers.form.areaHelp")}
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -193,17 +196,17 @@ export function SubscriberDetailsSection({
         name="customerRelation"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Relation</FormLabel>
+            <FormLabel>{t("subscribers.form.relation")}</FormLabel>
             <Select onValueChange={field.onChange} value={field.value || ""}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Optional relation" />
+                  <SelectValue placeholder={t("subscribers.form.relationPlaceholder")} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
                 {customerRelations.map((option) => (
                   <SelectItem key={option.label} value={option.label}>
-                    {option.label}
+                    {t(getSubscriberRelationLabel(option.label as "Friend" | "Family" | "Owner" | "Other"))}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -218,11 +221,11 @@ export function SubscriberDetailsSection({
         name="address"
         render={({ field }) => (
           <FormItem className="md:col-span-2">
-            <FormLabel>Address</FormLabel>
+            <FormLabel>{t("subscribers.form.address")}</FormLabel>
             <FormControl>
-              <Textarea placeholder="طرابلس - المينا" {...field} />
+              <Textarea placeholder={t("subscribers.form.addressPlaceholder")} {...field} />
             </FormControl>
-            <FormDescription>Optional.</FormDescription>
+            <FormDescription>{t("subscribers.form.optional")}</FormDescription>
             <FormMessage />
           </FormItem>
         )}
@@ -242,6 +245,7 @@ interface SubscriberPricingOverrideSectionProps {
 export function SubscriberPricingOverrideSection({
   form,
 }: Readonly<SubscriberPricingOverrideSectionProps>) {
+  const { t } = useI18n();
   const usePricingOverride = useWatch({
     control: form.control,
     name: "usePricingOverride",
@@ -262,10 +266,9 @@ export function SubscriberPricingOverrideSection({
                 />
               </FormControl>
               <div className="space-y-1">
-                <FormLabel>Use pricing override</FormLabel>
+                <FormLabel>{t("subscribers.form.pricingOverride")}</FormLabel>
                 <FormDescription>
-                  Override company pricing for this subscriber with a custom
-                  price, fixed charge, and TVA.
+                  {t("subscribers.form.pricingOverrideHelp")}
                 </FormDescription>
               </div>
             </div>
@@ -277,19 +280,19 @@ export function SubscriberPricingOverrideSection({
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <NumericField
             form={form}
-            label="Override Price"
+            label={t("subscribers.form.usePricingOverride.overridePrice")}
             name="overridePrice"
             placeholder="50000"
           />
           <NumericField
             form={form}
-            label="Fixed Charge"
+            label={t("subscribers.form.usePricingOverride.fixedCharge")}
             name="overrideFixedCharge"
             placeholder="10000"
           />
           <NumericField
             form={form}
-            label="TVA (%)"
+            label={t("subscribers.form.usePricingOverride.tva")}
             name="overrideTva"
             placeholder="11"
           />

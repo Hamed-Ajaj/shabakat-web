@@ -1,5 +1,6 @@
 import { Bell, CalendarDays, CirclePercent, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
 import packageJson from "../../../../../package.json";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useSettings } from "../../../providers/SettingsProvider";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { NotificationToggleRow } from "../components/NotificationToggleRow";
@@ -11,77 +12,83 @@ import { getLanguageLabel } from "../settingsMeta";
 
 export default function SettingsPage() {
   const { preferences, resolvedTheme, updateNotification } = useSettings();
+  const { t } = useI18n();
   const preferencesQuery = useCompanyPreferencesQuery();
   const companyPreferences = preferencesQuery.data;
-  const triggerDateLabel = companyPreferences ? `${companyPreferences.triggerDate}${getOrdinal(companyPreferences.triggerDate)} of month` : undefined;
+  const triggerDateLabel = companyPreferences ? t("settings.row.triggerDateValue", { day: companyPreferences.triggerDate }) : undefined;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <SettingsSection title="Appearance">
+      <SettingsSection title={t("settings.appearance")}>
         <div className="px-4 pb-4 pt-4">
           <div className="mb-3 flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
               <SunMoon className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Theme</p>
-              <p className="text-xs capitalize text-muted-foreground">{preferences.theme} · applied as {resolvedTheme}</p>
+              <p className="text-sm font-medium text-foreground">{t("settings.row.theme")}</p>
+              <p className="text-xs capitalize text-muted-foreground">
+                {t("settings.subtitle.theme", {
+                  theme: t(`settings.theme.${preferences.theme}` as "settings.theme.dark" | "settings.theme.light" | "settings.theme.system"),
+                  resolvedTheme: t(`settings.theme.${resolvedTheme}` as "settings.theme.dark" | "settings.theme.light"),
+                })}
+              </p>
             </div>
           </div>
           <ThemeSelector />
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Company Preferences">
+      <SettingsSection title={t("settings.companyPreferences")}>
         {preferencesQuery.isLoading ? (
           <SettingsLoadingRows />
         ) : preferencesQuery.error instanceof Error ? (
           <div className="px-4 py-4 text-sm text-red-300">{preferencesQuery.error.message}</div>
         ) : (
           <>
-            <SettingRowLink to="/settings/pricing/price-per-kilowatt" icon={<Zap className="h-4 w-4" />} label="Price per Kilowatt" value={companyPreferences ? `${companyPreferences.pricing.pricePerKilowat.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/price-per-amp" icon={<Zap className="h-4 w-4" />} label="Price per Amp" value={companyPreferences ? `${companyPreferences.pricing.pricePerAmp.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/fixed-charge" icon={<Wallet className="h-4 w-4" />} label="Fixed Charge" value={companyPreferences ? `${companyPreferences.pricing.fixedCharge.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/tva" icon={<CirclePercent className="h-4 w-4" />} label="TVA (%)" value={companyPreferences ? `${companyPreferences.pricing.tva.base}%` : "Not configured"} />
-            <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label="Language" value={companyPreferences ? getLanguageLabel(companyPreferences.language) : "Not configured"} />
-            <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label="Trigger Date" value={triggerDateLabel ?? "Not configured"} />
-            <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label="Trigger Message" value={companyPreferences?.triggerMessage || "Not set"} />
-            <SettingRowLink to="/settings/whatsapp" icon={<MessageCircle className="h-4 w-4" />} label="WhatsApp Connection" value="Manage QR pairing and live connection status" />
+            <SettingRowLink to="/settings/pricing/price-per-kilowatt" icon={<Zap className="h-4 w-4" />} label={t("settings.row.pricePerKilowatt")} value={companyPreferences ? `${companyPreferences.pricing.pricePerKilowat.base}` : t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/pricing/price-per-amp" icon={<Zap className="h-4 w-4" />} label={t("settings.row.pricePerAmp")} value={companyPreferences ? `${companyPreferences.pricing.pricePerAmp.base}` : t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/pricing/fixed-charge" icon={<Wallet className="h-4 w-4" />} label={t("settings.row.fixedCharge")} value={companyPreferences ? `${companyPreferences.pricing.fixedCharge.base}` : t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/pricing/tva" icon={<CirclePercent className="h-4 w-4" />} label={t("settings.row.tva")} value={companyPreferences ? `${companyPreferences.pricing.tva.base}%` : t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label={t("settings.row.language")} value={companyPreferences ? t(getLanguageLabel(companyPreferences.language) as "settings.language.ar" | "settings.language.en") : t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label={t("settings.row.triggerDate")} value={triggerDateLabel ?? t("common.labels.notConfigured")} />
+            <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label={t("settings.row.triggerMessage")} value={companyPreferences?.triggerMessage || t("common.labels.notSet")} />
+            <SettingRowLink to="/settings/whatsapp" icon={<MessageCircle className="h-4 w-4" />} label={t("settings.row.whatsapp")} value={t("settings.row.whatsappValue")} />
           </>
         )}
       </SettingsSection>
 
-      <SettingsSection title="Notifications">
+      <SettingsSection title={t("settings.notifications")}>
         <NotificationToggleRow
           icon={<Bell className="h-4 w-4" />}
-          label="Payment Reminders"
-          description="Notify when payments are due"
+          label={t("settings.row.paymentReminders")}
+          description={t("settings.row.paymentRemindersDescription")}
           checked={preferences.notifications.paymentReminders}
           onChange={(checked) => updateNotification("paymentReminders", checked)}
         />
         <NotificationToggleRow
           icon={<Settings2 className="h-4 w-4" />}
-          label="New Subscribers"
-          description="Alert when a subscriber joins"
+          label={t("settings.row.newSubscribers")}
+          description={t("settings.row.newSubscribersDescription")}
           checked={preferences.notifications.newSubscribers}
           onChange={(checked) => updateNotification("newSubscribers", checked)}
         />
         <NotificationToggleRow
           icon={<Bell className="h-4 w-4" />}
-          label="Overdue Alerts"
-          description="Warn about overdue invoices"
+          label={t("settings.row.overdueAlerts")}
+          description={t("settings.row.overdueAlertsDescription")}
           checked={preferences.notifications.overdueAlerts}
           onChange={(checked) => updateNotification("overdueAlerts", checked)}
         />
       </SettingsSection>
 
-      <SettingsSection title="About">
+      <SettingsSection title={t("settings.about")}>
         <div className="flex items-center gap-3 px-4 py-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Package className="h-4 w-4" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">Version</p>
+            <p className="text-sm font-medium text-foreground">{t("settings.row.version")}</p>
           </div>
           <span className="text-sm text-muted-foreground">{packageJson.version}</span>
         </div>
@@ -101,13 +108,4 @@ function SettingsLoadingRows() {
       <Skeleton className="h-4 w-4" />
     </div>
   ));
-}
-
-function getOrdinal(day: number) {
-  if (day >= 11 && day <= 13) return "th";
-  const lastDigit = day % 10;
-  if (lastDigit === 1) return "st";
-  if (lastDigit === 2) return "nd";
-  if (lastDigit === 3) return "rd";
-  return "th";
 }

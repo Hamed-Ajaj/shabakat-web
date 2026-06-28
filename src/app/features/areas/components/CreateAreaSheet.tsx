@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useCreateAreaMutation } from "../mutations";
 import type { AreaFormOutput } from "../schema";
 import { AreaFormSheet } from "./AreaFormSheet";
@@ -12,6 +13,7 @@ export function CreateAreaSheet({
   open,
   onOpenChange,
 }: Readonly<CreateAreaSheetProps>) {
+  const { t } = useI18n();
   const createArea = useCreateAreaMutation();
 
   async function handleSubmit(values: AreaFormOutput) {
@@ -19,18 +21,18 @@ export function CreateAreaSheet({
       name: values.name,
     });
 
-    toast.success("Area created successfully.");
+    toast.success(t("areas.toast.created"));
     onOpenChange(false);
   }
 
   return (
     <AreaFormSheet
-      description="Create an area to organize subscribers and reuse it across the billing workflow."
+      description={t("areas.form.description.create")}
       error={createArea.error instanceof Error ? createArea.error.message : ""}
       open={open}
       pending={createArea.isPending}
-      submitLabel="Create Area"
-      title="Add Area"
+      submitLabel={t("areas.actions.create")}
+      title={t("areas.form.title.create")}
       onOpenChange={(nextOpen) => {
         onOpenChange(nextOpen);
         if (!nextOpen) {

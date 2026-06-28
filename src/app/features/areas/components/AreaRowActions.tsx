@@ -1,5 +1,6 @@
 import { Eye, MoreHorizontal, PencilLine, Trash2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,8 @@ export function AreaRowActions({
   onEdit,
   onView,
 }: Readonly<AreaRowActionsProps>) {
+  const { isRtl, t } = useI18n();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,21 +35,21 @@ export function AreaRowActions({
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
+      <DropdownMenuContent align={isRtl ? "start" : "end"} className="w-44">
         <DropdownMenuItem onClick={onView}>
           <Eye className="h-4 w-4" />
-          View details
+          {t("areas.actions.viewDetails")}
         </DropdownMenuItem>
         {canManage ? (
           <DropdownMenuItem onClick={onEdit}>
             <PencilLine className="h-4 w-4" />
-            Edit area
+            {t("areas.actions.edit")}
           </DropdownMenuItem>
         ) : null}
         {canManage ? (
           <DropdownMenuItem variant="destructive" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
-            Delete area
+            {t("areas.actions.delete")}
           </DropdownMenuItem>
         ) : null}
       </DropdownMenuContent>

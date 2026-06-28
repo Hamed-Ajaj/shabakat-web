@@ -1,4 +1,5 @@
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 
 interface AreasToolbarProps {
   canManage: boolean;
@@ -17,6 +18,8 @@ export function AreasToolbar({
   onCreateClick,
   onSearchChange,
 }: Readonly<AreasToolbarProps>) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -25,7 +28,7 @@ export function AreasToolbar({
             type="text"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search areas by name..."
+            placeholder={t("areas.searchPlaceholder")}
             className="w-full max-w-[600px] rounded-xl border border-white/8 bg-card px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
@@ -36,14 +39,14 @@ export function AreasToolbar({
             className="rounded-xl px-4 py-2.5 text-sm font-medium"
             style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}
           >
-            Add Area
+            {t("areas.actions.add")}
           </Button>
         ) : null}
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {total} area{total === 1 ? "" : "s"}
-        {isFetching ? " · Refreshing..." : ""}
+        {t(total === 1 ? "areas.count" : "areas.count_plural", { count: total })}
+        {isFetching ? ` · ${t("areas.refreshing")}` : ""}
       </p>
     </div>
   );

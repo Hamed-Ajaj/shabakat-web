@@ -2,11 +2,13 @@ import { Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { SidebarTrigger } from "../../components/ui/sidebar";
 import { useAuth } from "../../providers/AuthProvider";
+import { useI18n } from "../../providers/I18nProvider";
 import { routeTitles } from "../../shared/data/mockData";
 import { Avatar } from "../../shared/components/Avatar";
 
 export function TopNavigation() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const location = useLocation();
   const current = routeTitles[location.pathname] ?? routeTitles["/dashboard"];
 
@@ -19,23 +21,23 @@ export function TopNavigation() {
 
       <div className="min-w-0">
         <h1 className="truncate text-base font-semibold text-foreground">
-          {current.title}
+          {t(current.titleKey)}
         </h1>
         <p className="hidden text-xs text-muted-foreground sm:block">
-          {current.subtitle}
+          {t(current.subtitleKey, { companyName: session?.companyName ?? t("shell.appName") })}
         </p>
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ms-auto flex items-center gap-2">
         <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Quick search..."
-            className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pl-9 pr-4 text-sm text-foreground outline-none transition focus:border-primary"
+            placeholder={t("common.labels.quickSearch")}
+            className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pe-4 ps-9 text-sm text-foreground outline-none transition focus:border-primary"
           />
         </div>
-        <Avatar name={session?.fullName ?? "Workspace User"} />
+        <Avatar name={session?.fullName ?? t("common.workspaceUser")} />
       </div>
     </header>
   );

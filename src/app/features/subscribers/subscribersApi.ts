@@ -164,15 +164,15 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
   return {
     id: subscriber.id,
     name: subscriber.name,
-    phone: subscriber.phone || "Not set",
-    address: subscriber.address || "Not set",
-    areaName: subscriber.areaName || "Unassigned",
+    phone: subscriber.phone,
+    address: subscriber.address,
+    areaName: subscriber.areaName,
     customerType: subscriber.customerType,
     plan: subscriber.plan,
     planValue: subscriber.planValue,
     customerStatus: subscriber.customerStatus,
-    subscriptionDate: formatDate(subscriber.subscriptionDate),
-    createdAt: formatDateTime(subscriber.createdAt),
+    subscriptionDate: subscriber.subscriptionDate,
+    createdAt: subscriber.createdAt,
     customerRelation: subscriber.customerRelation || "",
     hasPricingOverride: subscriber.hasPricingOverride,
     pricingOverride: subscriber.pricingOverride
@@ -223,47 +223,20 @@ export function deleteSubscriber(id: string, token: string) {
   );
 }
 
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-}
-
 function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): SubscriberRow {
   return {
     id: customer.id,
     name: customer.name,
-    phone: customer.phone || "Not set",
-    area: customer.areaName || "Unassigned",
-    planLabel:
-      customer.plan === "Ampere"
-        ? `${formatNumber(customer.planValue)} A`
-        : customer.plan === "FixedKilowatt"
-          ? `${formatNumber(customer.planValue)} kW prepaid`
-          : `${formatNumber(customer.planValue)} kW`,
-    subscriptionDate: formatDate(customer.subscriptionDate),
+    phone: customer.phone,
+    area: customer.areaName,
+    plan: customer.plan as SubscriberRow["plan"],
+    planValue: customer.planValue,
+    subscriptionDate: customer.subscriptionDate,
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,
     customerStatus: customer.customerStatus,
     customerType: customer.customerType,
   };
-}
-
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function formatNumber(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(2);
 }
 
 function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {

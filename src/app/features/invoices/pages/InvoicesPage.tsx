@@ -3,6 +3,7 @@ import type { PaginationState } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useInvoicesQuery } from "../queries";
 import { InvoiceDetailsSheet } from "../components/InvoiceDetailsSheet";
 import { InvoicesTable } from "../components/InvoicesTable";
@@ -20,6 +21,7 @@ type InvoiceDialogMode = "bulk" | "create" | "delete" | "pay" | "view" | null;
 
 export default function InvoicesPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [dialogMode, setDialogMode] = useState<InvoiceDialogMode>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRow | null>(null);
@@ -59,7 +61,7 @@ export default function InvoicesPage() {
   async function handlePrint(invoice: InvoiceRow) {
     try {
       if (!session?.token) {
-        throw new Error("You must be logged in to print invoices.");
+        throw new Error(t("invoices.error.loginToPrint"));
       }
 
       const html = await queryClient.fetchQuery({
@@ -68,12 +70,12 @@ export default function InvoicesPage() {
       });
 
       if (!html) {
-        throw new Error("Printable invoice HTML is unavailable.");
+        throw new Error(t("invoices.error.printUnavailable"));
       }
 
       printInvoiceHtml(html);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to print invoice.");
+      toast.error(error instanceof Error ? error.message : t("invoices.error.printFailed"));
     }
   }
 

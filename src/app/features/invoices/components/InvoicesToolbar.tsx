@@ -1,5 +1,6 @@
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,7 @@ export function InvoicesToolbar({
   onResetFilters,
   onStatusChange,
 }: Readonly<InvoicesToolbarProps>) {
+  const { t } = useI18n();
   const customerValue = customerId || "all";
   const statusValue = invoiceStatus || "all";
 
@@ -51,13 +53,13 @@ export function InvoicesToolbar({
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-64 flex-1">
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Customer</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.filters.customer")}</label>
           <Select value={customerValue} onValueChange={(value) => onCustomerChange(value === "all" ? "" : value)}>
             <SelectTrigger className="rounded-xl border-white/8 bg-card">
-              <SelectValue placeholder="All customers" />
+              <SelectValue placeholder={t("invoices.filters.allCustomers")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All customers</SelectItem>
+              <SelectItem value="all">{t("invoices.filters.allCustomers")}</SelectItem>
               {customers.map((customer) => (
                 <SelectItem key={customer.id} value={customer.id}>
                   {customer.name}
@@ -68,48 +70,48 @@ export function InvoicesToolbar({
         </div>
 
         <div className="min-w-48">
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Status</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.filters.status")}</label>
           <Select value={statusValue} onValueChange={(value) => onStatusChange(value === "all" ? "" : (value as InvoiceStatus))}>
             <SelectTrigger className="rounded-xl border-white/8 bg-card">
-              <SelectValue placeholder="All statuses" />
+              <SelectValue placeholder={t("invoices.filters.allStatuses")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="Unpaid">Unpaid</SelectItem>
-              <SelectItem value="PartiallyPaid">Partially paid</SelectItem>
-              <SelectItem value="Paid">Paid</SelectItem>
+              <SelectItem value="all">{t("invoices.filters.allStatuses")}</SelectItem>
+              <SelectItem value="Unpaid">{t("invoices.status.unpaid")}</SelectItem>
+              <SelectItem value="PartiallyPaid">{t("invoices.status.partiallyPaid")}</SelectItem>
+              <SelectItem value="Paid">{t("invoices.status.paid")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="min-w-44">
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Issue Date From</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.filters.issueDateFrom")}</label>
           <Input type="date" value={issueDateFrom} onChange={(event) => onIssueDateFromChange(event.target.value)} className="rounded-xl border-white/8 bg-card" />
         </div>
 
         <div className="min-w-44">
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Issue Date To</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.filters.issueDateTo")}</label>
           <Input type="date" value={issueDateTo} onChange={(event) => onIssueDateToChange(event.target.value)} className="rounded-xl border-white/8 bg-card" />
         </div>
 
         <Button type="button" variant="outline" onClick={onResetFilters}>
-          Reset
+          {t("invoices.actions.reset")}
         </Button>
 
         {canBulkCreate ? (
           <Button type="button" variant="outline" onClick={onBulkCreateClick}>
-            Bulk Generate
+            {t("invoices.actions.bulkGenerate")}
           </Button>
         ) : null}
 
         <Button type="button" onClick={onCreateClick} className="rounded-xl px-4 py-2.5 text-sm font-medium" style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}>
-          Create Invoice
+          {t("invoices.actions.create")}
         </Button>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {total} invoice{total === 1 ? "" : "s"}
-        {isFetching ? " · Refreshing..." : ""}
+        {t(total === 1 ? "invoices.count" : "invoices.count_plural", { count: total })}
+        {isFetching ? " · " + t("areas.refreshing") : ""}
       </p>
     </div>
   );
