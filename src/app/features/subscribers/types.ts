@@ -1,6 +1,7 @@
 export type SubscriberBillingStatus = "paid" | "unpaid" | "overdue";
 
 export type SubscriberSearchField = "name" | "phone";
+export type SubscriberPlan = "Ampere" | "Kilowatt" | "FixedKilowatt";
 
 export interface SubscriberRow {
   id: string;
@@ -22,7 +23,7 @@ export interface SubscriberDetail {
   address: string;
   areaName: string;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: SubscriberPlan;
   planValue: number;
   customerStatus: string;
   subscriptionDate: string;
@@ -38,6 +39,14 @@ export interface SubscriberDetail {
   totalPaid: number;
   totalOutstanding: number;
   paidThisMonth: boolean;
+}
+
+export interface MeterReadingRecord {
+  id: string;
+  readingValue: number;
+  consumption: number | null;
+  createdAt: string;
+  createdAtLabel: string;
 }
 
 export interface SubscribersQueryFilters {

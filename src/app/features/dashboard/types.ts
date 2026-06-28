@@ -1,10 +1,10 @@
 export interface DashboardSummary {
-  totalBilledThisMonth: number;
-  totalCollectedThisMonth: number;
+  totalBilledAllTime: number;
+  totalCollectedAllTime: number;
   totalOutstandingAllTime: number;
   collectionRate: number;
-  totalExpensesThisMonth: number;
-  netIncomeThisMonth: number;
+  totalExpensesAllTime: number;
+  netIncomeAllTime: number;
   customers: {
     total: number;
     active: number;

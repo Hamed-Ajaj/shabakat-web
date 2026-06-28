@@ -45,7 +45,7 @@ export interface CreateSubscriberPayload {
   address?: string;
   areaId?: string;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   subscriptionDate?: string;
   customerRelation?: "Friend" | "Family" | "Owner" | "Other";
@@ -71,7 +71,7 @@ interface CustomerDetailResponse {
   phone: string | null;
   address: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   areaName: string | null;
   customerStatus: string;
@@ -240,10 +240,7 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     name: customer.name,
     phone: customer.phone || "Not set",
     area: customer.areaName || "Unassigned",
-    planLabel:
-      customer.plan === "Ampere"
-        ? `${formatNumber(customer.planValue)} A`
-        : `${formatNumber(customer.planValue)} kW`,
+    planLabel: formatPlanLabel(customer.plan, customer.planValue),
     subscriptionDate: formatDate(customer.subscriptionDate),
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,
@@ -262,6 +259,14 @@ function formatDateTime(value: string) {
 
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function formatPlanLabel(plan: CustomerSummaryResponse["plan"], planValue: number) {
+  if (plan === "Ampere") {
+    return `Ampere · ${formatNumber(planValue)} A`;
+  }
+
+  return `${plan} · ${formatNumber(planValue)}`;
 }
 
 function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {

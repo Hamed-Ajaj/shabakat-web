@@ -1,5 +1,5 @@
 import { apiRequest } from "../../shared/api/client";
-import type { CompanyPreferences, CompanyPreferencesPayload } from "./types";
+import type { CompanyPreferences, CompanyPreferencesPayload, CompanyProfile } from "./types";
 
 interface GetPreferencesResponse {
   pricePerKilowat: number;
@@ -33,6 +33,11 @@ interface SavePreferencesResponse {
   message: string;
 }
 
+interface UpdateProfileResponse {
+  name: string;
+  logoUrl: string | null;
+}
+
 export async function fetchCompanyPreferences(token: string): Promise<CompanyPreferences | null> {
   const response = await apiRequest<GetPreferencesResponse | NotConfiguredResponse>(
     "/api/v1/company/preferences",
@@ -59,6 +64,44 @@ export function saveCompanyPreferences(payload: CompanyPreferencesPayload, token
     },
     token,
   );
+}
+
+export function uploadCompanyLogo(file: File, token: string) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return apiRequest<UpdateProfileResponse>(
+    "/api/v1/company/profile",
+    {
+      method: "PUT",
+      body: formData,
+    },
+    token,
+  );
+}
+
+export function removeCompanyLogo(name: string, token: string) {
+  return apiRequest<UpdateProfileResponse>(
+    "/api/v1/company/profile",
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        logoUrl: null,
+      }),
+    },
+    token,
+  );
+}
+
+export function mapProfileResponse(response: UpdateProfileResponse): CompanyProfile {
+  return {
+    name: response.name,
+    logoUrl: response.logoUrl,
+  };
 }
 
 export function mapPreferencesToPayload(preferences: CompanyPreferences): CompanyPreferencesPayload {

@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCompanyPreferencesQuery } from "../../settings/queries";
 import { fetchPrintableInvoiceHtml } from "../invoicesApi";
 import { invoiceQueryKeys, useInvoiceDetailQuery } from "../queries";
 import { formatCurrency, printInvoiceHtml } from "../utils";
@@ -25,9 +26,11 @@ export function InvoiceDetailsSheet({
   onPayClick,
 }: Readonly<InvoiceDetailsSheetProps>) {
   const { session } = useAuth();
+  const preferencesQuery = useCompanyPreferencesQuery();
   const queryClient = useQueryClient();
   const detailQuery = useInvoiceDetailQuery(invoiceId ?? undefined);
   const invoice = detailQuery.data;
+  const printLanguage = preferencesQuery.data?.language ?? "en";
 
   async function handlePrint() {
     if (!invoice || !session?.token) {
@@ -36,8 +39,8 @@ export function InvoiceDetailsSheet({
 
     try {
       const html = await queryClient.fetchQuery({
-        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html"],
-        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token),
+        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html", printLanguage],
+        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token, printLanguage),
       });
 
       if (!html) {

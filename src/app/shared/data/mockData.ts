@@ -38,7 +38,7 @@ export const navigationItems: NavigationItem[] = [
 ];
 
 export const routeTitles: Record<string, { title: string; subtitle: string }> = {
-  "/dashboard": { title: "Dashboard", subtitle: "Operations snapshot for El-Nour Generators" },
+  "/dashboard": { title: "Dashboard", subtitle: "All-time operations snapshot for El-Nour Generators" },
   "/areas": { title: "Areas", subtitle: "Organize subscriber groups and manage area assignments" },
   "/subscribers": { title: "Subscribers", subtitle: "Search, sort, and manage monthly accounts" },
   "/invoices": { title: "Invoices", subtitle: "Generate printable billing statements" },

@@ -7,6 +7,7 @@ import {
   createInvoice,
   deleteInvoice,
   recordInvoicePayment,
+  type CreateInvoicePayload,
 } from "./invoicesApi";
 import { invoiceQueryKeys } from "./queries";
 
@@ -15,12 +16,12 @@ export function useCreateInvoiceMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (customerId: string) => {
+    mutationFn: async (payload: CreateInvoicePayload) => {
       if (!session?.token) {
         throw new Error("You must be logged in to create invoices.");
       }
 
-      return createInvoice({ customerId }, session.token);
+      return createInvoice(payload, session.token);
     },
     onSuccess: async () =>
       Promise.all([

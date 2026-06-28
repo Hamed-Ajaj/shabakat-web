@@ -7,6 +7,11 @@ import {
   type CreateSubscriberPayload,
   type UpdateSubscriberPayload,
 } from "./subscribersApi";
+import {
+  createMeterReading,
+  deleteMeterReading,
+  type CreateMeterReadingPayload,
+} from "./meterReadingsApi";
 import { subscriberQueryKeys } from "./queries";
 
 export function useCreateSubscriberMutation() {
@@ -67,6 +72,46 @@ export function useDeleteSubscriberMutation() {
         queryClient.invalidateQueries({ queryKey: subscriberQueryKeys.all }),
         queryClient.removeQueries({ queryKey: subscriberQueryKeys.detail(id) }),
       ]);
+    },
+  });
+}
+
+export function useCreateMeterReadingMutation(customerId: string) {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: CreateMeterReadingPayload) => {
+      if (!session?.token) {
+        throw new Error("You must be signed in to create a meter reading.");
+      }
+
+      return createMeterReading(customerId, payload, session.token);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: subscriberQueryKeys.meterReadings(customerId),
+      });
+    },
+  });
+}
+
+export function useDeleteMeterReadingMutation(customerId: string) {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (readingId: string) => {
+      if (!session?.token) {
+        throw new Error("You must be signed in to delete a meter reading.");
+      }
+
+      return deleteMeterReading(customerId, readingId, session.token);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: subscriberQueryKeys.meterReadings(customerId),
+      });
     },
   });
 }

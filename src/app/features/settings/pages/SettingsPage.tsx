@@ -1,4 +1,5 @@
-import { Bell, CalendarDays, CirclePercent, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
+import { Bell, CalendarDays, CirclePercent, Image, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
+import { useAuth } from "../../../providers/AuthProvider";
 import packageJson from "../../../../../package.json";
 import { useSettings } from "../../../providers/SettingsProvider";
 import { Skeleton } from "../../../components/ui/skeleton";
@@ -10,6 +11,7 @@ import { useCompanyPreferencesQuery } from "../queries";
 import { getLanguageLabel } from "../settingsMeta";
 
 export default function SettingsPage() {
+  const { session } = useAuth();
   const { preferences, resolvedTheme, updateNotification } = useSettings();
   const preferencesQuery = useCompanyPreferencesQuery();
   const companyPreferences = preferencesQuery.data;
@@ -46,6 +48,7 @@ export default function SettingsPage() {
             <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label="Language" value={companyPreferences ? getLanguageLabel(companyPreferences.language) : "Not configured"} />
             <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label="Trigger Date" value={triggerDateLabel ?? "Not configured"} />
             <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label="Trigger Message" value={companyPreferences?.triggerMessage || "Not set"} />
+            <SettingRowLink to="/settings/company-logo" icon={<Image className="h-4 w-4" />} label="Company Logo" value={session?.logoUrl ? "Logo configured" : "No logo uploaded"} />
             <SettingRowLink to="/settings/whatsapp" icon={<MessageCircle className="h-4 w-4" />} label="WhatsApp Connection" value="Manage QR pairing and live connection status" />
           </>
         )}

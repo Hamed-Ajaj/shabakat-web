@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../providers/AuthProvider";
-import { mapPreferencesToPayload, saveCompanyPreferences } from "./settingsApi";
+import { mapPreferencesToPayload, mapProfileResponse, removeCompanyLogo, saveCompanyPreferences, uploadCompanyLogo } from "./settingsApi";
 import { settingsQueryKeys } from "./queries";
 import type { CompanyPreferences } from "./types";
 
@@ -18,6 +18,48 @@ export function useSaveCompanyPreferencesMutation() {
     },
     onSuccess: async (_, preferences) => {
       queryClient.setQueryData(settingsQueryKeys.preferences(session?.companyId), preferences);
+    },
+  });
+}
+
+export function useUploadCompanyLogoMutation() {
+  const { session, updateSessionProfile } = useAuth();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      if (!session?.token) {
+        throw new Error("You must be logged in to update the company logo.");
+      }
+
+      const response = await uploadCompanyLogo(file, session.token);
+      return mapProfileResponse(response);
+    },
+    onSuccess: (profile) => {
+      updateSessionProfile({
+        companyName: profile.name,
+        logoUrl: profile.logoUrl,
+      });
+    },
+  });
+}
+
+export function useRemoveCompanyLogoMutation() {
+  const { session, updateSessionProfile } = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!session?.token) {
+        throw new Error("You must be logged in to update the company logo.");
+      }
+
+      const response = await removeCompanyLogo(session.companyName, session.token);
+      return mapProfileResponse(response);
+    },
+    onSuccess: (profile) => {
+      updateSessionProfile({
+        companyName: profile.name,
+        logoUrl: profile.logoUrl,
+      });
     },
   });
 }
