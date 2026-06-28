@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { toast } from "sonner";
+import { useI18n } from "../../../providers/I18nProvider";
 import { mapExpenseDetailToFormInput, mapExpenseFormValuesToPayload } from "../formMappers";
 import { useExpenseDetailQuery } from "../queries";
 import { useUpdateExpenseMutation } from "../mutations";
@@ -18,6 +19,7 @@ export function EditExpenseSheet({
   open,
   onOpenChange,
 }: Readonly<EditExpenseSheetProps>) {
+  const { t } = useI18n();
   const detailQuery = useExpenseDetailQuery(expenseId ?? undefined);
   const updateExpense = useUpdateExpenseMutation(expenseId ?? "");
 
@@ -32,7 +34,7 @@ export function EditExpenseSheet({
   async function handleSubmit(values: ExpenseFormOutput) {
     await updateExpense.mutateAsync(mapExpenseFormValuesToPayload(values));
 
-    toast.success("Expense updated successfully.");
+    toast.success(t("expenses.toast.updated"));
     onOpenChange(false);
   }
 
@@ -44,13 +46,13 @@ export function EditExpenseSheet({
         : "";
 
   return (
-    <ExpenseFormSheet
-      description="Edit the expense line item and keep dashboard totals current."
+      <ExpenseFormSheet
+      description={t("expenses.form.description.edit")}
       error={error}
       open={open}
       pending={detailQuery.isLoading || updateExpense.isPending}
-      submitLabel="Save Changes"
-      title="Edit Expense"
+      submitLabel={t("expenses.actions.saveChanges")}
+      title={t("expenses.form.title.edit")}
       values={initialValues}
       onOpenChange={(nextOpen) => {
         onOpenChange(nextOpen);

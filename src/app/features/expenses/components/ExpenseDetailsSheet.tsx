@@ -1,5 +1,6 @@
 import { Calendar, CircleDollarSign, FileText, HandCoins, NotebookText } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Sheet,
   SheetContent,
@@ -11,6 +12,7 @@ import { SectionCard } from "../../../shared/components/SectionCard";
 import { useExpenseDetailQuery } from "../queries";
 import { formatCurrency } from "../utils";
 import { ExpenseTypeBadge } from "./ExpenseTypeBadge";
+import { getExpenseTypeLabel } from "../expenseLabels";
 
 interface ExpenseDetailsSheetProps {
   expenseId: string | null;
@@ -23,16 +25,17 @@ export function ExpenseDetailsSheet({
   open,
   onOpenChange,
 }: Readonly<ExpenseDetailsSheetProps>) {
+  const { formatDate, isRtl, t } = useI18n();
   const detailQuery = useExpenseDetailQuery(expenseId ?? undefined);
   const expense = detailQuery.data;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-xl">
+      <SheetContent side={isRtl ? "right" : "left"} className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-xl">
         <SheetHeader className="border-b border-white/8 px-6 py-5">
-          <SheetTitle className="text-xl text-foreground">{expense?.label || "Expense Details"}</SheetTitle>
+          <SheetTitle className="text-xl text-foreground">{expense?.label || t("expenses.details.title")}</SheetTitle>
           <SheetDescription>
-            Review expense amount, category, notes, and audit timestamps.
+            {t("expenses.details.description")}
           </SheetDescription>
         </SheetHeader>
 
@@ -43,8 +46,8 @@ export function ExpenseDetailsSheet({
           {expense ? (
             <>
               <div className="grid gap-4 md:grid-cols-2">
-                <MetricCard label="Amount" value={formatCurrency(expense.amount)} />
-                <MetricCard label="Type" value={expense.expenseType} />
+                <MetricCard label={t("expenses.details.amount")} value={formatCurrency(expense.amount)} />
+                <MetricCard label={t("expenses.details.type")} value={getExpenseTypeLabel(expense.expenseType, t)} />
               </div>
 
               <SectionCard className="space-y-4 p-5">
@@ -53,18 +56,18 @@ export function ExpenseDetailsSheet({
                     <HandCoins className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Category</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{t("expenses.details.category")}</p>
                     <div className="mt-1">
                       <ExpenseTypeBadge type={expense.expenseType} />
                     </div>
                   </div>
                 </div>
-                <DetailRow icon={CircleDollarSign} label="Amount" value={formatCurrency(expense.amount)} />
-                <DetailRow icon={Calendar} label="Expense Date" value={expense.expenseDateLabel} />
-                <DetailRow icon={FileText} label="Label" value={expense.label || "Not set"} />
-                <DetailRow icon={NotebookText} label="Notes" value={expense.notes || "No notes"} />
-                <DetailRow icon={Calendar} label="Created" value={expense.createdAtLabel} />
-                <DetailRow icon={Calendar} label="Updated" value={expense.updatedAtLabel} />
+                <DetailRow icon={CircleDollarSign} label={t("expenses.details.amount")} value={formatCurrency(expense.amount)} />
+                <DetailRow icon={Calendar} label={t("expenses.details.expenseDate")} value={formatDate(expense.expenseDate)} />
+                <DetailRow icon={FileText} label={t("expenses.details.label")} value={expense.label || t("common.labels.notSet")} />
+                <DetailRow icon={NotebookText} label={t("expenses.details.notes")} value={expense.notes || t("expenses.notesEmpty")} />
+                <DetailRow icon={Calendar} label={t("expenses.details.createdAt")} value={formatDate(expense.createdAt)} />
+                <DetailRow icon={Calendar} label={t("expenses.details.updatedAt")} value={formatDate(expense.updatedAt)} />
               </SectionCard>
             </>
           ) : null}

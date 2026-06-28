@@ -1,5 +1,6 @@
 import { ReceiptText, Rows3, Wallet } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
 
 interface ExpenseSummaryCardsProps {
@@ -17,6 +18,8 @@ export function ExpenseSummaryCards({
   totalAmount,
   totalCount,
 }: Readonly<ExpenseSummaryCardsProps>) {
+  const { t } = useI18n();
+
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-3">
@@ -34,21 +37,21 @@ export function ExpenseSummaryCards({
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <SummaryCard
-        description="Across all server-matched rows, not only current page."
+        description={t("expenses.summary.totalSpendDescription")}
         icon={<Wallet className="h-5 w-5 text-primary" />}
-        title="Total Matching Spend"
+        title={t("expenses.summary.totalSpend")}
         value={totalAmount}
       />
       <SummaryCard
-        description="Count of rows matching current backend filters."
+        description={t("expenses.summary.matchingCountDescription")}
         icon={<ReceiptText className="h-5 w-5 text-primary" />}
-        title="Matching Expenses"
+        title={t("expenses.summary.matchingCount")}
         value={String(totalCount)}
       />
       <SummaryCard
-        description={`Current page holds ${currentPageCount} row${currentPageCount === 1 ? "" : "s"}.`}
+        description={t(currentPageCount === 1 ? "expenses.summary.currentPageDescription" : "expenses.summary.currentPageDescription_plural").replace("{{count}}", String(currentPageCount))}
         icon={<Rows3 className="h-5 w-5 text-primary" />}
-        title="Current Page Spend"
+        title={t("expenses.summary.currentPageSpend")}
         value={pageAmount}
       />
     </div>

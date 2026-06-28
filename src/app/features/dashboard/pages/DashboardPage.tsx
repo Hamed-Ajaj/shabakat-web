@@ -1,9 +1,11 @@
 import { Suspense, lazy, useMemo } from "react";
 import { AlertCircle, ArrowUpRight, DollarSign, UserCheck, Users } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { MetricCard } from "../components/MetricCard";
 import { RecentPaymentsPanel, UpcomingDuePanel } from "../components/PaymentsPanels";
+import { formatCurrencyEn } from "../formatters";
 import { useDashboardQueries } from "../queries";
 
 const RevenueChartCard = lazy(async () => {
@@ -12,6 +14,7 @@ const RevenueChartCard = lazy(async () => {
 });
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const {
     summaryQuery,
     paidInvoicesQuery,
@@ -39,7 +42,7 @@ export default function DashboardPage() {
     <div className="space-y-5">
       {summaryQuery.isError ? (
         <SectionCard className="border-red-400/20 bg-red-400/10 p-5 text-red-200">
-          <h2 className="text-lg font-semibold">Dashboard data failed to load</h2>
+          <h2 className="text-lg font-semibold">{t("dashboard.error.failedToLoad")}</h2>
           <p className="mt-1 text-sm text-red-200/80">{summaryQuery.error.message}</p>
         </SectionCard>
       ) : summaryQuery.isLoading || !summaryQuery.data ? (
@@ -48,23 +51,32 @@ export default function DashboardPage() {
         <>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
-              label="Total Subscribers"
+              label={t("dashboard.metric.totalSubscribers")}
               value={summaryQuery.data.customers.total}
-              hint={`${summaryQuery.data.customers.active} active · ${summaryQuery.data.customers.suspended} suspended`}
+              hint={t("dashboard.metric.subscribersHint", {
+                active: summaryQuery.data.customers.active,
+                suspended: summaryQuery.data.customers.suspended,
+              })}
               icon={Users}
               accentClassName="text-foreground"
             />
             <MetricCard
-              label="Collected All Time"
-              value={formatCurrency(summaryQuery.data.totalCollectedAllTime)}
-              hint={`${summaryQuery.data.collectionRate.toFixed(0)}% of ${formatCurrency(summaryQuery.data.totalBilledAllTime)}`}
+              label={t("dashboard.metric.collectedAllTime")}
+              value={formatCurrencyEn(summaryQuery.data.totalCollectedAllTime)}
+              hint={t("dashboard.metric.collectedHint", {
+                rate: summaryQuery.data.collectionRate.toFixed(0),
+                amount: formatCurrencyEn(summaryQuery.data.totalBilledAllTime),
+              })}
               icon={UserCheck}
               accentClassName="text-emerald-400"
             />
             <MetricCard
-              label="Outstanding Invoices"
+              label={t("dashboard.metric.outstandingInvoices")}
               value={summaryQuery.data.invoices.unpaidCount + summaryQuery.data.invoices.partiallyPaidCount}
-              hint={`${summaryQuery.data.invoices.unpaidCount} unpaid · ${summaryQuery.data.invoices.partiallyPaidCount} partial`}
+              hint={t("dashboard.metric.outstandingHint", {
+                unpaid: summaryQuery.data.invoices.unpaidCount,
+                partial: summaryQuery.data.invoices.partiallyPaidCount,
+              })}
               icon={AlertCircle}
               accentClassName="text-red-400"
             />
@@ -72,11 +84,13 @@ export default function DashboardPage() {
             <SectionCard className="border-primary/30 bg-primary p-5 text-primary-foreground shadow-[0_0_30px_rgba(245,192,0,0.18)]">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-foreground/70">Net Income All Time</p>
-                  <p className="mt-2 font-mono text-3xl font-bold">{formatCurrency(summaryQuery.data.netIncomeAllTime)}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-foreground/70">{t("dashboard.metric.netIncomeAllTime")}</p>
+                  <p className="mt-2 font-mono text-3xl font-bold">{formatCurrencyEn(summaryQuery.data.netIncomeAllTime)}</p>
                   <p className="mt-1 flex items-center gap-1 text-xs text-primary-foreground/70">
                     <ArrowUpRight className="h-3 w-3" />
-                    {formatCurrency(summaryQuery.data.totalOutstandingAllTime)} outstanding
+                    {t("dashboard.metric.outstandingValueHint", {
+                      amount: formatCurrencyEn(summaryQuery.data.totalOutstandingAllTime),
+                    })}
                   </p>
                 </div>
                 <div className="rounded-xl bg-black/10 p-2.5">
@@ -138,10 +152,6 @@ function DashboardChartSkeleton() {
       </div>
     </SectionCard>
   );
-}
-
-function formatCurrency(value: number) {
-  return `$${Math.round(value).toLocaleString()}`;
 }
 
 function resolvePanelError(...errors: Array<Error | null>) {

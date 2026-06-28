@@ -1,6 +1,7 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { ExpenseSummaryCards } from "../components/ExpenseSummaryCards";
 import { ExpensesTable } from "../components/ExpensesTable";
 import { ExpensesToolbar } from "../components/ExpensesToolbar";
@@ -26,6 +27,7 @@ const DeleteExpenseDialog = lazy(() =>
 
 export default function ExpensesPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const [dialogMode, setDialogMode] = useState<ExpenseDialogMode>(null);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseRow | null>(null);
   const [expenseType, setExpenseType] = useState<"" | ExpenseType>("");
@@ -148,7 +150,7 @@ export default function ExpensesPage() {
         />
         <DeleteExpenseDialog
           expenseId={selectedExpense?.id ?? null}
-          expenseLabel={selectedExpense?.label || selectedExpense?.expenseType || ""}
+          expenseLabel={selectedExpense?.label || (selectedExpense ? t("expenses.delete.fallbackName") : "")}
           open={dialogMode === "delete"}
           onOpenChange={handleDialogOpenChange}
         />

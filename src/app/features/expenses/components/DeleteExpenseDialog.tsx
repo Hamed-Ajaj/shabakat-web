@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useDeleteExpenseMutation } from "../mutations";
 
 interface DeleteExpenseDialogProps {
@@ -24,6 +25,7 @@ export function DeleteExpenseDialog({
   open,
   onOpenChange,
 }: Readonly<DeleteExpenseDialogProps>) {
+  const { t } = useI18n();
   const deleteExpense = useDeleteExpenseMutation();
 
   async function handleDelete() {
@@ -32,7 +34,7 @@ export function DeleteExpenseDialog({
     }
 
     await deleteExpense.mutateAsync(expenseId);
-    toast.success("Expense deleted successfully.");
+    toast.success(t("expenses.delete.success"));
     onOpenChange(false);
   }
 
@@ -48,14 +50,14 @@ export function DeleteExpenseDialog({
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Expense</AlertDialogTitle>
+          <AlertDialogTitle>{t("expenses.delete.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Delete {expenseLabel || "this expense"}? This is a soft delete in the backend.
+            {t("expenses.delete.description").replace("{{name}}", expenseLabel || t("expenses.delete.fallbackName"))}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {deleteExpense.error instanceof Error ? <p className="text-sm text-red-300">{deleteExpense.error.message}</p> : null}
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("expenses.actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-red-500 text-white hover:bg-red-500/90"
             onClick={(event) => {
@@ -63,7 +65,7 @@ export function DeleteExpenseDialog({
               void handleDelete();
             }}
           >
-            {deleteExpense.isPending ? "Deleting..." : "Delete"}
+            {deleteExpense.isPending ? t("expenses.actions.deleting") : t("expenses.actions.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

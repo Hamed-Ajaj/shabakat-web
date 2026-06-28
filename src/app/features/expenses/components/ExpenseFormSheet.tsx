@@ -34,7 +34,8 @@ import {
   type ExpenseFormInput,
   type ExpenseFormOutput,
 } from "../schema";
-import { expenseTypeOptions, getExpenseTypeDescription } from "../utils";
+import { useI18n } from "../../../providers/I18nProvider";
+import { expenseTypes, getExpenseTypeDescription, getExpenseTypeLabel } from "../expenseLabels";
 
 interface ExpenseFormSheetProps {
   description: string;
@@ -59,6 +60,7 @@ export function ExpenseFormSheet({
   onOpenChange,
   onSubmit,
 }: Readonly<ExpenseFormSheetProps>) {
+  const { isRtl, t } = useI18n();
   const initialValues = useMemo(() => values ?? defaultExpenseFormValues, [values]);
 
   const form = useForm<ExpenseFormInput, undefined, ExpenseFormOutput>({
@@ -81,7 +83,7 @@ export function ExpenseFormSheet({
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-xl">
+      <SheetContent side={isRtl ? "right" : "left"} className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-xl">
         <SheetHeader className="border-b border-white/8 px-6 py-5">
           <SheetTitle className="flex items-center gap-2 text-xl text-foreground">
             <HandCoins className="h-5 w-5 text-primary" />
@@ -103,13 +105,13 @@ export function ExpenseFormSheet({
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder={t("expenses.form.typePlaceholder")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {expenseTypeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
+                          {expenseTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {getExpenseTypeLabel(type, t)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -124,7 +126,7 @@ export function ExpenseFormSheet({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount</FormLabel>
+                      <FormLabel>{t("expenses.form.amount")}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -146,7 +148,7 @@ export function ExpenseFormSheet({
                   name="expenseDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Expense Date</FormLabel>
+                      <FormLabel>{t("expenses.form.expenseDate")}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} value={field.value ?? ""} />
                       </FormControl>
@@ -160,9 +162,9 @@ export function ExpenseFormSheet({
                   name="label"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{expenseType === "Other" ? "Label" : "Label (Optional)"}</FormLabel>
+                      <FormLabel>{expenseType === "Other" ? t("expenses.form.labelRequired") : t("expenses.form.labelOptional")}</FormLabel>
                       <FormControl>
-                        <Input placeholder={expenseType === "Other" ? "Rent, Insurance..." : "Optional category"} {...field} />
+                        <Input placeholder={expenseType === "Other" ? t("expenses.form.labelPlaceholderRequired") : t("expenses.form.labelPlaceholderOptional")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -175,26 +177,26 @@ export function ExpenseFormSheet({
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                      <FormLabel>{t("expenses.form.notes")}</FormLabel>
                     <FormControl>
-                      <Textarea rows={6} placeholder="Optional internal note..." {...field} />
+                      <Textarea rows={6} placeholder={t("expenses.form.notesPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <p className="text-sm text-muted-foreground">{getExpenseTypeDescription(expenseType)}</p>
+              <p className="text-sm text-muted-foreground">{getExpenseTypeDescription(expenseType, t)}</p>
 
               <SheetFooter className="border-t border-white/8 px-0 pt-5">
                 <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div className="text-sm text-muted-foreground">
-                    Expenses update dashboard totals after successful save.
+                    {t("expenses.form.helper")}
                   </div>
 
                   <div className="flex items-center gap-3">
                     <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                      Cancel
+                      {t("expenses.actions.cancel")}
                     </Button>
                     <Button type="submit" disabled={pending}>
                       {pending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
