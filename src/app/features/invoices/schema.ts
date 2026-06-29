@@ -5,7 +5,9 @@ export const createInvoiceSchema = z
   .object({
     customerId: z.string().trim().min(1, "Customer is required."),
     customerPlan: z.custom<InvoiceCustomerPlan>().optional(),
+    fixedKilowattMode: z.enum(["payment", "kilowatt"]).default("payment"),
     paymentAmount: z.union([z.coerce.number(), z.nan()]).optional(),
+    kilowattAmount: z.union([z.coerce.number(), z.nan()]).optional(),
     paymentMethod: z.enum(["Cash", "Wish"]).optional(),
     notes: z
       .string()
@@ -19,17 +21,31 @@ export const createInvoiceSchema = z
       return;
     }
 
-    if (!Number.isFinite(values.paymentAmount)) {
+    if (values.fixedKilowattMode === "payment") {
+      if (!Number.isFinite(values.paymentAmount)) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Payment amount is required.",
+          path: ["paymentAmount"],
+        });
+      } else if (values.paymentAmount <= 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Payment amount must be greater than 0.",
+          path: ["paymentAmount"],
+        });
+      }
+    } else if (!Number.isFinite(values.kilowattAmount)) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Payment amount is required.",
-        path: ["paymentAmount"],
+        message: "Kilowatt amount is required.",
+        path: ["kilowattAmount"],
       });
-    } else if (values.paymentAmount <= 0) {
+    } else if (values.kilowattAmount <= 0) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Payment amount must be greater than 0.",
-        path: ["paymentAmount"],
+        message: "Kilowatt amount must be greater than 0.",
+        path: ["kilowattAmount"],
       });
     }
 

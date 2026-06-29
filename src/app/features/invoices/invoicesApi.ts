@@ -1,7 +1,10 @@
-import { apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
+import { ApiError, apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
+import { formatDate, formatDateTime } from "./utils";
 import type {
+  FixedKilowattCalculation,
   InvoiceCustomerOption,
   InvoiceCustomerPlan,
+  InvoiceCustomerType,
   InvoiceDetail,
   InvoicePayment,
   InvoicesPageData,
@@ -57,6 +60,8 @@ interface CustomerSummaryResponse {
   id: string;
   name: string;
   plan: InvoiceCustomerPlan;
+  customerType: InvoiceCustomerType;
+  planValue: number;
 }
 
 interface MessageResponse {
@@ -73,7 +78,15 @@ export interface CreateInvoicePayload {
   customerId: string;
   notes?: string;
   paymentAmount?: number;
+  kilowattAmount?: number;
   paymentMethod?: PaymentMethod;
+}
+
+export interface FixedKilowattCalculatePayload {
+  customerType: InvoiceCustomerType;
+  planValue: number;
+  paymentAmount?: number;
+  kilowattAmount?: number;
 }
 
 export interface RecordPaymentPayload {
@@ -158,7 +171,31 @@ export async function fetchInvoiceCustomerOptions(token: string): Promise<Invoic
     id: customer.id,
     name: customer.name,
     plan: customer.plan,
+    customerType: customer.customerType,
+    planValue: customer.planValue,
   }));
+}
+
+export async function calculateFixedKilowatt(payload: FixedKilowattCalculatePayload, token: string) {
+  try {
+    return await apiRequest<FixedKilowattCalculation>(
+      "/api/v1/invoices/fixed-kilowatt/calculate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      },
+      token,
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
 }
 
 export function createInvoice(payload: CreateInvoicePayload, token: string) {
@@ -227,8 +264,9 @@ export function deleteInvoice(id: string, token: string) {
   );
 }
 
-export async function fetchPrintableInvoiceHtml(id: string, token: string) {
-  const response = await fetch(`${apiBaseUrl}/api/v1/invoices/print/${id}`, {
+export async function fetchPrintableInvoiceHtml(id: string, token: string, language = "en") {
+  const params = new URLSearchParams({ lang: language });
+  const response = await fetch(`${apiBaseUrl}/api/v1/invoices/print/${id}?${params.toString()}`, {
     headers: {
       Accept: "text/html",
       Authorization: `Bearer ${token}`,

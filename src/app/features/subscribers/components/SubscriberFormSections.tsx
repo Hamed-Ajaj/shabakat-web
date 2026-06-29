@@ -153,14 +153,14 @@ export function SubscriberDetailsSection({
         form={form}
         helperText={
           selectedPlan === "Ampere"
-            ? t("subscribers.form.planHelp.ampere")
+            ? "Used as the contracted ampere value for ampere billing."
             : selectedPlan === "FixedKilowatt"
-              ? t("subscribers.form.planHelp.fixedKilowatt")
-              : t("subscribers.form.planHelp.kilowatt")
+              ? "Used by prepaid counter billing and fixed-kilowatt top-up calculations."
+              : "Used by monthly meter billing calculations."
         }
         label={t("subscribers.form.planValue")}
         name="planValue"
-        placeholder={selectedPlan === "Ampere" ? "5" : "25"}
+        placeholder="5"
       />
 
       <FormField

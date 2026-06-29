@@ -2,6 +2,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
 import { Button } from "../../../components/ui/button";
 import { useI18n } from "../../../providers/I18nProvider";
 import {
@@ -14,6 +15,7 @@ import {
 } from "../../../components/ui/dialog";
 import { Form } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -21,9 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
+import { SectionCard } from "../../../shared/components/SectionCard";
 import { useCreateInvoiceMutation } from "../mutations";
-import { useInvoiceCustomerOptionsQuery } from "../queries";
+import { useFixedKilowattCalculationQuery, useInvoiceCustomerOptionsQuery } from "../queries";
 import { createInvoiceSchema, type CreateInvoiceFormInput, type CreateInvoiceFormValues } from "../schema";
+import { formatCurrency } from "../utils";
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -42,23 +46,57 @@ export function CreateInvoiceDialog({
     defaultValues: {
       customerId: "",
       customerPlan: undefined,
+      fixedKilowattMode: "payment",
       notes: "",
       paymentAmount: Number.NaN,
+      kilowattAmount: Number.NaN,
       paymentMethod: undefined,
     },
   });
-  const isFixedKilowatt = form.watch("customerPlan") === "FixedKilowatt";
+  const customerId = form.watch("customerId");
+  const fixedKilowattMode = form.watch("fixedKilowattMode");
+  const paymentAmount = toFiniteNumber(form.watch("paymentAmount"));
+  const kilowattAmount = toFiniteNumber(form.watch("kilowattAmount"));
+  const selectedCustomer = (customersQuery.data ?? []).find((item) => item.id === customerId);
+  const isFixedKilowatt = selectedCustomer?.plan === "FixedKilowatt";
+  const debouncedPaymentAmount = useDebouncedValue(paymentAmount, 350);
+  const debouncedKilowattAmount = useDebouncedValue(kilowattAmount, 350);
+  const fixedKilowattCalculationPayload =
+    isFixedKilowatt && selectedCustomer
+      ? fixedKilowattMode === "payment"
+        ? debouncedPaymentAmount !== undefined && debouncedPaymentAmount > 0
+          ? {
+              customerType: selectedCustomer.customerType,
+              planValue: selectedCustomer.planValue,
+              paymentAmount: debouncedPaymentAmount,
+            }
+          : undefined
+        : debouncedKilowattAmount !== undefined && debouncedKilowattAmount > 0
+          ? {
+              customerType: selectedCustomer.customerType,
+              planValue: selectedCustomer.planValue,
+              kilowattAmount: debouncedKilowattAmount,
+            }
+          : undefined
+      : undefined;
+  const calculationQuery = useFixedKilowattCalculationQuery(
+    fixedKilowattCalculationPayload,
+  );
 
   async function handleSubmit(values: CreateInvoiceFormValues) {
     await createInvoice.mutateAsync({
       customerId: values.customerId,
       notes: values.notes || undefined,
       paymentAmount:
-        values.customerPlan === "FixedKilowatt"
+        selectedCustomer?.plan === "FixedKilowatt" && values.fixedKilowattMode === "payment"
           ? values.paymentAmount
           : undefined,
+      kilowattAmount:
+        selectedCustomer?.plan === "FixedKilowatt" && values.fixedKilowattMode === "kilowatt"
+          ? values.kilowattAmount
+          : undefined,
       paymentMethod:
-        values.customerPlan === "FixedKilowatt"
+        selectedCustomer?.plan === "FixedKilowatt"
           ? values.paymentMethod
           : undefined,
     });
@@ -67,8 +105,10 @@ export function CreateInvoiceDialog({
     form.reset({
       customerId: "",
       customerPlan: undefined,
+      fixedKilowattMode: "payment",
       notes: "",
       paymentAmount: Number.NaN,
+      kilowattAmount: Number.NaN,
       paymentMethod: undefined,
     });
   }
@@ -83,8 +123,10 @@ export function CreateInvoiceDialog({
           form.reset({
             customerId: "",
             customerPlan: undefined,
+            fixedKilowattMode: "payment",
             notes: "",
             paymentAmount: Number.NaN,
+            kilowattAmount: Number.NaN,
             paymentMethod: undefined,
           });
         }
@@ -116,8 +158,10 @@ export function CreateInvoiceDialog({
 
                   if (customer?.plan !== "FixedKilowatt") {
                     form.setValue("paymentAmount", Number.NaN);
+                    form.setValue("kilowattAmount", Number.NaN);
                     form.setValue("paymentMethod", undefined);
                     form.setValue("notes", "");
+                    form.setValue("fixedKilowattMode", "payment");
                   }
                 }}
               >
@@ -137,19 +181,62 @@ export function CreateInvoiceDialog({
 
             {isFixedKilowatt ? (
               <>
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-muted-foreground">Charge Mode</label>
+                  <Tabs
+                    value={fixedKilowattMode}
+                    onValueChange={(value) => {
+                      const nextMode = value as "payment" | "kilowatt";
+                      form.setValue("fixedKilowattMode", nextMode, {
+                        shouldValidate: true,
+                      });
+                      if (nextMode === "payment") {
+                        form.setValue("kilowattAmount", Number.NaN);
+                      } else {
+                        form.setValue("paymentAmount", Number.NaN);
+                      }
+                    }}
+                  >
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="payment">By payment</TabsTrigger>
+                      <TabsTrigger value="kilowatt">By kWh</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.paymentAmount")}</label>
-                  <Input
-                    inputMode="decimal"
-                    step="0.01"
-                    type="number"
-                    {...form.register("paymentAmount")}
-                  />
-                  {form.formState.errors.paymentAmount ? (
-                    <p className="mt-2 text-sm text-red-300">
-                      {form.formState.errors.paymentAmount.message}
-                    </p>
-                  ) : null}
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                    {fixedKilowattMode === "payment" ? "Payment Amount" : "Kilowatt Amount"}
+                  </label>
+                  {fixedKilowattMode === "payment" ? (
+                    <>
+                      <Input
+                        inputMode="decimal"
+                        step="0.01"
+                        type="number"
+                        {...form.register("paymentAmount", { valueAsNumber: true })}
+                      />
+                      {form.formState.errors.paymentAmount ? (
+                        <p className="mt-2 text-sm text-red-300">
+                          {form.formState.errors.paymentAmount.message}
+                        </p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        inputMode="decimal"
+                        step="0.01"
+                        type="number"
+                        {...form.register("kilowattAmount", { valueAsNumber: true })}
+                      />
+                      {form.formState.errors.kilowattAmount ? (
+                        <p className="mt-2 text-sm text-red-300">
+                          {form.formState.errors.kilowattAmount.message}
+                        </p>
+                      ) : null}
+                    </>
+                  )}
                 </div>
 
                 <div>
@@ -187,6 +274,36 @@ export function CreateInvoiceDialog({
                     {t("invoices.create.fixedKilowattHelp")}
                   </p>
                 </div>
+
+                <SectionCard className="space-y-3 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-foreground">Server Calculation Preview</p>
+                    {calculationQuery.isFetching ? (
+                      <span className="text-xs text-muted-foreground">Calculating...</span>
+                    ) : null}
+                  </div>
+
+                  {calculationQuery.data ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <PreviewMetric label="Payment" value={formatCurrency(calculationQuery.data.paymentAmount)} />
+                      <PreviewMetric label="kWh Credit" value={`${calculationQuery.data.kilowattAmount}`} />
+                      <PreviewMetric label="Unit Price" value={formatCurrency(calculationQuery.data.unitPrice)} />
+                      <PreviewMetric label="Fixed Charge" value={formatCurrency(calculationQuery.data.fixedCharge)} />
+                      <PreviewMetric label="TVA" value={`${calculationQuery.data.tva}%`} />
+                      <PreviewMetric label="Plan Value" value={`${calculationQuery.data.planValue}`} />
+                    </div>
+                  ) : calculationQuery.isSuccess ? (
+                    <p className="text-sm text-muted-foreground">
+                      Preview is unavailable on the current backend build. You can still create the prepaid invoice normally.
+                    </p>
+                  ) : calculationQuery.error instanceof Error ? (
+                    <p className="text-sm text-red-300">{calculationQuery.error.message}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Enter a payment or kWh amount to preview the exact backend calculation before creating the paid invoice.
+                    </p>
+                  )}
+                </SectionCard>
               </>
             ) : null}
 
@@ -211,4 +328,18 @@ export function CreateInvoiceDialog({
       </DialogContent>
     </Dialog>
   );
+}
+
+function PreviewMetric({ label, value }: Readonly<{ label: string; value: string }>) {
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function toFiniteNumber(value: unknown) {
+  const numericValue = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numericValue) ? numericValue : undefined;
 }
