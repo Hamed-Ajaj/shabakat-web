@@ -7,7 +7,7 @@ import type {
   ExpenseRow,
   ExpenseType,
 } from "./types";
-import { formatCurrency, formatDate, formatDateTime } from "./utils";
+import { formatCurrency } from "./utils";
 
 interface ExpenseResponse {
   id: string;
@@ -66,11 +66,7 @@ export async function fetchExpenses(filters: ExpensesQueryFilters, token: string
 export async function fetchExpenseDetail(id: string, token: string): Promise<ExpenseDetail> {
   const response = await apiRequest<ExpenseResponse>(`/api/v1/expenses/${id}`, undefined, token);
 
-  return {
-    ...mapExpenseRow(response),
-    createdAtLabel: formatDateTime(response.createdAt),
-    updatedAtLabel: formatDateTime(response.updatedAt),
-  };
+  return mapExpenseRow(response);
 }
 
 export function createExpense(payload: ExpensePayload, token: string) {
@@ -117,7 +113,6 @@ function mapExpenseRow(response: ExpenseResponse): ExpenseRow {
     expenseType: response.expenseType,
     amount: response.amount,
     expenseDate: response.expenseDate,
-    expenseDateLabel: formatDate(response.expenseDate),
     label: response.label ?? "",
     notes: response.notes ?? "",
     createdAt: response.createdAt,

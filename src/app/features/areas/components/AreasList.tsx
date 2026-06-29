@@ -1,4 +1,5 @@
 import { MapPinned, UsersRound } from "lucide-react";
+import { useI18n } from "../../../providers/I18nProvider";
 import { Avatar } from "../../../shared/components/Avatar";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import type { AreaRecord } from "../types";
@@ -23,10 +24,12 @@ export function AreasList({
   onEdit,
   onView,
 }: Readonly<AreasListProps>) {
+  const { formatDate, t } = useI18n();
+
   if (isLoading) {
     return (
       <SectionCard className="px-4 py-10 text-sm text-muted-foreground">
-        Loading areas...
+        {t("areas.loading")}
       </SectionCard>
     );
   }
@@ -42,7 +45,7 @@ export function AreasList({
   if (areas.length === 0) {
     return (
       <SectionCard className="px-4 py-10 text-sm text-muted-foreground">
-        No areas matched the current search.
+        {t("areas.empty")}
       </SectionCard>
     );
   }
@@ -66,16 +69,16 @@ export function AreasList({
                 {area.name}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Created {area.createdAtLabel}
+                {t("areas.createdAt", { date: formatDate(area.createdAt) })}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.03] px-3 py-1">
                   <UsersRound className="h-3.5 w-3.5 text-primary" />
-                  {area.customerCount} subscriber{area.customerCount === 1 ? "" : "s"}
+                  {t(area.customerCount === 1 ? "areas.subscriberCount" : "areas.subscriberCount_plural", { count: area.customerCount })}
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/[0.03] px-3 py-1">
                   <MapPinned className="h-3.5 w-3.5 text-primary" />
-                  Area
+                  {t("areas.label.area")}
                 </span>
               </div>
             </button>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SettingsScaffold } from "../components/SettingsScaffold";
 import { useSaveCompanyPreferencesMutation } from "../mutations";
 import { useCompanyPreferencesQuery } from "../queries";
@@ -12,6 +13,7 @@ import { defaultCompanyPreferences } from "../values";
 export default function LanguageSettingPage() {
   const navigate = useNavigate();
   const { session } = useAuth();
+  const { setLocale, t } = useI18n();
   const [language, setLanguage] = useState<"en" | "ar">("en");
   const preferencesQuery = useCompanyPreferencesQuery();
   const savePreferences = useSaveCompanyPreferencesMutation();
@@ -26,7 +28,7 @@ export default function LanguageSettingPage() {
     const parsed = languageSchema.safeParse(language);
 
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Invalid language.");
+      toast.error(parsed.error.issues[0]?.message ?? t("settings.language.invalid"));
       return;
     }
 
@@ -34,14 +36,15 @@ export default function LanguageSettingPage() {
       ...companyPreferences,
       language: parsed.data,
     });
-    toast.success("Company preferences saved successfully.");
+    setLocale(parsed.data);
+    toast.success(t("settings.language.saved"));
     navigate("/settings");
   }
 
   return (
-    <SettingsScaffold title="Language">
+    <SettingsScaffold title={t("settings.title.language")}>
       <div className="space-y-3">
-        {preferencesQuery.isLoading ? <p className="text-sm text-muted-foreground">Loading company preferences...</p> : null}
+        {preferencesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t("common.labels.loadingCompanyPreferences")}</p> : null}
         {preferencesQuery.error instanceof Error ? <p className="text-sm text-red-300">{preferencesQuery.error.message}</p> : null}
         {languageOptions.map((option) => {
           const active = language === option.value;
@@ -54,12 +57,12 @@ export default function LanguageSettingPage() {
                 active ? "border-primary bg-primary/8 text-foreground" : "border-black/6 bg-background text-foreground dark:border-white/8"
               }`}
             >
-              <span className="text-sm font-medium">{option.label}</span>
-              {active ? <span className="text-xs font-semibold text-primary">Selected</span> : null}
+              <span className="text-sm font-medium">{t(option.label as "settings.language.en" | "settings.language.ar")}</span>
+              {active ? <span className="text-xs font-semibold text-primary">{t("common.labels.selected")}</span> : null}
             </button>
           );
         })}
-        {!canManage ? <p className="text-sm text-muted-foreground">Only Owner and Admin can update company preferences.</p> : null}
+        {!canManage ? <p className="text-sm text-muted-foreground">{t("settings.language.onlyAdmin")}</p> : null}
         {savePreferences.error instanceof Error ? <p className="text-sm text-red-300">{savePreferences.error.message}</p> : null}
         <button
           type="button"
@@ -67,7 +70,7 @@ export default function LanguageSettingPage() {
           disabled={!canManage || preferencesQuery.isLoading || savePreferences.isPending}
           className="mt-6 w-full rounded-2xl bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
         >
-          {savePreferences.isPending ? "Saving..." : "Save"}
+          {savePreferences.isPending ? t("common.actions.saving") : t("common.actions.save")}
         </button>
       </div>
     </SettingsScaffold>

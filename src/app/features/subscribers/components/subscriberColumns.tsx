@@ -9,22 +9,26 @@ const columnHelper = createColumnHelper<SubscriberRow>();
 
 interface SubscriberColumnsOptions {
   canDelete: boolean;
+  formatDate: (value: string) => string;
   onDelete: (subscriber: SubscriberRow) => void;
   onEdit: (subscriber: SubscriberRow) => void;
   onView: (subscriber: SubscriberRow) => void;
+  t: (key: any, values?: Record<string, string | number>) => string;
 }
 
 export function createSubscriberColumns({
   canDelete,
+  formatDate,
   onDelete,
   onEdit,
   onView,
+  t,
 }: Readonly<SubscriberColumnsOptions>) {
   return [
   columnHelper.accessor("name", {
     header: ({ column }) => (
       <button className="inline-flex items-center gap-1" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        Name
+        {t("subscribers.table.name")}
         <ArrowUpDown className="h-3.5 w-3.5" />
       </button>
     ),
@@ -36,33 +40,42 @@ export function createSubscriberColumns({
     ),
   }),
   columnHelper.accessor("phone", {
-    header: "Phone Number",
-    cell: (info) => <span className="font-mono text-sm text-muted-foreground">{info.getValue()}</span>,
+    header: t("subscribers.table.phoneNumber"),
+    cell: (info) => <span className="font-mono text-sm text-muted-foreground">{info.getValue() ?? t("subscribers.notSet")}</span>,
   }),
   columnHelper.accessor("area", {
-    header: "Area",
-    cell: (info) => <span className="text-sm text-foreground">{info.getValue()}</span>,
+    header: t("subscribers.table.area"),
+    cell: (info) => <span className="text-sm text-foreground">{info.getValue() ?? t("subscribers.unassigned")}</span>,
   }),
-  columnHelper.accessor("planLabel", {
-    header: "Plan",
-    cell: (info) => <span className="font-mono text-sm font-bold text-primary">{info.getValue()}</span>,
+  columnHelper.accessor("planValue", {
+    id: "plan",
+    header: t("subscribers.table.plan"),
+    cell: ({ row }) => (
+      <span className="font-mono text-sm font-bold text-primary">
+        {row.original.plan === "Ampere"
+          ? `${formatNumberEn(row.original.planValue)} A`
+          : row.original.plan === "FixedKilowatt"
+            ? `${formatNumberEn(row.original.planValue)} kW prepaid`
+            : `${formatNumberEn(row.original.planValue)} kW`}
+      </span>
+    ),
   }),
   columnHelper.accessor("subscriptionDate", {
-    header: "Since",
-    cell: (info) => <span className="whitespace-nowrap text-sm text-muted-foreground">{info.getValue()}</span>,
+    header: t("subscribers.table.since"),
+    cell: (info) => <span className="whitespace-nowrap text-sm text-muted-foreground">{formatDate(info.getValue())}</span>,
   }),
   columnHelper.accessor("status", {
-    header: "Status",
+    header: t("subscribers.table.status"),
     cell: (info) => <StatusBadge status={info.getValue()} />,
   }),
   columnHelper.accessor("amountDue", {
     header: ({ column }) => (
       <button className="inline-flex items-center gap-1" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        Amount Due
+        {t("subscribers.table.amountDue")}
         <ArrowUpDown className="h-3.5 w-3.5" />
       </button>
     ),
-    cell: (info) => <span className="font-mono text-sm font-semibold text-foreground">${info.getValue().toLocaleString()}</span>,
+    cell: (info) => <span className="font-mono text-sm font-semibold text-foreground">{formatCurrencyEn(info.getValue())}</span>,
   }),
   columnHelper.display({
     id: "actions",
@@ -77,4 +90,18 @@ export function createSubscriberColumns({
     ),
   }),
 ];
+}
+
+function formatCurrencyEn(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatNumberEn(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 2,
+  }).format(value);
 }

@@ -164,15 +164,15 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
   return {
     id: subscriber.id,
     name: subscriber.name,
-    phone: subscriber.phone || "Not set",
-    address: subscriber.address || "Not set",
-    areaName: subscriber.areaName || "Unassigned",
+    phone: subscriber.phone,
+    address: subscriber.address,
+    areaName: subscriber.areaName,
     customerType: subscriber.customerType,
     plan: subscriber.plan,
     planValue: subscriber.planValue,
     customerStatus: subscriber.customerStatus,
-    subscriptionDate: formatDate(subscriber.subscriptionDate),
-    createdAt: formatDateTime(subscriber.createdAt),
+    subscriptionDate: subscriber.subscriptionDate,
+    createdAt: subscriber.createdAt,
     customerRelation: subscriber.customerRelation || "",
     hasPricingOverride: subscriber.hasPricingOverride,
     pricingOverride: subscriber.pricingOverride
@@ -221,17 +221,6 @@ export function deleteSubscriber(id: string, token: string) {
     },
     token,
   );
-}
-
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
 }
 
 function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): SubscriberRow {

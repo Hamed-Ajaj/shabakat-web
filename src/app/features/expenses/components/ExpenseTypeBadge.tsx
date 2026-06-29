@@ -1,5 +1,7 @@
 import { Badge } from "../../../components/ui/badge";
+import { useI18n } from "../../../providers/I18nProvider";
 import type { ExpenseType } from "../types";
+import { getExpenseTypeLabel } from "../expenseLabels";
 
 const variantMap: Record<ExpenseType, string> = {
   Fuel: "bg-amber-500/12 text-amber-300 border-amber-500/20",
@@ -9,9 +11,11 @@ const variantMap: Record<ExpenseType, string> = {
 };
 
 export function ExpenseTypeBadge({ type }: Readonly<{ type: ExpenseType }>) {
+  const { t } = useI18n();
+
   return (
     <Badge className={`border ${variantMap[type]}`}>
-      {type}
+      {getExpenseTypeLabel(type, t)}
     </Badge>
   );
 }

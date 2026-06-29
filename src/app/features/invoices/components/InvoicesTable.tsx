@@ -14,8 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import type { InvoiceRow } from "../types";
+import { formatCurrency } from "../utils";
 import { createInvoiceColumns } from "./invoiceColumns";
 
 interface InvoicesTableProps {
@@ -49,9 +51,10 @@ export function InvoicesTable({
   pagination,
   totalCount,
 }: Readonly<InvoicesTableProps>) {
+  const { formatDate, t } = useI18n();
   const columns = useMemo(
-    () => createInvoiceColumns({ canDelete, onDelete, onPay, onPrint, onView }),
-    [canDelete, onDelete, onPay, onPrint, onView],
+    () => createInvoiceColumns({ canDelete, formatCurrency, formatDate, onDelete, onPay, onPrint, onView, t }),
+    [canDelete, formatDate, onDelete, onPay, onPrint, onView, t],
   );
 
   const table = useReactTable({
@@ -66,10 +69,10 @@ export function InvoicesTable({
 
   return (
     <SectionCard className="overflow-hidden">
-      {isLoading ? <div className="px-4 py-10 text-sm text-muted-foreground">Loading invoices...</div> : null}
+      {isLoading ? <div className="px-4 py-10 text-sm text-muted-foreground">{t("invoices.loading")}</div> : null}
       {!isLoading && error ? <div className="px-4 py-10 text-sm text-red-300">{error}</div> : null}
       {!isLoading && !error && data.length === 0 ? (
-        <div className="px-4 py-10 text-sm text-muted-foreground">No invoices matched the current filters.</div>
+        <div className="px-4 py-10 text-sm text-muted-foreground">{t("invoices.empty")}</div>
       ) : null}
 
       {!isLoading && !error && data.length > 0 ? (
@@ -82,7 +85,7 @@ export function InvoicesTable({
                     {headerGroup.headers.map((header) => (
                       <th
                         key={header.id}
-                        className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+                        className="px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
                       >
                         {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                       </th>
@@ -106,36 +109,35 @@ export function InvoicesTable({
 
           <div className="flex flex-col gap-3 border-t border-white/8 px-4 py-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
             <div>
-              Showing {pagination.pageIndex * pagination.pageSize + 1}
-              {" - "}
-              {pagination.pageIndex * pagination.pageSize + data.length}
-              {" of "}
-              {totalCount}
-              {isFetching ? " · Refreshing..." : ""}
+              {t(isFetching ? "invoices.pageInfoUpdating" : "invoices.pageInfo", {
+                from: pagination.pageIndex * pagination.pageSize + 1,
+                to: pagination.pageIndex * pagination.pageSize + data.length,
+                total: totalCount,
+              })}
             </div>
 
             <div className="flex items-center gap-2 self-end md:self-auto">
               <Select value={String(pagination.pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
                 <SelectTrigger className="h-9 w-28 rounded-xl border-white/8 bg-card">
-                  <SelectValue placeholder="Page size" />
+                  <SelectValue placeholder={t("invoices.pageSizePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[10, 20, 50].map((size) => (
                     <SelectItem key={size} value={String(size)}>
-                      {size} / page
+                      {t("invoices.pageSize", { size })}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
               <Button type="button" variant="outline" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
-                Previous
+                {t("invoices.actions.previous")}
               </Button>
               <span className="min-w-24 text-center">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {t("invoices.pageNumber", { page: table.getState().pagination.pageIndex + 1, count: table.getPageCount() })}
               </span>
               <Button type="button" variant="outline" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
-                Next
+                {t("invoices.actions.next")}
               </Button>
             </div>
           </div>

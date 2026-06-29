@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SettingsScaffold } from "../components/SettingsScaffold";
 import { useSaveCompanyPreferencesMutation } from "../mutations";
 import { useCompanyPreferencesQuery } from "../queries";
@@ -11,6 +12,7 @@ import { defaultCompanyPreferences } from "../values";
 export default function TriggerMessagePage() {
   const navigate = useNavigate();
   const { session } = useAuth();
+  const { t } = useI18n();
   const [triggerMessage, setTriggerMessage] = useState("");
   const preferencesQuery = useCompanyPreferencesQuery();
   const savePreferences = useSaveCompanyPreferencesMutation();
@@ -25,7 +27,7 @@ export default function TriggerMessagePage() {
     const parsed = triggerMessageSchema.safeParse(triggerMessage);
 
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Invalid trigger message.");
+      toast.error(parsed.error.issues[0]?.message ?? t("settings.triggerMessage.invalid"));
       return;
     }
 
@@ -33,17 +35,17 @@ export default function TriggerMessagePage() {
       ...companyPreferences,
       triggerMessage: parsed.data,
     });
-    toast.success("Company preferences saved successfully.");
+    toast.success(t("settings.preferences.saved"));
     navigate("/settings");
   }
 
   return (
-    <SettingsScaffold title="Trigger Message">
+    <SettingsScaffold title={t("settings.title.triggerMessage")}>
       <div className="space-y-4">
-        {preferencesQuery.isLoading ? <p className="text-sm text-muted-foreground">Loading company preferences...</p> : null}
+        {preferencesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t("common.labels.loadingCompanyPreferences")}</p> : null}
         {preferencesQuery.error instanceof Error ? <p className="text-sm text-red-300">{preferencesQuery.error.message}</p> : null}
         <label className="space-y-2">
-          <span className="block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Message</span>
+          <span className="block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">{t("settings.triggerMessage.message")}</span>
           <textarea
             rows={8}
             value={triggerMessage}
@@ -51,8 +53,8 @@ export default function TriggerMessagePage() {
             className="w-full rounded-2xl border border-black/6 bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary dark:border-white/8"
           />
         </label>
-        <p className="text-sm leading-6 text-muted-foreground">Keep this under 1000 characters to match backend validation.</p>
-        {!canManage ? <p className="text-sm text-muted-foreground">Only Owner and Admin can update company preferences.</p> : null}
+        <p className="text-sm leading-6 text-muted-foreground">{t("settings.triggerMessage.helper")}</p>
+        {!canManage ? <p className="text-sm text-muted-foreground">{t("settings.permissions.onlyAdmin")}</p> : null}
         {savePreferences.error instanceof Error ? <p className="text-sm text-red-300">{savePreferences.error.message}</p> : null}
         <button
           type="button"
@@ -60,7 +62,7 @@ export default function TriggerMessagePage() {
           disabled={!canManage || preferencesQuery.isLoading || savePreferences.isPending}
           className="w-full rounded-2xl bg-secondary px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary/80"
         >
-          {savePreferences.isPending ? "Saving..." : "Save"}
+          {savePreferences.isPending ? t("common.actions.saving") : t("common.actions.save")}
         </button>
       </div>
     </SettingsScaffold>

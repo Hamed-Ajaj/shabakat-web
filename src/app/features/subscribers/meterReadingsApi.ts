@@ -28,7 +28,6 @@ export async function fetchMeterReadings(
     readingValue: reading.readingValue,
     consumption: reading.consumption,
     createdAt: reading.createdAt,
-    createdAtLabel: formatDateTime(reading.createdAt),
   }));
 }
 
@@ -65,14 +64,4 @@ export function deleteMeterReading(
     },
     token,
   );
-}
-
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
 }

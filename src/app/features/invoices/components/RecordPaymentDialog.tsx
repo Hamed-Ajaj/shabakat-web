@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ export function RecordPaymentDialog({
   open,
   onOpenChange,
 }: Readonly<RecordPaymentDialogProps>) {
+  const { t } = useI18n();
   const detailQuery = useInvoiceDetailQuery(invoiceId ?? undefined);
   const recordPayment = useRecordInvoicePaymentMutation(invoiceId ?? "");
   const form = useForm<RecordPaymentFormInput, undefined, RecordPaymentFormValues>({
@@ -65,7 +67,7 @@ export function RecordPaymentDialog({
     }
 
     await recordPayment.mutateAsync(values);
-    toast.success("Payment recorded successfully.");
+    toast.success(t("invoices.payment.success"));
     onOpenChange(false);
   }
 
@@ -81,9 +83,9 @@ export function RecordPaymentDialog({
     >
       <DialogContent className="border-white/8 bg-background sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Record Payment</DialogTitle>
+          <DialogTitle>{t("invoices.payment.title")}</DialogTitle>
           <DialogDescription>
-            {detailQuery.data ? `Collect payment for invoice #${detailQuery.data.invoiceNumber}.` : "Record payment for this invoice."}
+            {detailQuery.data ? t("invoices.payment.descriptionWithNumber", { number: `#${detailQuery.data.invoiceNumber}` }) : t("invoices.payment.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -91,33 +93,33 @@ export function RecordPaymentDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             {detailQuery.data ? (
               <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3 text-sm text-muted-foreground">
-                Remaining balance: <span className="font-mono font-semibold text-foreground">{formatCurrency(detailQuery.data.amountDue)}</span>
+                {t("invoices.payment.remaining", { amount: formatCurrency(detailQuery.data.amountDue) })}
               </div>
             ) : null}
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Amount</label>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.payment.amount")}</label>
               <Input type="number" step="0.01" min="0" {...form.register("amount")} className="rounded-xl border-white/8 bg-card" />
               {form.formState.errors.amount ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.amount.message}</p> : null}
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Payment Method</label>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.payment.method")}</label>
               <Select value={form.watch("paymentMethod")} onValueChange={(value) => form.setValue("paymentMethod", value as "Cash" | "Wish", { shouldValidate: true })}>
                 <SelectTrigger className="rounded-xl border-white/8 bg-card">
-                  <SelectValue placeholder="Select payment method" />
+                  <SelectValue placeholder={t("invoices.create.paymentMethodPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Cash">Cash</SelectItem>
-                  <SelectItem value="Wish">Wish</SelectItem>
+                  <SelectItem value="Cash">{t("invoices.paymentMethod.cash")}</SelectItem>
+                  <SelectItem value="Wish">{t("invoices.paymentMethod.wish")}</SelectItem>
                 </SelectContent>
               </Select>
               {form.formState.errors.paymentMethod ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.paymentMethod.message}</p> : null}
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</label>
-              <Textarea rows={4} {...form.register("notes")} className="rounded-xl border-white/8 bg-card" placeholder="Optional receipt or context note" />
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.payment.notes")}</label>
+              <Textarea rows={4} {...form.register("notes")} className="rounded-xl border-white/8 bg-card" placeholder={t("invoices.payment.notesPlaceholder")} />
               {form.formState.errors.notes ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.notes.message}</p> : null}
             </div>
 
@@ -125,11 +127,11 @@ export function RecordPaymentDialog({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t("invoices.actions.cancel")}
               </Button>
               <Button type="submit" disabled={recordPayment.isPending || detailQuery.isLoading}>
                 {recordPayment.isPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
-                Record Payment
+                {t("invoices.actions.recordPayment")}
               </Button>
             </DialogFooter>
           </form>

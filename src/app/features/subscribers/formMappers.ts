@@ -34,8 +34,8 @@ export function mapSubscriberDetailToFormInput(
 
   return {
     name: subscriber.name,
-    phone: subscriber.phone === "Not set" ? "" : subscriber.phone,
-    address: subscriber.address === "Not set" ? "" : subscriber.address,
+    phone: subscriber.phone ?? "",
+    address: subscriber.address ?? "",
     areaId: matchedArea?.id ?? "",
     customerType: subscriber.customerType,
     plan: subscriber.plan,

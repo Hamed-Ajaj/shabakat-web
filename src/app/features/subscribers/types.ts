@@ -6,9 +6,10 @@ export type SubscriberPlan = "Ampere" | "Kilowatt" | "FixedKilowatt";
 export interface SubscriberRow {
   id: string;
   name: string;
-  phone: string;
-  area: string;
-  planLabel: string;
+  phone: string | null;
+  area: string | null;
+  plan: SubscriberPlan;
+  planValue: number;
   subscriptionDate: string;
   status: SubscriberBillingStatus;
   amountDue: number;
@@ -19,9 +20,9 @@ export interface SubscriberRow {
 export interface SubscriberDetail {
   id: string;
   name: string;
-  phone: string;
-  address: string;
-  areaName: string;
+  phone: string | null;
+  address: string | null;
+  areaName: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
   plan: SubscriberPlan;
   planValue: number;
@@ -46,7 +47,6 @@ export interface MeterReadingRecord {
   readingValue: number;
   consumption: number | null;
   createdAt: string;
-  createdAtLabel: string;
 }
 
 export interface SubscribersQueryFilters {

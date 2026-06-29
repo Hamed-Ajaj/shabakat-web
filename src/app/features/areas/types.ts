@@ -3,7 +3,6 @@ export interface AreaRecord {
   name: string;
   customerCount: number;
   createdAt: string;
-  createdAtLabel: string;
 }
 
 export interface AreaFormValues {

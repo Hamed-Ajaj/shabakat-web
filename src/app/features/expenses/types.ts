@@ -5,17 +5,13 @@ export interface ExpenseRow {
   expenseType: ExpenseType;
   amount: number;
   expenseDate: string;
-  expenseDateLabel: string;
   label: string;
   notes: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface ExpenseDetail extends ExpenseRow {
-  createdAtLabel: string;
-  updatedAtLabel: string;
-}
+export type ExpenseDetail = ExpenseRow;
 
 export interface ExpensesQueryFilters {
   dateFrom: string;

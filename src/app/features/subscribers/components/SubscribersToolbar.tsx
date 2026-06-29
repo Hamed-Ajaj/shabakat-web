@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import type { AreaRecord } from "../../areas/types";
 import type { SubscriberSearchField } from "../types";
 
@@ -34,6 +35,7 @@ export function SubscribersToolbar({
   onSearchFieldChange,
   onSearchTermChange,
 }: Readonly<SubscribersToolbarProps>) {
+  const { t } = useI18n();
   const areaValue = areaId || "all";
 
   return (
@@ -48,11 +50,11 @@ export function SubscribersToolbar({
               }
             >
               <SelectTrigger className="rounded-xl border-white/8 bg-card">
-                <SelectValue placeholder="Search by" />
+                <SelectValue placeholder={t("subscribers.searchField.name")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="phone">Phone</SelectItem>
+                <SelectItem value="name">{t("subscribers.searchField.name")}</SelectItem>
+                <SelectItem value="phone">{t("subscribers.searchField.phone")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -62,9 +64,7 @@ export function SubscribersToolbar({
             value={searchTerm}
             onChange={(event) => onSearchTermChange(event.target.value)}
             placeholder={
-              searchField === "name"
-                ? "Search subscribers by name..."
-                : "Search subscribers by phone..."
+              searchField === "name" ? t("subscribers.search.byName") : t("subscribers.search.byPhone")
             }
             className="w-full rounded-xl border border-white/8 bg-card px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-primary"
           />
@@ -76,10 +76,10 @@ export function SubscribersToolbar({
             onValueChange={(value) => onAreaChange(value === "all" ? "" : value)}
           >
             <SelectTrigger className="rounded-xl border-white/8 bg-card">
-              <SelectValue placeholder="Area" />
+              <SelectValue placeholder={t("subscribers.search.area")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All areas</SelectItem>
+              <SelectItem value="all">{t("subscribers.search.allAreas")}</SelectItem>
               {areas.map((area) => (
                 <SelectItem key={area.id} value={area.id}>
                   {area.name}
@@ -94,13 +94,13 @@ export function SubscribersToolbar({
           className="rounded-xl px-4 py-2.5 text-sm font-medium"
           style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}
         >
-          Add Subscriber
+          {t("subscribers.actions.add")}
         </Button>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        {total} subscriber{total === 1 ? "" : "s"}
-        {isFetching ? " · Refreshing..." : ""}
+        {t(total === 1 ? "subscribers.count" : "subscribers.count_plural", { count: total })}
+        {isFetching ? ` · ${t("areas.refreshing")}` : ""}
       </p>
     </div>
   );

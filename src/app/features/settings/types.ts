@@ -1,3 +1,4 @@
+import type { TranslationKey } from "../../shared/i18n/messages";
 import type { ThemeMode } from "../../providers/SettingsProvider";
 
 export type PricingTier = "base" | "residential" | "commercial" | "industrial";
@@ -49,6 +50,6 @@ export interface CompanyPreferencesPayload {
 
 export interface SettingThemeOption {
   value: ThemeMode;
-  label: string;
-  description: string;
+  label: TranslationKey;
+  description: TranslationKey;
 }

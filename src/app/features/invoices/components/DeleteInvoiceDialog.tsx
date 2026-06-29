@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ export function DeleteInvoiceDialog({
   open,
   onOpenChange,
 }: Readonly<DeleteInvoiceDialogProps>) {
+  const { t } = useI18n();
   const deleteInvoice = useDeleteInvoiceMutation();
 
   async function handleDelete() {
@@ -33,7 +35,7 @@ export function DeleteInvoiceDialog({
     }
 
     await deleteInvoice.mutateAsync(invoiceId);
-    toast.success("Invoice deleted successfully.");
+    toast.success(t("invoices.delete.success"));
     onOpenChange(false);
   }
 
@@ -49,9 +51,11 @@ export function DeleteInvoiceDialog({
     >
       <AlertDialogContent className="border-white/8 bg-background">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Invoice</AlertDialogTitle>
+          <AlertDialogTitle>{t("invoices.delete.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Delete invoice {invoiceNumber ? `#${invoiceNumber}` : "?"}. Backend blocks deletion if payments already exist.
+            {t("invoices.delete.description", {
+              number: invoiceNumber ? `#${invoiceNumber}` : t("invoices.delete.fallbackNumber"),
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -60,12 +64,12 @@ export function DeleteInvoiceDialog({
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button type="button" variant="outline">
-              Cancel
+              {t("invoices.actions.cancel")}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button type="button" variant="destructive" disabled={deleteInvoice.isPending} onClick={handleDelete}>
-              {deleteInvoice.isPending ? "Deleting..." : "Delete"}
+              {deleteInvoice.isPending ? t("invoices.actions.deleting") : t("invoices.actions.delete")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

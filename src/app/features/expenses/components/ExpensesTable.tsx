@@ -15,8 +15,10 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Skeleton } from "../../../components/ui/skeleton";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import type { ExpenseRow } from "../types";
+import { formatCurrency } from "../utils";
 import { createExpenseColumns } from "./expenseColumns";
 
 interface ExpensesTableProps {
@@ -48,9 +50,10 @@ export function ExpensesTable({
   pagination,
   totalCount,
 }: Readonly<ExpensesTableProps>) {
+  const { formatDate, t } = useI18n();
   const columns = useMemo(
-    () => createExpenseColumns({ canManage, onDelete, onEdit, onView }),
-    [canManage, onDelete, onEdit, onView],
+    () => createExpenseColumns({ canManage, formatCurrency, formatDate, onDelete, onEdit, onView, t }),
+    [canManage, formatDate, onDelete, onEdit, onView, t],
   );
 
   const table = useReactTable({
@@ -68,7 +71,7 @@ export function ExpensesTable({
       {isLoading ? <ExpensesTableSkeleton /> : null}
       {!isLoading && error ? <div className="px-4 py-10 text-sm text-red-300">{error}</div> : null}
       {!isLoading && !error && data.length === 0 ? (
-        <div className="px-4 py-10 text-sm text-muted-foreground">No expenses matched the current filters.</div>
+        <div className="px-4 py-10 text-sm text-muted-foreground">{t("expenses.empty")}</div>
       ) : null}
 
       {!isLoading && !error && data.length > 0 ? (
@@ -79,7 +82,7 @@ export function ExpensesTable({
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id} className="border-b border-white/8">
                     {headerGroup.headers.map((header) => (
-                      <th key={header.id} className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      <th key={header.id} className="px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                       </th>
                     ))}
@@ -102,35 +105,35 @@ export function ExpensesTable({
 
           <div className="flex flex-col gap-3 border-t border-white/8 px-4 py-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
             <div>
-              Showing {pagination.pageIndex * pagination.pageSize + 1}
-              {" - "}
-              {pagination.pageIndex * pagination.pageSize + data.length}
-              {" of "}
-              {totalCount}
-              {isFetching ? " · Refreshing..." : ""}
+              {t(isFetching ? "expenses.pageInfoUpdating" : "expenses.pageInfo")
+                .replace("{{from}}", String(pagination.pageIndex * pagination.pageSize + 1))
+                .replace("{{to}}", String(pagination.pageIndex * pagination.pageSize + data.length))
+                .replace("{{total}}", String(totalCount))}
             </div>
 
             <div className="flex items-center gap-2 self-end md:self-auto">
               <Select value={String(pagination.pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
                 <SelectTrigger className="h-9 w-28 rounded-xl border-white/8 bg-card">
-                  <SelectValue placeholder="Page size" />
+                  <SelectValue placeholder={t("expenses.pageSizePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[10, 20, 50].map((size) => (
                     <SelectItem key={size} value={String(size)}>
-                      {size} / page
+                      {t("expenses.pageSize").replace("{{size}}", String(size))}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Button type="button" variant="outline" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
-                Previous
+                {t("expenses.actions.previous")}
               </Button>
               <span className="min-w-24 text-center">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {t("expenses.pageNumber")
+                  .replace("{{page}}", String(table.getState().pagination.pageIndex + 1))
+                  .replace("{{count}}", String(table.getPageCount()))}
               </span>
               <Button type="button" variant="outline" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
-                Next
+                {t("expenses.actions.next")}
               </Button>
             </div>
           </div>

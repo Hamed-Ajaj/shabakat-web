@@ -5,6 +5,7 @@ import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { SettingsScaffold } from "../components/SettingsScaffold";
 import { useConnectWhatsAppMutation, useDisconnectWhatsAppMutation } from "../whatsappMutations";
 import { useWhatsAppStatusQuery } from "../whatsappQueries";
@@ -17,6 +18,7 @@ type WhatsAppFlowState = "idle" | "waiting-for-scan" | "waiting-for-confirmation
 
 export default function WhatsAppConnectionPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const connectMutation = useConnectWhatsAppMutation();
   const disconnectMutation = useDisconnectWhatsAppMutation();
   const [qrCode, setQrCode] = useState("");
@@ -39,12 +41,12 @@ export default function WhatsAppConnectionPage() {
         dateStyle: "medium",
         timeStyle: "short",
       }).format(statusQuery.dataUpdatedAt)
-    : "Not checked yet";
+    : t("settings.whatsapp.notChecked");
 
   useEffect(() => {
     if (status === "open") {
       if (activeAttemptId !== null && notifiedAttemptIdRef.current !== activeAttemptId) {
-        toast.success("Connected");
+        toast.success(t("settings.whatsapp.status.connected"));
         notifiedAttemptIdRef.current = activeAttemptId;
       }
 
@@ -52,7 +54,7 @@ export default function WhatsAppConnectionPage() {
       setPollStartedAt(null);
       setFlowState("connected");
       setQrCode("");
-      setConnectMessage("Connected");
+      setConnectMessage(t("settings.whatsapp.status.connected"));
       return;
     }
 
@@ -64,22 +66,22 @@ export default function WhatsAppConnectionPage() {
       setActiveAttemptId(null);
       setPollStartedAt(null);
       setFlowState("timeout");
-      setConnectMessage("Connection timed out. Generate a new QR and try again.");
-      toast.error("WhatsApp connection timed out.");
+      setConnectMessage(t("settings.whatsapp.qr.timeoutDescription"));
+      toast.error(t("settings.whatsapp.qr.timeoutTitle"));
       return;
     }
 
     if (status === "connecting") {
       setFlowState("waiting-for-confirmation");
-      setConnectMessage("Waiting for confirmation...");
+      setConnectMessage(t("settings.whatsapp.qr.waitingForConfirmation"));
       return;
     }
 
     if (status === "close" && !qrCode) {
       setFlowState("waiting-for-confirmation");
-      setConnectMessage("Waiting for confirmation...");
+      setConnectMessage(t("settings.whatsapp.qr.waitingForConfirmation"));
     }
-  }, [activeAttemptId, pollStartedAt, qrCode, shouldPollStatus, status]);
+  }, [activeAttemptId, pollStartedAt, qrCode, shouldPollStatus, status, t]);
 
   async function handleGenerateQr() {
     const attemptId = nextAttemptIdRef.current + 1;
@@ -100,10 +102,10 @@ export default function WhatsAppConnectionPage() {
         setQrCode(response.qrCode.trim());
         setQrImageKey(attemptId);
         setFlowState("waiting-for-scan");
-        setConnectMessage("Scan QR with WhatsApp");
+        setConnectMessage(t("settings.whatsapp.qr.scanWithWhatsapp"));
       } else {
         setFlowState("waiting-for-confirmation");
-        setConnectMessage("Waiting for confirmation...");
+        setConnectMessage(t("settings.whatsapp.qr.waitingForConfirmation"));
       }
 
       const latestStatus = await statusQuery.refetch();
@@ -114,15 +116,15 @@ export default function WhatsAppConnectionPage() {
         setPollStartedAt(null);
         setFlowState("connected");
         setQrCode("");
-        setConnectMessage("Connected");
-        toast.success("Connected");
+        setConnectMessage(t("settings.whatsapp.status.connected"));
+        toast.success(t("settings.whatsapp.status.connected"));
         notifiedAttemptIdRef.current = attemptId;
         return;
       }
 
       if (nextStatus === "connecting" || !response.qrCode.trim()) {
         setFlowState("waiting-for-confirmation");
-        setConnectMessage("Waiting for confirmation...");
+        setConnectMessage(t("settings.whatsapp.qr.waitingForConfirmation"));
       }
     } catch (error) {
       setActiveAttemptId(null);
@@ -130,7 +132,7 @@ export default function WhatsAppConnectionPage() {
       setFlowState("idle");
       setQrCode("");
       setConnectMessage("");
-      toast.error(error instanceof Error ? error.message : "Failed to generate WhatsApp QR code.");
+      toast.error(error instanceof Error ? error.message : t("settings.whatsapp.error.generateQr"));
     }
   }
 
@@ -145,12 +147,12 @@ export default function WhatsAppConnectionPage() {
       toast.success(response.message);
       await statusQuery.refetch();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to disconnect WhatsApp.");
+      toast.error(error instanceof Error ? error.message : t("settings.whatsapp.error.disconnect"));
     }
   }
 
   return (
-    <SettingsScaffold title="WhatsApp Connection">
+    <SettingsScaffold title={t("settings.title.whatsapp")}>
       <div className="space-y-6">
         <div className="rounded-[24px] border border-black/6 bg-background/70 p-4 dark:border-white/8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -160,8 +162,8 @@ export default function WhatsAppConnectionPage() {
                   <MessageCircle className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">WhatsApp session</p>
-                  <p className="text-xs text-muted-foreground">Evolution API connection for automated reminders</p>
+                  <p className="text-sm font-medium text-foreground">{t("settings.whatsapp.sessionTitle")}</p>
+                  <p className="text-xs text-muted-foreground">{t("settings.whatsapp.sessionDescription")}</p>
                 </div>
               </div>
 
@@ -174,19 +176,19 @@ export default function WhatsAppConnectionPage() {
               {!statusQuery.isLoading && !statusQuery.error ? (
                 <div className="grid gap-3 sm:grid-cols-3">
                   <StatusCard
-                    label="State"
+                    label={t("settings.whatsapp.card.state")}
                     value={<StatusBadge state={status} />}
-                    description={getStateDescription(status)}
+                    description={getStateDescription(status, t)}
                   />
                   <StatusCard
-                    label="Instance"
-                    value={<span className="text-sm font-medium text-foreground">{statusQuery.data?.instanceName ?? "Unknown"}</span>}
-                    description="Configured Evolution instance"
+                    label={t("settings.whatsapp.card.instance")}
+                    value={<span className="text-sm font-medium text-foreground">{statusQuery.data?.instanceName ?? t("settings.whatsapp.status.unknown")}</span>}
+                    description={t("settings.whatsapp.card.instanceDescription")}
                   />
                   <StatusCard
-                    label="Last checked"
+                    label={t("settings.whatsapp.card.lastChecked")}
                     value={<span className="text-sm font-medium text-foreground">{lastCheckedLabel}</span>}
-                    description={shouldPollStatus ? "Polling every 2.5 seconds" : "Polling every 3 seconds"}
+                    description={shouldPollStatus ? t("settings.whatsapp.card.pollingActive") : t("settings.whatsapp.card.pollingIdle")}
                   />
                 </div>
               ) : null}
@@ -200,7 +202,7 @@ export default function WhatsAppConnectionPage() {
                 disabled={statusQuery.isFetching}
               >
                 <RefreshCw className={statusQuery.isFetching ? "animate-spin" : ""} />
-                Refresh
+                {t("settings.whatsapp.actions.refresh")}
               </Button>
               <Button
                 type="button"
@@ -208,7 +210,7 @@ export default function WhatsAppConnectionPage() {
                 disabled={!canConnect || connectMutation.isPending}
               >
                 <QrCode className="h-4 w-4" />
-                {connectMutation.isPending ? "Generating..." : "Generate QR"}
+                {connectMutation.isPending ? t("settings.whatsapp.actions.generating") : t("settings.whatsapp.actions.generateQr")}
               </Button>
               <Button
                 type="button"
@@ -217,13 +219,13 @@ export default function WhatsAppConnectionPage() {
                 disabled={!canDisconnect || disconnectMutation.isPending || status !== "open"}
               >
                 <Unplug className="h-4 w-4" />
-                {disconnectMutation.isPending ? "Disconnecting..." : "Disconnect"}
+                {disconnectMutation.isPending ? t("settings.whatsapp.actions.disconnecting") : t("settings.whatsapp.actions.disconnect")}
               </Button>
             </div>
           </div>
 
           {!canConnect ? (
-            <p className="mt-4 text-sm text-muted-foreground">Only Owner and Admin can generate a QR code. Only Owner can disconnect a live session.</p>
+            <p className="mt-4 text-sm text-muted-foreground">{t("settings.whatsapp.permissions")}</p>
           ) : null}
         </div>
 
@@ -233,8 +235,8 @@ export default function WhatsAppConnectionPage() {
               <QrCode className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Scan QR Code</p>
-              <p className="text-xs text-muted-foreground">Open WhatsApp on the phone and scan to connect this generator account.</p>
+              <p className="text-sm font-medium text-foreground">{t("settings.whatsapp.qr.title")}</p>
+              <p className="text-xs text-muted-foreground">{t("settings.whatsapp.qr.description")}</p>
             </div>
           </div>
 
@@ -244,20 +246,20 @@ export default function WhatsAppConnectionPage() {
                 <img
                   key={qrImageKey}
                   src={qrCode}
-                  alt="WhatsApp QR code"
+                  alt={t("settings.whatsapp.qr.alt")}
                   className="h-full w-full max-w-[280px] rounded-2xl object-contain"
                 />
               </div>
-              <p className="text-sm text-muted-foreground">{connectMessage || "Scan QR with WhatsApp"}</p>
+              <p className="text-sm text-muted-foreground">{connectMessage || t("settings.whatsapp.qr.scanWithWhatsapp")}</p>
             </div>
           ) : (
             <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[28px] border border-dashed border-black/8 bg-black/[0.015] px-6 text-center dark:border-white/10 dark:bg-white/[0.02]">
               <QrCode className="mb-4 h-10 w-10 text-primary" />
               <p className="text-sm font-medium text-foreground">
-                {getQrPanelTitle(status, flowState)}
+                {getQrPanelTitle(status, flowState, t)}
               </p>
               <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-                {getQrPanelDescription(status, flowState, connectMessage)}
+                {getQrPanelDescription(status, flowState, connectMessage, t)}
               </p>
             </div>
           )}
@@ -300,19 +302,21 @@ function StatusCard({
 }
 
 function StatusBadge({ state }: Readonly<{ state: "open" | "close" | "connecting" | "unknown" }>) {
+  const { t } = useI18n();
+
   if (state === "open") {
-    return <Badge className="border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">Connected</Badge>;
+    return <Badge className="border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">{t("settings.whatsapp.status.connected")}</Badge>;
   }
 
   if (state === "connecting") {
-    return <Badge className="border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300">Connecting</Badge>;
+    return <Badge className="border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300">{t("settings.whatsapp.status.connecting")}</Badge>;
   }
 
   if (state === "close") {
-    return <Badge variant="outline" className="border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300">Disconnected</Badge>;
+    return <Badge variant="outline" className="border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-300">{t("settings.whatsapp.status.disconnected")}</Badge>;
   }
 
-  return <Badge variant="outline">Unknown</Badge>;
+  return <Badge variant="outline">{t("settings.whatsapp.status.unknown")}</Badge>;
 }
 
 function normalizeWhatsAppState(state?: string) {
@@ -323,65 +327,67 @@ function normalizeWhatsAppState(state?: string) {
   return "unknown";
 }
 
-function getStateDescription(state: ReturnType<typeof normalizeWhatsAppState>) {
+function getStateDescription(state: ReturnType<typeof normalizeWhatsAppState>, t: (key: never) => string) {
   if (state === "open") {
-    return "Reminders can be sent from this linked WhatsApp session";
+    return t("settings.whatsapp.stateDescription.connected" as never);
   }
 
   if (state === "connecting") {
-    return "Waiting for scan or final pairing confirmation";
+    return t("settings.whatsapp.stateDescription.connecting" as never);
   }
 
   if (state === "close") {
-    return "No active linked session right now";
+    return t("settings.whatsapp.stateDescription.disconnected" as never);
   }
 
-  return "Backend returned an unrecognized connection state";
+  return t("settings.whatsapp.stateDescription.unknown" as never);
 }
 
 function getQrPanelTitle(
   status: ReturnType<typeof normalizeWhatsAppState>,
   flowState: WhatsAppFlowState,
+  t: (key: never) => string,
 ) {
   if (status === "open" || flowState === "connected") {
-    return "Connected";
+    return t("settings.whatsapp.qr.connectedTitle" as never);
   }
 
   if (flowState === "waiting-for-confirmation") {
-    return "Waiting for confirmation...";
+    return t("settings.whatsapp.qr.waitingForConfirmation" as never);
   }
 
   if (flowState === "timeout") {
-    return "Connection timed out";
+    return t("settings.whatsapp.qr.timeoutTitle" as never);
   }
 
   if (flowState === "waiting-for-scan") {
-    return "Scan QR with WhatsApp";
+    return t("settings.whatsapp.qr.scanWithWhatsapp" as never);
   }
 
-  return "No QR code generated yet";
+  return t("settings.whatsapp.qr.noQrYet" as never);
 }
 
 function getQrPanelDescription(
   status: ReturnType<typeof normalizeWhatsAppState>,
   flowState: WhatsAppFlowState,
   connectMessage: string,
+  t: (key: never) => string,
 ) {
   if (status === "open" || flowState === "connected") {
-    return "This WhatsApp session is active and ready for automated reminders.";
+    return t("settings.whatsapp.qr.connectedDescription" as never);
   }
 
   if (flowState === "timeout") {
-    return connectMessage || "Generate a new QR and try again.";
+    return connectMessage || t("settings.whatsapp.qr.timeoutDescription" as never);
   }
 
   if (flowState === "waiting-for-confirmation") {
-    return connectMessage || "Waiting for confirmation...";
+    return connectMessage || t("settings.whatsapp.qr.waitingForConfirmation" as never);
   }
 
   if (flowState === "waiting-for-scan") {
-    return connectMessage || "Scan QR with WhatsApp";
+    return connectMessage || t("settings.whatsapp.qr.scanWithWhatsapp" as never);
   }
 
-  return "Press Generate QR, then scan it from the WhatsApp mobile app.";
+  return t("settings.whatsapp.qr.idleDescription" as never);
 }

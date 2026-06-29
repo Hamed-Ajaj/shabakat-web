@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
+import { useI18n } from "../../../providers/I18nProvider";
 
 interface ExpenseRowActionsProps {
   canManage: boolean;
@@ -20,6 +21,8 @@ export function ExpenseRowActions({
   onEdit,
   onView,
 }: Readonly<ExpenseRowActionsProps>) {
+  const { isRtl, t } = useI18n();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,26 +30,26 @@ export function ExpenseRowActions({
           variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
-          aria-label="Expense actions"
+          aria-label={t("expenses.actions.more")}
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
+      <DropdownMenuContent align={isRtl ? "start" : "end"} className="w-44">
         <DropdownMenuItem onClick={onView}>
           <Eye className="h-4 w-4" />
-          View expense
+          {t("expenses.actions.view")}
         </DropdownMenuItem>
         {canManage ? (
           <DropdownMenuItem onClick={onEdit}>
             <PencilLine className="h-4 w-4" />
-            Edit expense
+            {t("expenses.actions.edit")}
           </DropdownMenuItem>
         ) : null}
         {canManage ? (
           <DropdownMenuItem variant="destructive" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
-            Delete expense
+            {t("expenses.actions.delete")}
           </DropdownMenuItem>
         ) : null}
       </DropdownMenuContent>

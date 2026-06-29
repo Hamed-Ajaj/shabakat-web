@@ -24,7 +24,6 @@ export async function fetchAreas(token: string): Promise<AreaRecord[]> {
     name: area.name,
     customerCount: area.customerCount,
     createdAt: area.createdAt,
-    createdAtLabel: formatDate(area.createdAt),
   }));
 }
 
@@ -64,12 +63,4 @@ export function deleteArea(id: string, token: string) {
     },
     token,
   );
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
 }

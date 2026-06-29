@@ -9,9 +9,7 @@ export interface InvoiceRow {
   customerName: string;
   invoiceStatus: InvoiceStatus;
   issueDate: string;
-  issueDateLabel: string;
   dueDate: string;
-  dueDateLabel: string;
   totalAmount: number;
   paidAmount: number;
   amountDue: number;
@@ -26,7 +24,6 @@ export interface InvoicePayment {
   amount: number;
   paymentMethod: PaymentMethod;
   paymentDate: string;
-  paymentDateLabel: string;
   notes: string;
   createdAt: string;
 }
@@ -37,18 +34,14 @@ export interface InvoiceDetail {
   customerName: string;
   invoiceStatus: InvoiceStatus;
   issueDate: string;
-  issueDateLabel: string;
   dueDate: string;
-  dueDateLabel: string;
   fixedCharge: number;
   tva: number;
   totalAmount: number;
   paidAmount: number;
   amountDue: number;
   createdAt: string;
-  createdAtLabel: string;
   updatedAt: string;
-  updatedAtLabel: string;
   payments: InvoicePayment[];
 }
 

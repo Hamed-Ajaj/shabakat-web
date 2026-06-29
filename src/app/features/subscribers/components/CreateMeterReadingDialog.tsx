@@ -3,6 +3,7 @@ import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,7 @@ export function CreateMeterReadingDialog({
   open,
   onOpenChange,
 }: Readonly<CreateMeterReadingDialogProps>) {
+  const { t } = useI18n();
   const createReading = useCreateMeterReadingMutation(customerId);
   const form = useForm<
     CreateMeterReadingFormInput,
@@ -48,7 +50,7 @@ export function CreateMeterReadingDialog({
 
   async function handleSubmit(values: CreateMeterReadingFormValues) {
     await createReading.mutateAsync(values);
-    toast.success("Meter reading created successfully.");
+    toast.success(t("subscribers.meterReading.create.success"));
     onOpenChange(false);
     form.reset({
       readingDate: "",
@@ -72,16 +74,18 @@ export function CreateMeterReadingDialog({
     >
       <DialogContent className="border-white/8 bg-background sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Meter Reading</DialogTitle>
+          <DialogTitle>{t("subscribers.meterReading.create.title")}</DialogTitle>
           <DialogDescription>
-            Record one monthly meter reading for {customerName || "this subscriber"}.
+            {t("subscribers.meterReading.create.description", {
+              name: customerName || t("subscribers.meterReading.create.fallbackName"),
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Reading Value</label>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("subscribers.meterReading.create.readingValue")}</label>
               <Input
                 inputMode="decimal"
                 step="0.01"
@@ -96,10 +100,10 @@ export function CreateMeterReadingDialog({
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Reading Date</label>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("subscribers.meterReading.create.readingDate")}</label>
               <Input type="date" {...form.register("readingDate")} />
               <p className="mt-2 text-xs text-muted-foreground">
-                Optional. Backend defaults to today and blocks duplicate calendar months.
+                {t("subscribers.meterReading.create.readingDateHelp")}
               </p>
             </div>
 
@@ -109,13 +113,13 @@ export function CreateMeterReadingDialog({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {t("subscribers.actions.cancel")}
               </Button>
               <Button type="submit" disabled={createReading.isPending}>
                 {createReading.isPending ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" />
                 ) : null}
-                Save Reading
+                {t("subscribers.actions.saveReading")}
               </Button>
             </DialogFooter>
           </form>
