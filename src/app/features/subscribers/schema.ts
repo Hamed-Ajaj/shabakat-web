@@ -11,7 +11,7 @@ export const createSubscriberSchema = z
     customerType: z.enum(["Residential", "Commercial", "Industrial"], {
       message: "Customer type is required.",
     }),
-    plan: z.enum(["Ampere", "Kilowatt"], {
+    plan: z.enum(["Ampere", "Kilowatt", "FixedKilowatt"], {
       message: "Plan type is required.",
     }),
     planValue: z.coerce.number().min(0.01, "Plan value must be greater than 0.").max(9999999, "Plan value is too large."),

@@ -1,13 +1,13 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../providers/AuthProvider";
 import {
-  fetchAreas,
   fetchCustomerRelations,
   fetchCustomerTypes,
   fetchPlanTypes,
   fetchSubscriberDetail,
   fetchSubscribers,
 } from "./subscribersApi";
+import { fetchMeterReadings } from "./meterReadingsApi";
 import type { SubscribersQueryFilters } from "./types";
 
 export const subscriberQueryKeys = {
@@ -15,10 +15,10 @@ export const subscriberQueryKeys = {
   company: (companyId?: string, filters?: SubscribersQueryFilters) =>
     ["subscribers", companyId, filters] as const,
   detail: (id?: string) => ["subscriber-detail", id] as const,
-  areas: (companyId?: string) => ["subscriber-areas", companyId] as const,
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
   customerRelations: ["subscriber-customer-relations"] as const,
+  meterReadings: (id?: string) => ["subscriber-meter-readings", id] as const,
 };
 
 export function useSubscribersQuery(filters: SubscribersQueryFilters) {
@@ -42,14 +42,13 @@ export function useSubscriberDetailQuery(id?: string) {
   });
 }
 
-export function useSubscriberAreasQuery() {
+export function useSubscriberMeterReadingsQuery(id?: string, enabled = true) {
   const { session } = useAuth();
 
   return useQuery({
-    queryKey: subscriberQueryKeys.areas(session?.companyId),
-    queryFn: () => fetchAreas(session?.token ?? ""),
-    enabled: Boolean(session?.token),
-    staleTime: 1000 * 60 * 30,
+    queryKey: subscriberQueryKeys.meterReadings(id),
+    queryFn: () => fetchMeterReadings(id ?? "", session?.token ?? ""),
+    enabled: Boolean(session?.token && id && enabled),
   });
 }
 

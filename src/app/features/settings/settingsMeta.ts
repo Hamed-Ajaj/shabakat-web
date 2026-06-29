@@ -1,9 +1,9 @@
-import type { PricingField, PricingTier, ThemeMode } from "../../providers/SettingsProvider";
+import type { CompanyLanguage, PricingField, PricingTier, SettingThemeOption } from "./types";
 
-export const themeOptions: Array<{ value: ThemeMode; label: string; description: string }> = [
-  { value: "light", label: "Light", description: "Bright surfaces for daytime work" },
-  { value: "dark", label: "Dark", description: "Lower glare for night operations" },
-  { value: "system", label: "System", description: "Follow the device preference" },
+export const themeOptions: SettingThemeOption[] = [
+  { value: "light", label: "settings.theme.light", description: "settings.theme.description.light" },
+  { value: "dark", label: "settings.theme.dark", description: "settings.theme.description.dark" },
+  { value: "system", label: "settings.theme.system", description: "settings.theme.description.system" },
 ];
 
 export const pricingFieldMeta: Record<
@@ -12,30 +12,39 @@ export const pricingFieldMeta: Record<
 > = {
   "price-per-kilowatt": {
     field: "pricePerKilowat",
-    label: "Price per Kilowatt",
-    fallbackMessage: "Used as the fallback for all customer types when no specific configuration is set.",
+    label: "settings.row.pricePerKilowatt",
+    fallbackMessage: "settings.pricing.fallbackMessage",
   },
   "price-per-amp": {
     field: "pricePerAmp",
-    label: "Price per Amp",
-    fallbackMessage: "Used as the fallback for all customer types when no specific configuration is set.",
+    label: "settings.row.pricePerAmp",
+    fallbackMessage: "settings.pricing.fallbackMessage",
   },
   "fixed-charge": {
     field: "fixedCharge",
-    label: "Fixed Charge",
-    fallbackMessage: "Used as the fallback for all customer types when no specific configuration is set.",
+    label: "settings.row.fixedCharge",
+    fallbackMessage: "settings.pricing.fallbackMessage",
   },
   "tva": {
     field: "tva",
-    label: "TVA (%)",
+    label: "settings.row.tva",
     suffix: "%",
-    fallbackMessage: "Used as the fallback for all customer types when no specific configuration is set.",
+    fallbackMessage: "settings.pricing.fallbackMessage",
   },
 };
 
 export const pricingTiers: Array<{ value: PricingTier; label: string }> = [
-  { value: "base", label: "Base" },
-  { value: "residential", label: "Residential" },
-  { value: "commercial", label: "Commercial" },
-  { value: "industrial", label: "Industrial" },
+  { value: "base", label: "settings.pricing.tier.base" },
+  { value: "residential", label: "settings.pricing.tier.residential" },
+  { value: "commercial", label: "settings.pricing.tier.commercial" },
+  { value: "industrial", label: "settings.pricing.tier.industrial" },
 ];
+
+export const languageOptions: Array<{ value: CompanyLanguage; label: string }> = [
+  { value: "en", label: "settings.language.en" },
+  { value: "ar", label: "settings.language.ar" },
+];
+
+export function getLanguageLabel(language: CompanyLanguage) {
+  return languageOptions.find((option) => option.value === language)?.label ?? language;
+}

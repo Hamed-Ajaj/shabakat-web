@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
+import { useI18n } from "../../providers/I18nProvider";
 import { navigationItems } from "../../shared/data/mockData";
 
 export function BottomNavigation() {
+  const { t } = useI18n();
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/8 bg-card md:hidden">
       <div className="flex items-center">
-        {navigationItems.map(({ to, icon: Icon, label }) => (
+        {navigationItems.map(({ to, icon: Icon, labelKey }) => (
           <NavLink
             key={to}
             to={to}
@@ -16,7 +19,7 @@ export function BottomNavigation() {
             }
           >
             <Icon className="h-5 w-5" />
-            <span>{label}</span>
+            <span>{t(labelKey)}</span>
           </NavLink>
         ))}
       </div>

@@ -3,6 +3,7 @@ import { LoaderCircle, UserPlus } from "lucide-react";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
+import { useI18n } from "../../../providers/I18nProvider";
 import {
   Form,
 } from "../../../components/ui/form";
@@ -15,11 +16,11 @@ import {
   SheetTitle,
 } from "../../../components/ui/sheet";
 import {
-  useSubscriberAreasQuery,
   useSubscriberCustomerRelationsQuery,
   useSubscriberCustomerTypesQuery,
   useSubscriberPlanTypesQuery,
 } from "../queries";
+import { useAreasQuery } from "../../areas/queries";
 import {
   createSubscriberSchema,
   defaultSubscriberFormValues,
@@ -54,6 +55,7 @@ export function SubscriberFormSheet({
   onOpenChange,
   onSubmit,
 }: Readonly<SubscriberFormSheetProps>) {
+  const { isRtl, t } = useI18n();
   const initialValues = useMemo(
     () => values ?? defaultSubscriberFormValues,
     [values],
@@ -66,7 +68,7 @@ export function SubscriberFormSheet({
     resolver: standardSchemaResolver(createSubscriberSchema),
     values: initialValues,
   });
-  const areasQuery = useSubscriberAreasQuery();
+  const areasQuery = useAreasQuery();
   const customerTypesQuery = useSubscriberCustomerTypesQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
@@ -94,7 +96,7 @@ export function SubscriberFormSheet({
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
-        side="right"
+        side={isRtl ? "right" : "left"}
         className="w-full overflow-y-auto border-white/8 bg-background p-0 sm:max-w-2xl"
       >
         <SheetHeader className="border-b border-white/8 px-6 py-5">
@@ -109,7 +111,7 @@ export function SubscriberFormSheet({
           <div className="px-6 py-5 text-sm text-red-300">
             {optionsError instanceof Error
               ? optionsError.message
-              : "Unable to load form options."}
+              : t("subscribers.form.optionsError")}
           </div>
         ) : null}
 
@@ -130,8 +132,8 @@ export function SubscriberFormSheet({
                 <div className="flex w-full items-center justify-between gap-3">
                   <div className="text-sm text-muted-foreground">
                     {isOptionsLoading
-                      ? "Loading form options..."
-                      : "Required fields are validated before submit."}
+                      ? t("subscribers.form.helper.loadingOptions")
+                      : t("subscribers.form.helper.required")}
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -140,7 +142,7 @@ export function SubscriberFormSheet({
                       variant="outline"
                       onClick={() => handleOpenChange(false)}
                     >
-                      Cancel
+                      {t("subscribers.actions.cancel")}
                     </Button>
                     <Button
                       type="submit"

@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useCreateSubscriberMutation } from "../mutations";
 import { mapFormValuesToSubscriberPayload } from "../formMappers";
 import type { CreateSubscriberFormValues } from "../schema";
@@ -13,23 +14,24 @@ export function CreateSubscriberSheet({
   open,
   onOpenChange,
 }: Readonly<CreateSubscriberSheetProps>) {
+  const { t } = useI18n();
   const createSubscriber = useCreateSubscriberMutation();
 
   async function handleSubmit(values: CreateSubscriberFormValues) {
     await createSubscriber.mutateAsync(mapFormValuesToSubscriberPayload(values));
 
-    toast.success("Subscriber created successfully.");
+    toast.success(t("subscribers.toast.created"));
     onOpenChange(false);
   }
 
   return (
     <SubscriberFormSheet
-      description="Create a subscriber with plan, area, and optional custom pricing."
+      description={t("subscribers.form.description.create")}
       error={createSubscriber.error instanceof Error ? createSubscriber.error.message : ""}
       open={open}
       pending={createSubscriber.isPending}
-      submitLabel="Create Subscriber"
-      title="Add Subscriber"
+      submitLabel={t("subscribers.actions.create")}
+      title={t("subscribers.form.title.create")}
       onOpenChange={(nextOpen) => {
         onOpenChange(nextOpen);
         if (!nextOpen) {

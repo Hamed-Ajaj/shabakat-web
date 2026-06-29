@@ -1,4 +1,5 @@
-import { FileText, LayoutDashboard, Settings, Users } from "lucide-react";
+import { FileText, LayoutDashboard, MapPinned, Settings, Users, Wallet } from "lucide-react";
+import type { TranslationKey } from "../i18n/messages";
 import type { NavigationItem, RevenuePoint, Subscriber } from "../types/domain";
 
 export const subscribers: Subscriber[] = [
@@ -29,22 +30,27 @@ export const revenueData: RevenuePoint[] = [
 ];
 
 export const navigationItems: NavigationItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/subscribers", label: "Subscribers", icon: Users },
-  { to: "/invoices", label: "Invoices", icon: FileText },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", labelKey: "shell.nav.dashboard", icon: LayoutDashboard },
+  { to: "/areas", labelKey: "shell.nav.areas", icon: MapPinned },
+  { to: "/subscribers", labelKey: "shell.nav.subscribers", icon: Users },
+  { to: "/invoices", labelKey: "shell.nav.invoices", icon: FileText },
+  { to: "/expenses", labelKey: "shell.nav.expenses", icon: Wallet },
+  { to: "/settings", labelKey: "shell.nav.settings", icon: Settings },
 ];
 
-export const routeTitles: Record<string, { title: string; subtitle: string }> = {
-  "/dashboard": { title: "Dashboard", subtitle: "Operations snapshot for El-Nour Generators" },
-  "/subscribers": { title: "Subscribers", subtitle: "Search, sort, and manage monthly accounts" },
-  "/invoices": { title: "Invoices", subtitle: "Generate printable billing statements" },
-  "/settings": { title: "Settings", subtitle: "Preferences, pricing, and notification defaults" },
-  "/settings/pricing/price-per-kilowatt": { title: "Price per Kilowatt", subtitle: "Edit default and customer-type kilowatt pricing" },
-  "/settings/pricing/price-per-amp": { title: "Price per Amp", subtitle: "Edit default and customer-type amp pricing" },
-  "/settings/pricing/fixed-charge": { title: "Fixed Charge", subtitle: "Edit fixed charges by tier" },
-  "/settings/pricing/tva": { title: "TVA (%)", subtitle: "Edit tax values by tier" },
-  "/settings/trigger-date": { title: "Trigger Date", subtitle: "Choose the billing reminder day of month" },
-  "/settings/trigger-message": { title: "Trigger Message", subtitle: "Update the default billing reminder copy" },
-  "/settings/language": { title: "Language", subtitle: "Set the notification language" },
+export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey: TranslationKey }> = {
+  "/dashboard": { titleKey: "shell.route.dashboard.title", subtitleKey: "shell.route.dashboard.subtitle" },
+  "/areas": { titleKey: "shell.route.areas.title", subtitleKey: "shell.route.areas.subtitle" },
+  "/subscribers": { titleKey: "shell.route.subscribers.title", subtitleKey: "shell.route.subscribers.subtitle" },
+  "/invoices": { titleKey: "shell.route.invoices.title", subtitleKey: "shell.route.invoices.subtitle" },
+  "/expenses": { titleKey: "shell.route.expenses.title", subtitleKey: "shell.route.expenses.subtitle" },
+  "/settings": { titleKey: "shell.route.settings.title", subtitleKey: "shell.route.settings.subtitle" },
+  "/settings/pricing/price-per-kilowatt": { titleKey: "shell.route.settingsPricePerKilowatt.title", subtitleKey: "shell.route.settingsPricePerKilowatt.subtitle" },
+  "/settings/pricing/price-per-amp": { titleKey: "shell.route.settingsPricePerAmp.title", subtitleKey: "shell.route.settingsPricePerAmp.subtitle" },
+  "/settings/pricing/fixed-charge": { titleKey: "shell.route.settingsFixedCharge.title", subtitleKey: "shell.route.settingsFixedCharge.subtitle" },
+  "/settings/pricing/tva": { titleKey: "shell.route.settingsTva.title", subtitleKey: "shell.route.settingsTva.subtitle" },
+  "/settings/trigger-date": { titleKey: "shell.route.settingsTriggerDate.title", subtitleKey: "shell.route.settingsTriggerDate.subtitle" },
+  "/settings/trigger-message": { titleKey: "shell.route.settingsTriggerMessage.title", subtitleKey: "shell.route.settingsTriggerMessage.subtitle" },
+  "/settings/language": { titleKey: "shell.route.settingsLanguage.title", subtitleKey: "shell.route.settingsLanguage.subtitle" },
+  "/settings/whatsapp": { titleKey: "shell.route.settingsWhatsapp.title", subtitleKey: "shell.route.settingsWhatsapp.subtitle" },
 };

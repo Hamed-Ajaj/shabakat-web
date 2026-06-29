@@ -1,4 +1,5 @@
-import type { AreaOption, CreateSubscriberPayload } from "./subscribersApi";
+import type { AreaRecord } from "../areas/types";
+import type { CreateSubscriberPayload } from "./subscribersApi";
 import type { CreateSubscriberFormInput, CreateSubscriberFormValues } from "./schema";
 import type { SubscriberDetail } from "./types";
 
@@ -27,14 +28,14 @@ export function mapFormValuesToSubscriberPayload(
 
 export function mapSubscriberDetailToFormInput(
   subscriber: SubscriberDetail,
-  areas: AreaOption[],
+  areas: AreaRecord[],
 ): CreateSubscriberFormInput {
   const matchedArea = areas.find((area) => area.name === subscriber.areaName);
 
   return {
     name: subscriber.name,
-    phone: subscriber.phone === "Not set" ? "" : subscriber.phone,
-    address: subscriber.address === "Not set" ? "" : subscriber.address,
+    phone: subscriber.phone ?? "",
+    address: subscriber.address ?? "",
     areaId: matchedArea?.id ?? "",
     customerType: subscriber.customerType,
     plan: subscriber.plan,

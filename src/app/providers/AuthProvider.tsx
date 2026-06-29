@@ -7,6 +7,7 @@ interface AuthState {
   isLoggingIn: boolean;
   session: AuthSession | null;
   setHasHydrated: (hasHydrated: boolean) => void;
+  updateSessionProfile: (profile: { companyName: string; logoUrl: string | null }) => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -20,6 +21,16 @@ const useAuthStore = create<AuthState>()(
       isLoggingIn: false,
       session: null,
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+      updateSessionProfile: (profile) =>
+        set((state) => ({
+          session: state.session
+            ? {
+                ...state.session,
+                companyName: profile.companyName,
+                logoUrl: profile.logoUrl,
+              }
+            : null,
+        })),
       login: async (email, password) => {
         if (!email.trim() || !password.trim()) {
           throw new Error("Email and password are required.");
@@ -64,6 +75,7 @@ export function useAuth() {
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
   const session = useAuthStore((state) => state.session);
+  const updateSessionProfile = useAuthStore((state) => state.updateSessionProfile);
 
   return {
     hasHydrated,
@@ -72,5 +84,6 @@ export function useAuth() {
     login,
     logout,
     session,
+    updateSessionProfile,
   };
 }

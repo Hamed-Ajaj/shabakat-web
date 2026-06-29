@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { TranslationKey } from "../i18n/messages";
 
 export type Status = "paid" | "unpaid" | "overdue";
 
@@ -22,7 +23,7 @@ export interface RevenuePoint {
 
 export interface NavigationItem {
   to: string;
-  label: string;
+  labelKey: TranslationKey;
   icon: LucideIcon;
   badge?: number;
 }

@@ -1,5 +1,6 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useI18n } from "../../../providers/I18nProvider";
 
 export interface SettingRowLinkProps {
   to: string;
@@ -9,6 +10,9 @@ export interface SettingRowLinkProps {
 }
 
 export function SettingRowLink({ to, icon, label, value }: Readonly<SettingRowLinkProps>) {
+  const { isRtl } = useI18n();
+  const ChevronIcon = isRtl ? ChevronLeft : ChevronRight;
+
   return (
     <Link
       to={to}
@@ -21,7 +25,7 @@ export function SettingRowLink({ to, icon, label, value }: Readonly<SettingRowLi
         <p className="text-sm font-medium text-foreground">{label}</p>
         {value ? <p className="truncate text-xs text-muted-foreground">{value}</p> : null}
       </div>
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      <ChevronIcon className="h-4 w-4 text-muted-foreground" />
     </Link>
   );
 }

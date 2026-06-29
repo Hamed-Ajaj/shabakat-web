@@ -34,13 +34,6 @@ interface PagedResponse<TData> {
   hasNextPage: boolean;
 }
 
-export interface AreaOption {
-  id: string;
-  name: string;
-  customerCount: number;
-  createdAt: string;
-}
-
 export interface LookupOption {
   value: number;
   label: string;
@@ -52,7 +45,7 @@ export interface CreateSubscriberPayload {
   address?: string;
   areaId?: string;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   subscriptionDate?: string;
   customerRelation?: "Friend" | "Family" | "Owner" | "Other";
@@ -78,7 +71,7 @@ interface CustomerDetailResponse {
   phone: string | null;
   address: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
-  plan: "Ampere" | "Kilowatt";
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
   areaName: string | null;
   customerStatus: string;
@@ -128,10 +121,6 @@ export async function fetchSubscribers(
   };
 }
 
-export function fetchAreas(token: string) {
-  return apiRequest<AreaOption[]>("/api/v1/areas", undefined, token);
-}
-
 export function fetchCustomerTypes(token: string) {
   return apiRequest<LookupOption[]>("/api/v1/lookups/customerTypes", undefined, token);
 }
@@ -175,15 +164,15 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
   return {
     id: subscriber.id,
     name: subscriber.name,
-    phone: subscriber.phone || "Not set",
-    address: subscriber.address || "Not set",
-    areaName: subscriber.areaName || "Unassigned",
+    phone: subscriber.phone,
+    address: subscriber.address,
+    areaName: subscriber.areaName,
     customerType: subscriber.customerType,
     plan: subscriber.plan,
     planValue: subscriber.planValue,
     customerStatus: subscriber.customerStatus,
-    subscriptionDate: formatDate(subscriber.subscriptionDate),
-    createdAt: formatDateTime(subscriber.createdAt),
+    subscriptionDate: subscriber.subscriptionDate,
+    createdAt: subscriber.createdAt,
     customerRelation: subscriber.customerRelation || "",
     hasPricingOverride: subscriber.hasPricingOverride,
     pricingOverride: subscriber.pricingOverride
@@ -234,28 +223,15 @@ export function deleteSubscriber(id: string, token: string) {
   );
 }
 
-function formatDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-}
-
 function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): SubscriberRow {
   return {
     id: customer.id,
     name: customer.name,
     phone: customer.phone || "Not set",
     area: customer.areaName || "Unassigned",
-    planLabel:
-      customer.plan === "Ampere"
-        ? `${formatNumber(customer.planValue)} A`
-        : `${formatNumber(customer.planValue)} kW`,
-    subscriptionDate: formatDate(customer.subscriptionDate),
+    plan: customer.plan as SubscriberRow["plan"],
+    planValue: customer.planValue,
+    subscriptionDate: customer.subscriptionDate,
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,
     customerStatus: customer.customerStatus,
@@ -263,16 +239,16 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
   };
 }
 
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+function formatPlanLabel(plan: CustomerSummaryResponse["plan"], planValue: number) {
+  if (plan === "Ampere") {
+    return `Ampere · ${formatNumber(planValue)} A`;
+  }
+
+  return `${plan} · ${formatNumber(planValue)}`;
 }
 
 function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {
