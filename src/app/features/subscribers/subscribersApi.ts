@@ -229,21 +229,14 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     name: customer.name,
     phone: customer.phone || "Not set",
     area: customer.areaName || "Unassigned",
-    planLabel: formatPlanLabel(customer.plan, customer.planValue),
-    subscriptionDate: formatDate(customer.subscriptionDate),
+    plan: customer.plan as SubscriberRow["plan"],
+    planValue: customer.planValue,
+    subscriptionDate: customer.subscriptionDate,
     status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
     amountDue: customer.amountDue,
     customerStatus: customer.customerStatus,
     customerType: customer.customerType,
   };
-}
-
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
 }
 
 function formatNumber(value: number) {
