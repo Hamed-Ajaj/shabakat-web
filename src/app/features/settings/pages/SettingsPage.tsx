@@ -17,7 +17,13 @@ export default function SettingsPage() {
   const { t } = useI18n();
   const preferencesQuery = useCompanyPreferencesQuery();
   const companyPreferences = preferencesQuery.data;
+  const dueDateLabel = companyPreferences ? t("settings.row.dueDateValue", { day: companyPreferences.dueDate }) : undefined;
   const triggerDateLabel = companyPreferences ? t("settings.row.triggerDateValue", { day: companyPreferences.triggerDate }) : undefined;
+  const notConfiguredLabel = t("common.labels.notConfigured");
+  const notSetLabel = t("common.labels.notSet");
+  const languageValue = companyPreferences
+    ? t(getLanguageLabel(companyPreferences.language) as "settings.language.en" | "settings.language.ar")
+    : notConfiguredLabel;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -48,15 +54,66 @@ export default function SettingsPage() {
           <div className="px-4 py-4 text-sm text-red-300">{preferencesQuery.error.message}</div>
         ) : (
           <>
-            <SettingRowLink to="/settings/pricing/price-per-kilowatt" icon={<Zap className="h-4 w-4" />} label="Price per Kilowatt" value={companyPreferences ? `${companyPreferences.pricing.pricePerKilowat.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/price-per-amp" icon={<Zap className="h-4 w-4" />} label="Price per Amp" value={companyPreferences ? `${companyPreferences.pricing.pricePerAmp.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/fixed-charge" icon={<Wallet className="h-4 w-4" />} label="Fixed Charge" value={companyPreferences ? `${companyPreferences.pricing.fixedCharge.base}` : "Not configured"} />
-            <SettingRowLink to="/settings/pricing/tva" icon={<CirclePercent className="h-4 w-4" />} label="TVA (%)" value={companyPreferences ? `${companyPreferences.pricing.tva.base}%` : "Not configured"} />
-            <SettingRowLink to="/settings/language" icon={<Languages className="h-4 w-4" />} label="Language" value={companyPreferences ? getLanguageLabel(companyPreferences.language) : "Not configured"} />
-            <SettingRowLink to="/settings/trigger-date" icon={<CalendarDays className="h-4 w-4" />} label="Trigger Date" value={triggerDateLabel ?? "Not configured"} />
-            <SettingRowLink to="/settings/trigger-message" icon={<MessageSquareText className="h-4 w-4" />} label="Trigger Message" value={companyPreferences?.triggerMessage || "Not set"} />
-            <SettingRowLink to="/settings/company-logo" icon={<Image className="h-4 w-4" />} label="Company Logo" value={session?.logoUrl ? "Logo configured" : "No logo uploaded"} />
-            <SettingRowLink to="/settings/whatsapp" icon={<MessageCircle className="h-4 w-4" />} label="WhatsApp Connection" value="Manage QR pairing and live connection status" />
+            <SettingRowLink
+              to="/settings/pricing/price-per-kilowatt"
+              icon={<Zap className="h-4 w-4" />}
+              label={t("settings.row.pricePerKilowatt")}
+              value={companyPreferences ? `${companyPreferences.pricing.pricePerKilowat.base}` : notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/pricing/price-per-amp"
+              icon={<Zap className="h-4 w-4" />}
+              label={t("settings.row.pricePerAmp")}
+              value={companyPreferences ? `${companyPreferences.pricing.pricePerAmp.base}` : notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/pricing/fixed-charge"
+              icon={<Wallet className="h-4 w-4" />}
+              label={t("settings.row.fixedCharge")}
+              value={companyPreferences ? `${companyPreferences.pricing.fixedCharge.base}` : notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/pricing/tva"
+              icon={<CirclePercent className="h-4 w-4" />}
+              label={t("settings.row.tva")}
+              value={companyPreferences ? `${companyPreferences.pricing.tva.base}%` : notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/language"
+              icon={<Languages className="h-4 w-4" />}
+              label={t("settings.row.language")}
+              value={languageValue}
+            />
+            <SettingRowLink
+              to="/settings/due-date"
+              icon={<CalendarDays className="h-4 w-4" />}
+              label={t("settings.row.dueDate")}
+              value={dueDateLabel ?? notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/trigger-date"
+              icon={<CalendarDays className="h-4 w-4" />}
+              label={t("settings.row.triggerDate")}
+              value={triggerDateLabel ?? notConfiguredLabel}
+            />
+            <SettingRowLink
+              to="/settings/trigger-message"
+              icon={<MessageSquareText className="h-4 w-4" />}
+              label={t("settings.row.triggerMessage")}
+              value={companyPreferences?.triggerMessage || notSetLabel}
+            />
+            <SettingRowLink
+              to="/settings/company-logo"
+              icon={<Image className="h-4 w-4" />}
+              label={t("settings.row.companyLogo")}
+              value={session?.logoUrl ? t("settings.row.companyLogoConfigured") : t("settings.row.companyLogoMissing")}
+            />
+            <SettingRowLink
+              to="/settings/whatsapp"
+              icon={<MessageCircle className="h-4 w-4" />}
+              label={t("settings.row.whatsapp")}
+              value={t("settings.row.whatsappValue")}
+            />
           </>
         )}
       </SettingsSection>

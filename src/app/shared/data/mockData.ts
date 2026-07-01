@@ -49,6 +49,7 @@ export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey
   "/settings/pricing/price-per-amp": { titleKey: "shell.route.settingsPricePerAmp.title", subtitleKey: "shell.route.settingsPricePerAmp.subtitle" },
   "/settings/pricing/fixed-charge": { titleKey: "shell.route.settingsFixedCharge.title", subtitleKey: "shell.route.settingsFixedCharge.subtitle" },
   "/settings/pricing/tva": { titleKey: "shell.route.settingsTva.title", subtitleKey: "shell.route.settingsTva.subtitle" },
+  "/settings/due-date": { titleKey: "shell.route.settingsDueDate.title", subtitleKey: "shell.route.settingsDueDate.subtitle" },
   "/settings/trigger-date": { titleKey: "shell.route.settingsTriggerDate.title", subtitleKey: "shell.route.settingsTriggerDate.subtitle" },
   "/settings/trigger-message": { titleKey: "shell.route.settingsTriggerMessage.title", subtitleKey: "shell.route.settingsTriggerMessage.subtitle" },
   "/settings/language": { titleKey: "shell.route.settingsLanguage.title", subtitleKey: "shell.route.settingsLanguage.subtitle" },

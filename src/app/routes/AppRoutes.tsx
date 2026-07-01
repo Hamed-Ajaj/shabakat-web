@@ -10,6 +10,7 @@ const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"
 const ExpensesPage = lazy(() => import("../features/expenses/pages/ExpensesPage"));
 const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
 const PricingSettingPage = lazy(() => import("../features/settings/pages/PricingSettingPage"));
+const DueDatePage = lazy(() => import("../features/settings/pages/DueDatePage"));
 const TriggerMessagePage = lazy(() => import("../features/settings/pages/TriggerMessagePage"));
 const TriggerDatePage = lazy(() => import("../features/settings/pages/TriggerDatePage"));
 const LanguageSettingPage = lazy(() => import("../features/settings/pages/LanguageSettingPage"));
@@ -53,6 +54,7 @@ export function AppRoutes() {
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/pricing/:field" element={<PricingSettingPage />} />
+          <Route path="/settings/due-date" element={<DueDatePage />} />
           <Route path="/settings/trigger-date" element={<TriggerDatePage />} />
           <Route path="/settings/trigger-message" element={<TriggerMessagePage />} />
           <Route path="/settings/language" element={<LanguageSettingPage />} />
