@@ -28,6 +28,7 @@ import type {
 
 interface SubscriberDetailsSectionProps {
   areas: AreaRecord[];
+  boxes: LookupOption[];
   customerRelations: LookupOption[];
   customerTypes: LookupOption[];
   form: UseFormReturn<
@@ -40,6 +41,7 @@ interface SubscriberDetailsSectionProps {
 
 export function SubscriberDetailsSection({
   areas,
+  boxes,
   customerRelations,
   customerTypes,
   form,
@@ -50,6 +52,7 @@ export function SubscriberDetailsSection({
     control: form.control,
     name: "plan",
   });
+  const hasBoxes = boxes.length > 0;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -169,7 +172,13 @@ export function SubscriberDetailsSection({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{t("subscribers.form.area")}</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value || ""}>
+            <Select
+              onValueChange={(value) => {
+                field.onChange(value);
+                form.setValue("boxId", "");
+              }}
+              value={field.value || ""}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder={t("subscribers.form.areaPlaceholder")} />
@@ -185,6 +194,39 @@ export function SubscriberDetailsSection({
             </Select>
             <FormDescription className="min-h-10">
               {t("subscribers.form.areaHelp")}
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="boxId"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("subscribers.form.box")}</FormLabel>
+            <Select
+              disabled={!hasBoxes}
+              onValueChange={(value) => field.onChange(value === "none" ? "" : value)}
+              value={field.value || "none"}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("subscribers.form.boxPlaceholder")} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="none">{t("subscribers.form.boxNone")}</SelectItem>
+                {boxes.map((box) => (
+                  <SelectItem key={String(box.value)} value={String(box.value)}>
+                    {box.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormDescription className="min-h-10">
+              {hasBoxes ? t("subscribers.form.boxHelp") : t("subscribers.form.boxEmpty")}
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -211,6 +253,21 @@ export function SubscriberDetailsSection({
                 ))}
               </SelectContent>
             </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="cableName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("subscribers.form.cableName")}</FormLabel>
+            <FormControl>
+              <Input placeholder={t("subscribers.form.cableNamePlaceholder")} {...field} />
+            </FormControl>
+            <FormDescription>{t("subscribers.form.optional")}</FormDescription>
             <FormMessage />
           </FormItem>
         )}

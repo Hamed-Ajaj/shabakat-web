@@ -33,7 +33,7 @@ export function EditSubscriberSheet({
   }, [areasQuery.data, detailQuery.data]);
 
   async function handleSubmit(values: CreateSubscriberFormValues) {
-    await updateSubscriber.mutateAsync(mapFormValuesToSubscriberPayload(values));
+    await updateSubscriber.mutateAsync(mapFormValuesToSubscriberPayload(values, { preserveClears: true }));
 
     toast.success(t("subscribers.toast.updated"));
     onOpenChange(false);

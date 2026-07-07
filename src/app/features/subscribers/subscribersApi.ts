@@ -12,6 +12,9 @@ interface CustomerSummaryResponse {
   name: string;
   phone: string | null;
   address: string | null;
+  cableName: string | null;
+  boxId: string | null;
+  boxName: string | null;
   customerType: string;
   plan: string;
   areaName: string | null;
@@ -35,7 +38,7 @@ interface PagedResponse<TData> {
 }
 
 export interface LookupOption {
-  value: number;
+  value: number | string;
   label: string;
 }
 
@@ -43,7 +46,9 @@ export interface CreateSubscriberPayload {
   name: string;
   phone?: string;
   address?: string;
+  cableName?: string | null;
   areaId?: string;
+  boxId?: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
   plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
@@ -70,6 +75,9 @@ interface CustomerDetailResponse {
   name: string;
   phone: string | null;
   address: string | null;
+  cableName: string | null;
+  boxId: string | null;
+  boxName: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
   plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
   planValue: number;
@@ -84,6 +92,11 @@ interface CustomerDetailResponse {
   totalPaid: number;
   totalOutstanding: number;
   paidThisMonth: boolean;
+}
+
+interface DistributionBoxResponse {
+  id: string;
+  name: string;
 }
 
 export async function fetchSubscribers(
@@ -133,6 +146,28 @@ export function fetchCustomerRelations(token: string) {
   return apiRequest<LookupOption[]>("/api/v1/lookups/customerRelations", undefined, token);
 }
 
+export async function fetchDistributionBoxes(token: string, areaId?: string) {
+  const params = new URLSearchParams({
+    pageNumber: "1",
+    pageSize: "1000",
+  });
+
+  if (areaId) {
+    params.set("areaId", areaId);
+  }
+
+  const response = await apiRequest<PagedResponse<DistributionBoxResponse>>(
+    `/api/v1/distribution-boxes?${params.toString()}`,
+    undefined,
+    token,
+  );
+
+  return response.data.map((box) => ({
+    value: box.id,
+    label: box.name,
+  }));
+}
+
 export function createSubscriber(payload: CreateSubscriberPayload, token: string) {
   return apiRequest(
     "/api/v1/customers",
@@ -145,7 +180,9 @@ export function createSubscriber(payload: CreateSubscriberPayload, token: string
         name: payload.name,
         phone: payload.phone,
         address: payload.address,
+        cableName: payload.cableName,
         areaId: payload.areaId,
+        boxId: payload.boxId,
         customerType: payload.customerType,
         plan: payload.plan,
         planValue: payload.planValue,
@@ -166,6 +203,9 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
     name: subscriber.name,
     phone: subscriber.phone,
     address: subscriber.address,
+    cableName: subscriber.cableName,
+    boxId: subscriber.boxId,
+    boxName: subscriber.boxName,
     areaName: subscriber.areaName,
     customerType: subscriber.customerType,
     plan: subscriber.plan,
@@ -201,7 +241,9 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         name: payload.name,
         phone: payload.phone,
         address: payload.address,
+        cableName: payload.cableName,
         areaId: payload.areaId,
+        boxId: payload.boxId,
         customerType: payload.customerType,
         plan: payload.plan,
         planValue: payload.planValue,
@@ -237,18 +279,6 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     customerStatus: customer.customerStatus,
     customerType: customer.customerType,
   };
-}
-
-function formatNumber(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(2);
-}
-
-function formatPlanLabel(plan: CustomerSummaryResponse["plan"], planValue: number) {
-  if (plan === "Ampere") {
-    return `Ampere · ${formatNumber(planValue)} A`;
-  }
-
-  return `${plan} · ${formatNumber(planValue)}`;
 }
 
 function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {

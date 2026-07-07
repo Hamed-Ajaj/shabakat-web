@@ -5,12 +5,18 @@ import type { SubscriberDetail } from "./types";
 
 export function mapFormValuesToSubscriberPayload(
   values: CreateSubscriberFormValues,
+  options?: { preserveClears?: boolean },
 ): CreateSubscriberPayload {
+  const preserveClears = options?.preserveClears ?? false;
+  const trimmedCableName = values.cableName?.trim() ?? "";
+
   return {
     name: values.name.trim(),
     phone: values.phone?.trim() || undefined,
     address: values.address?.trim() || undefined,
+    cableName: preserveClears ? (trimmedCableName ? trimmedCableName : null) : trimmedCableName || undefined,
     areaId: values.areaId || undefined,
+    boxId: preserveClears ? (values.boxId || null) : values.boxId || undefined,
     customerType: values.customerType,
     plan: values.plan,
     planValue: values.planValue,
@@ -36,7 +42,9 @@ export function mapSubscriberDetailToFormInput(
     name: subscriber.name,
     phone: subscriber.phone ?? "",
     address: subscriber.address ?? "",
+    cableName: subscriber.cableName ?? "",
     areaId: matchedArea?.id ?? "",
+    boxId: subscriber.boxId ?? "",
     customerType: subscriber.customerType,
     plan: subscriber.plan,
     planValue: subscriber.planValue,
