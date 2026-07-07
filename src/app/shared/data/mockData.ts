@@ -1,4 +1,4 @@
-import { FileText, LayoutDashboard, MapPinned, Settings, Users, Wallet } from "lucide-react";
+import { Boxes, FileText, LayoutDashboard, MapPinned, Settings, Users, Wallet } from "lucide-react";
 import type { TranslationKey } from "../i18n/messages";
 import type { NavigationItem, RevenuePoint, Subscriber } from "../types/domain";
 
@@ -32,15 +32,24 @@ export const revenueData: RevenuePoint[] = [
 export const navigationItems: NavigationItem[] = [
   { to: "/dashboard", labelKey: "shell.nav.dashboard", icon: LayoutDashboard },
   { to: "/areas", labelKey: "shell.nav.areas", icon: MapPinned },
+  { to: "/boxes", labelKey: "shell.nav.boxes", icon: Boxes },
   { to: "/subscribers", labelKey: "shell.nav.subscribers", icon: Users },
   { to: "/invoices", labelKey: "shell.nav.invoices", icon: FileText },
   { to: "/expenses", labelKey: "shell.nav.expenses", icon: Wallet },
   { to: "/settings", labelKey: "shell.nav.settings", icon: Settings },
 ];
 
+export const mobileNavigationItems: NavigationItem[] = [
+  { to: "/dashboard", labelKey: "shell.nav.dashboard", icon: LayoutDashboard },
+  { to: "/subscribers", labelKey: "shell.nav.subscribers", icon: Users },
+  { to: "/invoices", labelKey: "shell.nav.invoices", icon: FileText },
+  { to: "/settings", labelKey: "shell.nav.settings", icon: Settings },
+];
+
 export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey: TranslationKey }> = {
   "/dashboard": { titleKey: "shell.route.dashboard.title", subtitleKey: "shell.route.dashboard.subtitle" },
   "/areas": { titleKey: "shell.route.areas.title", subtitleKey: "shell.route.areas.subtitle" },
+  "/boxes": { titleKey: "shell.route.boxes.title", subtitleKey: "shell.route.boxes.subtitle" },
   "/subscribers": { titleKey: "shell.route.subscribers.title", subtitleKey: "shell.route.subscribers.subtitle" },
   "/invoices": { titleKey: "shell.route.invoices.title", subtitleKey: "shell.route.invoices.subtitle" },
   "/expenses": { titleKey: "shell.route.expenses.title", subtitleKey: "shell.route.expenses.subtitle" },

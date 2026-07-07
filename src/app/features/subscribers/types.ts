@@ -22,6 +22,9 @@ export interface SubscriberDetail {
   name: string;
   phone: string | null;
   address: string | null;
+  cableName: string | null;
+  boxId: string | null;
+  boxName: string | null;
   areaName: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
   plan: SubscriberPlan;

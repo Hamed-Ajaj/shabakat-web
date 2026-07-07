@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useI18n } from "../../providers/I18nProvider";
-import { navigationItems } from "../../shared/data/mockData";
+import { mobileNavigationItems } from "../../shared/data/mockData";
 
 export function BottomNavigation() {
   const { t } = useI18n();
@@ -8,7 +8,7 @@ export function BottomNavigation() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/8 bg-card md:hidden">
       <div className="flex items-center">
-        {navigationItems.map(({ to, icon: Icon, labelKey }) => (
+        {mobileNavigationItems.map(({ to, icon: Icon, labelKey }) => (
           <NavLink
             key={to}
             to={to}

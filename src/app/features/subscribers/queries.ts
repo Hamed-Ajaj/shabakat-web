@@ -3,6 +3,7 @@ import { useAuth } from "../../providers/AuthProvider";
 import {
   fetchCustomerRelations,
   fetchCustomerTypes,
+  fetchDistributionBoxes,
   fetchPlanTypes,
   fetchSubscriberDetail,
   fetchSubscribers,
@@ -18,6 +19,8 @@ export const subscriberQueryKeys = {
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
   customerRelations: ["subscriber-customer-relations"] as const,
+  distributionBoxes: (companyId?: string, areaId?: string) =>
+    ["subscriber-distribution-boxes", companyId, areaId] as const,
   meterReadings: (id?: string) => ["subscriber-meter-readings", id] as const,
 };
 
@@ -82,5 +85,16 @@ export function useSubscriberCustomerRelationsQuery() {
     queryFn: () => fetchCustomerRelations(session?.token ?? ""),
     enabled: Boolean(session?.token),
     staleTime: Infinity,
+  });
+}
+
+export function useSubscriberDistributionBoxesQuery(areaId?: string) {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: subscriberQueryKeys.distributionBoxes(session?.companyId, areaId),
+    queryFn: () => fetchDistributionBoxes(session?.token ?? "", areaId),
+    enabled: Boolean(session?.token),
+    staleTime: 60_000,
   });
 }

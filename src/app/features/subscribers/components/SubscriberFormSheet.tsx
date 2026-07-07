@@ -18,6 +18,7 @@ import {
 import {
   useSubscriberCustomerRelationsQuery,
   useSubscriberCustomerTypesQuery,
+  useSubscriberDistributionBoxesQuery,
   useSubscriberPlanTypesQuery,
 } from "../queries";
 import { useAreasQuery } from "../../areas/queries";
@@ -69,18 +70,22 @@ export function SubscriberFormSheet({
     values: initialValues,
   });
   const areasQuery = useAreasQuery();
+  const selectedAreaId = form.watch("areaId");
   const customerTypesQuery = useSubscriberCustomerTypesQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
+  const boxesQuery = useSubscriberDistributionBoxesQuery(selectedAreaId || undefined);
 
   const isOptionsLoading =
     areasQuery.isLoading ||
+    boxesQuery.isLoading ||
     customerTypesQuery.isLoading ||
     planTypesQuery.isLoading ||
     customerRelationsQuery.isLoading;
 
   const optionsError =
     areasQuery.error ||
+    boxesQuery.error ||
     customerTypesQuery.error ||
     planTypesQuery.error ||
     customerRelationsQuery.error;
@@ -120,6 +125,7 @@ export function SubscriberFormSheet({
             <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
               <SubscriberDetailsSection
                 areas={areasQuery.data ?? []}
+                boxes={boxesQuery.data ?? []}
                 customerRelations={customerRelationsQuery.data ?? []}
                 customerTypes={customerTypesQuery.data ?? []}
                 form={form}

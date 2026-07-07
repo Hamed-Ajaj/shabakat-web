@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const AreasPage = lazy(() => import("../features/areas/pages/AreasPage"));
+const BoxesPage = lazy(() => import("../features/boxes/pages/BoxesPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
 const ExpensesPage = lazy(() => import("../features/expenses/pages/ExpensesPage"));
@@ -49,6 +50,7 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/areas" element={<AreasPage />} />
+          <Route path="/boxes" element={<BoxesPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
