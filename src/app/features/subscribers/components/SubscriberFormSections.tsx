@@ -253,6 +253,9 @@ export function SubscriberDetailsSection({
                 ))}
               </SelectContent>
             </Select>
+            <FormDescription className="min-h-10">
+              {t("subscribers.form.optional")}
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
