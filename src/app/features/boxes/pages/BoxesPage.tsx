@@ -1,16 +1,24 @@
-import { useMemo, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useAreasQuery } from "../../areas/queries";
-import { BoxDetailsSheet } from "../components/BoxDetailsSheet";
 import { BoxesList } from "../components/BoxesList";
+import { BoxesPageSkeleton } from "../components/BoxesPageSkeleton";
 import { BoxesToolbar } from "../components/BoxesToolbar";
-import { CreateBoxSheet } from "../components/CreateBoxSheet";
-import { EditBoxSheet } from "../components/EditBoxSheet";
 import { useBoxesQuery } from "../queries";
 import type { BoxRecord } from "../types";
 
 type BoxDialogMode = "create" | "edit" | "view" | null;
+
+const CreateBoxSheet = lazy(() =>
+  import("../components/CreateBoxSheet").then((module) => ({ default: module.CreateBoxSheet })),
+);
+const EditBoxSheet = lazy(() =>
+  import("../components/EditBoxSheet").then((module) => ({ default: module.EditBoxSheet })),
+);
+const BoxDetailsSheet = lazy(() =>
+  import("../components/BoxDetailsSheet").then((module) => ({ default: module.BoxDetailsSheet })),
+);
 
 export default function BoxesPage() {
   const { session } = useAuth();
@@ -48,12 +56,22 @@ export default function BoxesPage() {
     setSelectedBox(null);
   }
 
+  function handleDialogOpenChange(open: boolean) {
+    if (!open) {
+      closeDialog();
+    }
+  }
+
   const error =
     boxesQuery.error instanceof Error
       ? boxesQuery.error.message
       : areasQuery.error instanceof Error
         ? areasQuery.error.message
         : "";
+
+  if (boxesQuery.isLoading && areasQuery.isLoading && !boxesQuery.data && !areasQuery.data) {
+    return <BoxesPageSkeleton />;
+  }
 
   return (
     <div className="space-y-4">
@@ -78,33 +96,28 @@ export default function BoxesPage() {
         onView={(box) => openDialog("view", box)}
       />
 
-      <CreateBoxSheet
-        open={dialogMode === "create"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
-      <EditBoxSheet
-        box={selectedBox}
-        open={dialogMode === "edit"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
-      <BoxDetailsSheet
-        box={selectedBox}
-        open={dialogMode === "view"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+      <Suspense fallback={null}>
+        {dialogMode === "create" ? (
+          <CreateBoxSheet
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "edit" ? (
+          <EditBoxSheet
+            box={selectedBox}
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "view" ? (
+          <BoxDetailsSheet
+            box={selectedBox}
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }
-
