@@ -15,6 +15,11 @@ export function mapFormValuesToSubscriberPayload(
     phone: values.phone?.trim() || undefined,
     address: values.address?.trim() || undefined,
     cableName: preserveClears ? (trimmedCableName ? trimmedCableName : null) : trimmedCableName || undefined,
+    ampereScheduleId: values.plan === "Ampere"
+      ? preserveClears
+        ? values.ampereScheduleId || null
+        : values.ampereScheduleId || undefined
+      : null,
     areaId: values.areaId || undefined,
     boxId: preserveClears ? (values.boxId || null) : values.boxId || undefined,
     customerType: values.customerType,
@@ -43,6 +48,7 @@ export function mapSubscriberDetailToFormInput(
     phone: subscriber.phone ?? "",
     address: subscriber.address ?? "",
     cableName: subscriber.cableName ?? "",
+    ampereScheduleId: subscriber.ampereScheduleId ?? "",
     areaId: matchedArea?.id ?? "",
     boxId: subscriber.boxId ?? "",
     customerType: subscriber.customerType,
@@ -50,6 +56,7 @@ export function mapSubscriberDetailToFormInput(
     planValue: subscriber.planValue,
     subscriptionDate: "",
     customerRelation: subscriber.customerRelation,
+    ampereSchedulePricingEnabled: false,
     usePricingOverride: subscriber.hasPricingOverride,
     overridePrice: subscriber.pricingOverride?.price ?? Number.NaN,
     overrideFixedCharge: subscriber.pricingOverride?.fixedCharge ?? Number.NaN,

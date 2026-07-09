@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { LoaderCircle, UserPlus } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
 import { useI18n } from "../../../providers/I18nProvider";
@@ -16,12 +16,14 @@ import {
   SheetTitle,
 } from "../../../components/ui/sheet";
 import {
+  useSubscriberAmpereSchedulesQuery,
   useSubscriberCustomerRelationsQuery,
   useSubscriberCustomerTypesQuery,
   useSubscriberDistributionBoxesQuery,
   useSubscriberPlanTypesQuery,
 } from "../queries";
 import { useAreasQuery } from "../../areas/queries";
+import { useCompanyPreferencesQuery } from "../../settings/queries";
 import {
   createSubscriberSchema,
   defaultSubscriberFormValues,
@@ -70,25 +72,38 @@ export function SubscriberFormSheet({
     values: initialValues,
   });
   const areasQuery = useAreasQuery();
+  const companyPreferencesQuery = useCompanyPreferencesQuery();
   const selectedAreaId = form.watch("areaId");
+  const selectedPlan = form.watch("plan");
   const customerTypesQuery = useSubscriberCustomerTypesQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
+  const ampereSchedulePricingEnabled = companyPreferencesQuery.data?.ampereSchedulePricingEnabled ?? false;
+  const shouldFetchAmpereSchedules = ampereSchedulePricingEnabled && selectedPlan === "Ampere";
+  const ampereSchedulesQuery = useSubscriberAmpereSchedulesQuery(shouldFetchAmpereSchedules);
   const boxesQuery = useSubscriberDistributionBoxesQuery(selectedAreaId || undefined);
+
+  useEffect(() => {
+    form.setValue("ampereSchedulePricingEnabled", ampereSchedulePricingEnabled);
+  }, [ampereSchedulePricingEnabled, form]);
 
   const isOptionsLoading =
     areasQuery.isLoading ||
+    companyPreferencesQuery.isLoading ||
     boxesQuery.isLoading ||
     customerTypesQuery.isLoading ||
     planTypesQuery.isLoading ||
-    customerRelationsQuery.isLoading;
+    customerRelationsQuery.isLoading ||
+    (shouldFetchAmpereSchedules && ampereSchedulesQuery.isLoading);
 
   const optionsError =
     areasQuery.error ||
+    companyPreferencesQuery.error ||
     boxesQuery.error ||
     customerTypesQuery.error ||
     planTypesQuery.error ||
-    customerRelationsQuery.error;
+    customerRelationsQuery.error ||
+    (shouldFetchAmpereSchedules ? ampereSchedulesQuery.error : null);
 
   function handleOpenChange(nextOpen: boolean) {
     onOpenChange(nextOpen);
@@ -124,6 +139,8 @@ export function SubscriberFormSheet({
           <Form {...form}>
             <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
               <SubscriberDetailsSection
+                ampereSchedulePricingEnabled={ampereSchedulePricingEnabled}
+                ampereSchedules={ampereSchedulesQuery.data ?? []}
                 areas={areasQuery.data ?? []}
                 boxes={boxesQuery.data ?? []}
                 customerRelations={customerRelationsQuery.data ?? []}

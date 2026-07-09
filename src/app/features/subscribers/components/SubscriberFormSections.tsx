@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
+import type { AmpereScheduleRecord } from "../../ampere-schedules/types";
 import type { AreaRecord } from "../../areas/types";
 import { getSubscriberCustomerTypeLabel, getSubscriberPlanLabel, getSubscriberRelationLabel } from "../subscriberLabels";
 import type { LookupOption } from "../subscribersApi";
@@ -27,6 +28,8 @@ import type {
 } from "../schema";
 
 interface SubscriberDetailsSectionProps {
+  ampereSchedulePricingEnabled: boolean;
+  ampereSchedules: AmpereScheduleRecord[];
   areas: AreaRecord[];
   boxes: LookupOption[];
   customerRelations: LookupOption[];
@@ -40,6 +43,8 @@ interface SubscriberDetailsSectionProps {
 }
 
 export function SubscriberDetailsSection({
+  ampereSchedulePricingEnabled,
+  ampereSchedules,
   areas,
   boxes,
   customerRelations,
@@ -53,6 +58,7 @@ export function SubscriberDetailsSection({
     name: "plan",
   });
   const hasBoxes = boxes.length > 0;
+  const shouldShowAmpereSchedule = selectedPlan === "Ampere" && ampereSchedulePricingEnabled;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -133,7 +139,15 @@ export function SubscriberDetailsSection({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{t("subscribers.form.plan")}</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
+            <Select
+              onValueChange={(value) => {
+                field.onChange(value);
+                if (value !== "Ampere") {
+                  form.setValue("ampereScheduleId", "");
+                }
+              }}
+              value={field.value}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder={t("subscribers.form.planPlaceholder")} />
@@ -165,6 +179,38 @@ export function SubscriberDetailsSection({
         name="planValue"
         placeholder="5"
       />
+
+      {shouldShowAmpereSchedule ? (
+        <FormField
+          control={form.control}
+          name="ampereScheduleId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("subscribers.form.ampereSchedule")}</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value || ""}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("subscribers.form.ampereSchedulePlaceholder")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {ampereSchedules.map((schedule) => (
+                    <SelectItem key={schedule.id} value={schedule.id}>
+                      {schedule.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                {ampereSchedules.length > 0
+                  ? t("subscribers.form.ampereScheduleHelp")
+                  : t("subscribers.form.ampereScheduleEmpty")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      ) : null}
 
       <FormField
         control={form.control}

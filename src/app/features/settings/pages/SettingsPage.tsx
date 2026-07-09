@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, CirclePercent, Image, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
+import { Bell, CalendarDays, CirclePercent, Clock3, Image, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
 import { useAuth } from "../../../providers/AuthProvider";
 import packageJson from "../../../../../package.json";
 import { useI18n } from "../../../providers/I18nProvider";
@@ -103,6 +103,22 @@ export default function SettingsPage() {
               value={companyPreferences?.triggerMessage || notSetLabel}
             />
             <SettingRowLink
+              to="/settings/ampere-schedule-pricing"
+              icon={<Zap className="h-4 w-4" />}
+              label={t("settings.row.ampereSchedulePricing")}
+              value={t(
+                companyPreferences?.ampereSchedulePricingEnabled
+                  ? "settings.row.ampereSchedulePricingEnabled"
+                  : "settings.row.ampereSchedulePricingDisabled",
+              )}
+            />
+            <SettingRowLink
+              to="/ampere-schedules"
+              icon={<Clock3 className="h-4 w-4" />}
+              label={t("settings.row.ampereSchedules")}
+              value={t("settings.row.ampereSchedulesValue")}
+            />
+            <SettingRowLink
               to="/settings/company-logo"
               icon={<Image className="h-4 w-4" />}
               label={t("settings.row.companyLogo")}
@@ -158,7 +174,7 @@ export default function SettingsPage() {
 }
 
 function SettingsLoadingRows() {
-  return Array.from({ length: 7 }).map((_, index) => (
+  return Array.from({ length: 9 }).map((_, index) => (
     <div key={index} className="flex items-center gap-3 border-b border-black/5 px-4 py-4 last:border-b-0 dark:border-white/8">
       <Skeleton className="h-8 w-8 rounded-full" />
       <div className="min-w-0 flex-1">
