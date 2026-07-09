@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
 const AreasPage = lazy(() => import("../features/areas/pages/AreasPage"));
+const AmpereSchedulesPage = lazy(() => import("../features/ampere-schedules/pages/AmpereSchedulesPage"));
 const BoxesPage = lazy(() => import("../features/boxes/pages/BoxesPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
@@ -16,6 +17,7 @@ const TriggerMessagePage = lazy(() => import("../features/settings/pages/Trigger
 const TriggerDatePage = lazy(() => import("../features/settings/pages/TriggerDatePage"));
 const LanguageSettingPage = lazy(() => import("../features/settings/pages/LanguageSettingPage"));
 const CompanyLogoPage = lazy(() => import("../features/settings/pages/CompanyLogoPage"));
+const AmpereSchedulePricingPage = lazy(() => import("../features/settings/pages/AmpereSchedulePricingPage"));
 const WhatsAppConnectionPage = lazy(() => import("../features/settings/pages/WhatsAppConnectionPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 
@@ -50,6 +52,7 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/areas" element={<AreasPage />} />
+          <Route path="/ampere-schedules" element={<AmpereSchedulesPage />} />
           <Route path="/boxes" element={<BoxesPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
@@ -61,6 +64,7 @@ export function AppRoutes() {
           <Route path="/settings/trigger-message" element={<TriggerMessagePage />} />
           <Route path="/settings/language" element={<LanguageSettingPage />} />
           <Route path="/settings/company-logo" element={<CompanyLogoPage />} />
+          <Route path="/settings/ampere-schedule-pricing" element={<AmpereSchedulePricingPage />} />
           <Route path="/settings/whatsapp" element={<WhatsAppConnectionPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

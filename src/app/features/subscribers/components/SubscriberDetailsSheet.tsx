@@ -134,6 +134,11 @@ export function SubscriberDetailsSheet({
                   value={subscriber.cableName ?? t("subscribers.notSet")}
                 />
                 <DetailRow
+                  icon={Gauge}
+                  label={t("subscribers.details.ampereSchedule")}
+                  value={subscriber.ampereScheduleName ?? t("subscribers.notSet")}
+                />
+                <DetailRow
                   icon={MapPin}
                   label={t("subscribers.details.address")}
                   value={subscriber.address ?? t("subscribers.notSet")}

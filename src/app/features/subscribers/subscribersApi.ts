@@ -13,6 +13,8 @@ interface CustomerSummaryResponse {
   phone: string | null;
   address: string | null;
   cableName: string | null;
+  ampereScheduleId: string | null;
+  ampereScheduleName: string | null;
   boxId: string | null;
   boxName: string | null;
   customerType: string;
@@ -47,6 +49,7 @@ export interface CreateSubscriberPayload {
   phone?: string;
   address?: string;
   cableName?: string | null;
+  ampereScheduleId?: string | null;
   areaId?: string;
   boxId?: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
@@ -76,6 +79,8 @@ interface CustomerDetailResponse {
   phone: string | null;
   address: string | null;
   cableName: string | null;
+  ampereScheduleId: string | null;
+  ampereScheduleName: string | null;
   boxId: string | null;
   boxName: string | null;
   customerType: "Residential" | "Commercial" | "Industrial";
@@ -181,6 +186,7 @@ export function createSubscriber(payload: CreateSubscriberPayload, token: string
         phone: payload.phone,
         address: payload.address,
         cableName: payload.cableName,
+        ampereScheduleId: payload.ampereScheduleId,
         areaId: payload.areaId,
         boxId: payload.boxId,
         customerType: payload.customerType,
@@ -204,6 +210,8 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
     phone: subscriber.phone,
     address: subscriber.address,
     cableName: subscriber.cableName,
+    ampereScheduleId: subscriber.ampereScheduleId,
+    ampereScheduleName: subscriber.ampereScheduleName,
     boxId: subscriber.boxId,
     boxName: subscriber.boxName,
     areaName: subscriber.areaName,
@@ -242,6 +250,7 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         phone: payload.phone,
         address: payload.address,
         cableName: payload.cableName,
+        ampereScheduleId: payload.ampereScheduleId,
         areaId: payload.areaId,
         boxId: payload.boxId,
         customerType: payload.customerType,

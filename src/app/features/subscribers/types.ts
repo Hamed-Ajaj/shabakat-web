@@ -23,6 +23,8 @@ export interface SubscriberDetail {
   phone: string | null;
   address: string | null;
   cableName: string | null;
+  ampereScheduleId: string | null;
+  ampereScheduleName: string | null;
   boxId: string | null;
   boxName: string | null;
   areaName: string | null;

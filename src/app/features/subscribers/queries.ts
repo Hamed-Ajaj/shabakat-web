@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../providers/AuthProvider";
+import { fetchAmpereSchedules } from "../ampere-schedules/ampereSchedulesApi";
 import {
   fetchCustomerRelations,
   fetchCustomerTypes,
@@ -19,6 +20,7 @@ export const subscriberQueryKeys = {
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
   customerRelations: ["subscriber-customer-relations"] as const,
+  ampereSchedules: (companyId?: string) => ["subscriber-ampere-schedules", companyId] as const,
   distributionBoxes: (companyId?: string, areaId?: string) =>
     ["subscriber-distribution-boxes", companyId, areaId] as const,
   meterReadings: (id?: string) => ["subscriber-meter-readings", id] as const,
@@ -95,6 +97,17 @@ export function useSubscriberDistributionBoxesQuery(areaId?: string) {
     queryKey: subscriberQueryKeys.distributionBoxes(session?.companyId, areaId),
     queryFn: () => fetchDistributionBoxes(session?.token ?? "", areaId),
     enabled: Boolean(session?.token),
+    staleTime: 60_000,
+  });
+}
+
+export function useSubscriberAmpereSchedulesQuery(enabled = true) {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: subscriberQueryKeys.ampereSchedules(session?.companyId),
+    queryFn: () => fetchAmpereSchedules(session?.token ?? ""),
+    enabled: Boolean(session?.token && enabled),
     staleTime: 60_000,
   });
 }

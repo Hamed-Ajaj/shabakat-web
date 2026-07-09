@@ -8,6 +8,7 @@ export const createSubscriberSchema = z
     phone: z.string().trim().max(30, "Phone must be 30 characters or fewer.").optional().or(z.literal("")),
     address: z.string().trim().max(500, "Address must be 500 characters or fewer.").optional().or(z.literal("")),
     cableName: z.string().trim().max(100, "Cable name must be 100 characters or fewer.").optional().or(z.literal("")),
+    ampereScheduleId: z.string().optional().or(z.literal("")),
     areaId: z.string().optional().or(z.literal("")),
     boxId: z.string().optional().or(z.literal("")),
     customerType: z.enum(["Residential", "Commercial", "Industrial"], {
@@ -19,12 +20,21 @@ export const createSubscriberSchema = z
     planValue: z.coerce.number().min(0.01, "Plan value must be greater than 0.").max(9999999, "Plan value is too large."),
     subscriptionDate: z.string().optional().or(z.literal("")),
     customerRelation: customerRelationSchema.optional().or(z.literal("")),
+    ampereSchedulePricingEnabled: z.boolean().default(false),
     usePricingOverride: z.boolean().default(false),
     overridePrice: z.union([z.coerce.number(), z.nan()]).optional(),
     overrideFixedCharge: z.union([z.coerce.number(), z.nan()]).optional(),
     overrideTva: z.union([z.coerce.number(), z.nan()]).optional(),
   })
   .superRefine((values, context) => {
+    if (values.plan === "Ampere" && values.ampereSchedulePricingEnabled && !values.ampereScheduleId) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Ampere schedule is required.",
+        path: ["ampereScheduleId"],
+      });
+    }
+
     if (!values.usePricingOverride) {
       return;
     }
@@ -80,6 +90,7 @@ export const defaultSubscriberFormValues: CreateSubscriberFormInput = {
   phone: "",
   address: "",
   cableName: "",
+  ampereScheduleId: "",
   areaId: "",
   boxId: "",
   customerType: "Residential",
@@ -87,6 +98,7 @@ export const defaultSubscriberFormValues: CreateSubscriberFormInput = {
   planValue: 5,
   subscriptionDate: "",
   customerRelation: "",
+  ampereSchedulePricingEnabled: false,
   usePricingOverride: false,
   overridePrice: Number.NaN,
   overrideFixedCharge: Number.NaN,
