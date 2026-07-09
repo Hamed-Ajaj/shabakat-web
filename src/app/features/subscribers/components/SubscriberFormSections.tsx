@@ -281,6 +281,36 @@ export function SubscriberDetailsSection({
 
       <FormField
         control={form.control}
+        name="building"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("subscribers.form.building")}</FormLabel>
+            <FormControl>
+              <Input placeholder={t("subscribers.form.buildingPlaceholder")} {...field} />
+            </FormControl>
+            <FormDescription className="min-h-10">{t("subscribers.form.optional")}</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="floor"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("subscribers.form.floor")}</FormLabel>
+            <FormControl>
+              <Input placeholder={t("subscribers.form.floorPlaceholder")} {...field} />
+            </FormControl>
+            <FormDescription className="min-h-10">{t("subscribers.form.optional")}</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="customerRelation"
         render={({ field }) => (
           <FormItem>
@@ -316,7 +346,7 @@ export function SubscriberDetailsSection({
             <FormControl>
               <Input placeholder={t("subscribers.form.cableNamePlaceholder")} {...field} />
             </FormControl>
-            <FormDescription>{t("subscribers.form.optional")}</FormDescription>
+            <FormDescription className="min-h-10">{t("subscribers.form.optional")}</FormDescription>
             <FormMessage />
           </FormItem>
         )}

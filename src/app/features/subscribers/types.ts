@@ -22,6 +22,8 @@ export interface SubscriberDetail {
   name: string;
   phone: string | null;
   address: string | null;
+  building: string | null;
+  floor: string | null;
   cableName: string | null;
   ampereScheduleId: string | null;
   ampereScheduleName: string | null;

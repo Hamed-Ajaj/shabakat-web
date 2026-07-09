@@ -12,6 +12,8 @@ interface CustomerSummaryResponse {
   name: string;
   phone: string | null;
   address: string | null;
+  building: string | null;
+  floor: string | null;
   cableName: string | null;
   ampereScheduleId: string | null;
   ampereScheduleName: string | null;
@@ -48,6 +50,8 @@ export interface CreateSubscriberPayload {
   name: string;
   phone?: string;
   address?: string;
+  building?: string;
+  floor?: string;
   cableName?: string | null;
   ampereScheduleId?: string | null;
   areaId?: string;
@@ -78,6 +82,8 @@ interface CustomerDetailResponse {
   name: string;
   phone: string | null;
   address: string | null;
+  building: string | null;
+  floor: string | null;
   cableName: string | null;
   ampereScheduleId: string | null;
   ampereScheduleName: string | null;
@@ -185,6 +191,8 @@ export function createSubscriber(payload: CreateSubscriberPayload, token: string
         name: payload.name,
         phone: payload.phone,
         address: payload.address,
+        building: payload.building,
+        floor: payload.floor,
         cableName: payload.cableName,
         ampereScheduleId: payload.ampereScheduleId,
         areaId: payload.areaId,
@@ -209,6 +217,8 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
     name: subscriber.name,
     phone: subscriber.phone,
     address: subscriber.address,
+    building: subscriber.building,
+    floor: subscriber.floor,
     cableName: subscriber.cableName,
     ampereScheduleId: subscriber.ampereScheduleId,
     ampereScheduleName: subscriber.ampereScheduleName,
@@ -249,6 +259,8 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         name: payload.name,
         phone: payload.phone,
         address: payload.address,
+        building: payload.building,
+        floor: payload.floor,
         cableName: payload.cableName,
         ampereScheduleId: payload.ampereScheduleId,
         areaId: payload.areaId,

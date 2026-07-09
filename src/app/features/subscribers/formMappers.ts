@@ -8,12 +8,16 @@ export function mapFormValuesToSubscriberPayload(
   options?: { preserveClears?: boolean },
 ): CreateSubscriberPayload {
   const preserveClears = options?.preserveClears ?? false;
+  const trimmedBuilding = values.building?.trim() ?? "";
+  const trimmedFloor = values.floor?.trim() ?? "";
   const trimmedCableName = values.cableName?.trim() ?? "";
 
   return {
     name: values.name.trim(),
     phone: values.phone?.trim() || undefined,
     address: values.address?.trim() || undefined,
+    building: preserveClears ? (trimmedBuilding ? trimmedBuilding : null) : trimmedBuilding || undefined,
+    floor: preserveClears ? (trimmedFloor ? trimmedFloor : null) : trimmedFloor || undefined,
     cableName: preserveClears ? (trimmedCableName ? trimmedCableName : null) : trimmedCableName || undefined,
     ampereScheduleId: values.plan === "Ampere"
       ? preserveClears
@@ -47,6 +51,8 @@ export function mapSubscriberDetailToFormInput(
     name: subscriber.name,
     phone: subscriber.phone ?? "",
     address: subscriber.address ?? "",
+    building: subscriber.building ?? "",
+    floor: subscriber.floor ?? "",
     cableName: subscriber.cableName ?? "",
     ampereScheduleId: subscriber.ampereScheduleId ?? "",
     areaId: matchedArea?.id ?? "",
