@@ -125,6 +125,16 @@ export function SubscriberDetailsSheet({
                 <DetailRow icon={MapPin} label={t("subscribers.details.area")} value={subscriber.areaName ?? t("subscribers.unassigned")} />
                 <DetailRow
                   icon={MapPin}
+                  label={t("subscribers.details.building")}
+                  value={subscriber.building ?? t("subscribers.notSet")}
+                />
+                <DetailRow
+                  icon={MapPin}
+                  label={t("subscribers.details.floor")}
+                  value={subscriber.floor ?? t("subscribers.notSet")}
+                />
+                <DetailRow
+                  icon={MapPin}
                   label={t("subscribers.details.box")}
                   value={subscriber.boxName ?? t("subscribers.notSet")}
                 />
