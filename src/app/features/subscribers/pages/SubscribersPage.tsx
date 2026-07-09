@@ -1,10 +1,7 @@
-import { useMemo, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
 import { useAreasQuery } from "../../areas/queries";
-import { CreateSubscriberSheet } from "../components/CreateSubscriberSheet";
-import { DeleteSubscriberDialog } from "../components/DeleteSubscriberDialog";
-import { EditSubscriberSheet } from "../components/EditSubscriberSheet";
-import { SubscriberDetailsSheet } from "../components/SubscriberDetailsSheet";
+import { SubscribersPageSkeleton } from "../components/SubscribersPageSkeleton";
 import { SubscribersTable } from "../components/SubscribersTable";
 import { SubscribersToolbar } from "../components/SubscribersToolbar";
 import {
@@ -19,6 +16,19 @@ import { useAuth } from "../../../providers/AuthProvider";
 import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
 
 type SubscriberDialogMode = "create" | "delete" | "edit" | "view" | null;
+
+const CreateSubscriberSheet = lazy(() =>
+  import("../components/CreateSubscriberSheet").then((module) => ({ default: module.CreateSubscriberSheet })),
+);
+const EditSubscriberSheet = lazy(() =>
+  import("../components/EditSubscriberSheet").then((module) => ({ default: module.EditSubscriberSheet })),
+);
+const SubscriberDetailsSheet = lazy(() =>
+  import("../components/SubscriberDetailsSheet").then((module) => ({ default: module.SubscriberDetailsSheet })),
+);
+const DeleteSubscriberDialog = lazy(() =>
+  import("../components/DeleteSubscriberDialog").then((module) => ({ default: module.DeleteSubscriberDialog })),
+);
 
 export default function SubscribersPage() {
   const { session } = useAuth();
@@ -87,6 +97,16 @@ export default function SubscribersPage() {
     }));
   }
 
+  function handleDialogOpenChange(open: boolean) {
+    if (!open) {
+      closeDialog();
+    }
+  }
+
+  if (isLoading && !subscribersPage) {
+    return <SubscribersPageSkeleton />;
+  }
+
   return (
     <div className="space-y-4">
       <SubscribersToolbar
@@ -129,42 +149,36 @@ export default function SubscribersPage() {
         pagination={pagination}
         totalCount={subscribersPage?.totalCount ?? 0}
       />
-      <CreateSubscriberSheet
-        open={dialogMode === "create"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
-      <EditSubscriberSheet
-        open={dialogMode === "edit"}
-        subscriberId={selectedSubscriber?.id ?? null}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
-      <SubscriberDetailsSheet
-        open={dialogMode === "view"}
-        subscriberId={selectedSubscriber?.id ?? null}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
-      <DeleteSubscriberDialog
-        open={dialogMode === "delete"}
-        subscriberId={selectedSubscriber?.id ?? null}
-        subscriberName={selectedSubscriber?.name ?? ""}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+      <Suspense fallback={null}>
+        {dialogMode === "create" ? (
+          <CreateSubscriberSheet
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "edit" ? (
+          <EditSubscriberSheet
+            open
+            subscriberId={selectedSubscriber?.id ?? null}
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "view" ? (
+          <SubscriberDetailsSheet
+            open
+            subscriberId={selectedSubscriber?.id ?? null}
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "delete" ? (
+          <DeleteSubscriberDialog
+            open
+            subscriberId={selectedSubscriber?.id ?? null}
+            subscriberName={selectedSubscriber?.name ?? ""}
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }

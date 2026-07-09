@@ -1,5 +1,8 @@
 import { Suspense, lazy } from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { BoxesPageSkeleton } from "../features/boxes/components/BoxesPageSkeleton";
+import { InvoicesPageSkeleton } from "../features/invoices/components/InvoicesPageSkeleton";
+import { SubscribersPageSkeleton } from "../features/subscribers/components/SubscribersPageSkeleton";
 import { AppShell } from "../shell/AppShell";
 import { ProtectedRoute } from "./ProtectedRoute";
 
@@ -24,24 +27,54 @@ const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 function ShellLayout() {
   return (
     <AppShell>
-      <Outlet />
+      <Suspense fallback={<RouteFallback />}>
+        <Outlet />
+      </Suspense>
     </AppShell>
   );
 }
 
 function RouteFallback() {
-  return (
-    <div className="min-h-dvh bg-background px-6 py-10 text-muted-foreground">
-      Loading workspace...
-    </div>
-  );
+  const { pathname } = useLocation();
+
+  if (pathname.startsWith("/subscribers")) {
+    return (
+      <div className="px-6 py-6">
+        <SubscribersPageSkeleton />
+      </div>
+    );
+  }
+
+  if (pathname.startsWith("/invoices")) {
+    return (
+      <div className="px-6 py-6">
+        <InvoicesPageSkeleton />
+      </div>
+    );
+  }
+
+  if (pathname.startsWith("/boxes")) {
+    return (
+      <div className="px-6 py-6">
+        <BoxesPageSkeleton />
+      </div>
+    );
+  }
+
+  return <div className="min-h-dvh bg-background px-6 py-10 text-muted-foreground">Loading workspace...</div>;
 }
 
 export function AppRoutes() {
   return (
-    <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/login"
+          element={(
+            <Suspense fallback={<RouteFallback />}>
+              <LoginPage />
+            </Suspense>
+          )}
+        />
         <Route
           element={
             <ProtectedRoute>
@@ -69,6 +102,5 @@ export function AppRoutes() {
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-    </Suspense>
   );
 }

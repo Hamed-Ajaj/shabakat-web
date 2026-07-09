@@ -22,6 +22,10 @@ Favor feature-first structure over large page files. Put route-specific UI insid
 
 Prefer functional React components, explicit local types, and route-driven navigation with `react-router-dom`. TanStack Table is used for subscribers, while the areas screen uses query-backed card lists and sheet/dialog CRUD flows.
 
+- Every new route/page should ship with a visible loading state.
+- Prefer route-level lazy loading for pages and lazy loading for heavy secondary UI such as sheets/dialogs when practical.
+- Use skeleton loaders instead of plain loading text for primary page content whenever data is expected to take noticeable time.
+
 ## Testing Guidelines
 There is no dedicated automated test suite yet. Before opening a PR, run `pnpm lint`, `pnpm typecheck`, and `pnpm build`, then verify the main routes in `pnpm dev`: `/login`, `/dashboard`, `/areas`, `/subscribers`, `/invoices`, and `/settings`. If tests are added later, place them near the feature they cover and use `*.test.tsx`.
 

@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { Button } from "../../../components/ui/button";
+import { Skeleton } from "../../../components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -69,7 +70,7 @@ export function InvoicesTable({
 
   return (
     <SectionCard className="overflow-hidden">
-      {isLoading ? <div className="px-4 py-10 text-sm text-muted-foreground">{t("invoices.loading")}</div> : null}
+      {isLoading ? <InvoicesTableSkeleton /> : null}
       {!isLoading && error ? <div className="px-4 py-10 text-sm text-red-300">{error}</div> : null}
       {!isLoading && !error && data.length === 0 ? (
         <div className="px-4 py-10 text-sm text-muted-foreground">{t("invoices.empty")}</div>
@@ -144,5 +145,46 @@ export function InvoicesTable({
         </>
       ) : null}
     </SectionCard>
+  );
+}
+
+function InvoicesTableSkeleton() {
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[840px]">
+          <thead>
+            <tr className="border-b border-white/8">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <th key={index} className="px-4 py-3.5">
+                  <Skeleton className="h-4 w-24" />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 6 }).map((_, rowIndex) => (
+              <tr key={rowIndex} className="border-b border-white/8">
+                {Array.from({ length: 6 }).map((__, cellIndex) => (
+                  <td key={cellIndex} className="px-4 py-3.5">
+                    <Skeleton className="h-4 w-full" />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-white/8 px-4 py-3 md:flex-row md:items-center md:justify-between">
+        <Skeleton className="h-4 w-40" />
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <Skeleton className="h-9 w-28 rounded-xl" />
+          <Skeleton className="h-9 w-24 rounded-xl" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-9 w-24 rounded-xl" />
+        </div>
+      </div>
+    </>
   );
 }

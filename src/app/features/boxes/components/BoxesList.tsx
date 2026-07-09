@@ -1,4 +1,5 @@
 import { Cable, MapPinned, Package2, UsersRound } from "lucide-react";
+import { Skeleton } from "../../../components/ui/skeleton";
 import { useI18n } from "../../../providers/I18nProvider";
 import { Avatar } from "../../../shared/components/Avatar";
 import { SectionCard } from "../../../shared/components/SectionCard";
@@ -29,14 +30,23 @@ export function BoxesList({
       <div className="grid gap-4 xl:grid-cols-2">
         {Array.from({ length: 4 }).map((_, index) => (
           <SectionCard key={index} className="p-5">
-            <div className="animate-pulse space-y-4">
-              <div className="h-5 w-40 rounded bg-white/8" />
-              <div className="h-4 w-28 rounded bg-white/8" />
-              <div className="grid gap-2 sm:grid-cols-2">
-                <div className="h-8 rounded bg-white/8" />
-                <div className="h-8 rounded bg-white/8" />
+            <div className="flex items-start gap-4">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="min-w-0 flex-1 space-y-4">
+                <div>
+                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="mt-2 h-4 w-28" />
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Skeleton className="h-7 w-28 rounded-full" />
+                  <Skeleton className="h-7 w-32 rounded-full" />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Skeleton className="h-16 w-full rounded-xl" />
+                  <Skeleton className="h-16 w-full rounded-xl" />
+                </div>
               </div>
-              <div className="h-12 rounded bg-white/8" />
+              <Skeleton className="h-9 w-9 rounded-lg" />
             </div>
           </SectionCard>
         ))}
@@ -122,4 +132,3 @@ export function BoxesList({
     </div>
   );
 }
-

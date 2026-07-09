@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -6,19 +6,31 @@ import { useAuth } from "../../../providers/AuthProvider";
 import { useI18n } from "../../../providers/I18nProvider";
 import { useCompanyPreferencesQuery } from "../../settings/queries";
 import { useInvoicesQuery } from "../queries";
-import { InvoiceDetailsSheet } from "../components/InvoiceDetailsSheet";
+import { InvoicesPageSkeleton } from "../components/InvoicesPageSkeleton";
 import { InvoicesTable } from "../components/InvoicesTable";
 import { InvoicesToolbar } from "../components/InvoicesToolbar";
-import { CreateInvoiceDialog } from "../components/CreateInvoiceDialog";
-import { BulkCreateInvoicesDialog } from "../components/BulkCreateInvoicesDialog";
-import { RecordPaymentDialog } from "../components/RecordPaymentDialog";
-import { DeleteInvoiceDialog } from "../components/DeleteInvoiceDialog";
 import type { InvoiceRow, InvoiceStatus } from "../types";
 import { useInvoiceCustomerOptionsQuery, invoiceQueryKeys } from "../queries";
 import { fetchPrintableInvoiceHtml } from "../invoicesApi";
 import { printInvoiceHtml } from "../utils";
 
 type InvoiceDialogMode = "bulk" | "create" | "delete" | "pay" | "view" | null;
+
+const CreateInvoiceDialog = lazy(() =>
+  import("../components/CreateInvoiceDialog").then((module) => ({ default: module.CreateInvoiceDialog })),
+);
+const BulkCreateInvoicesDialog = lazy(() =>
+  import("../components/BulkCreateInvoicesDialog").then((module) => ({ default: module.BulkCreateInvoicesDialog })),
+);
+const RecordPaymentDialog = lazy(() =>
+  import("../components/RecordPaymentDialog").then((module) => ({ default: module.RecordPaymentDialog })),
+);
+const DeleteInvoiceDialog = lazy(() =>
+  import("../components/DeleteInvoiceDialog").then((module) => ({ default: module.DeleteInvoiceDialog })),
+);
+const InvoiceDetailsSheet = lazy(() =>
+  import("../components/InvoiceDetailsSheet").then((module) => ({ default: module.InvoiceDetailsSheet })),
+);
 
 export default function InvoicesPage() {
   const { session } = useAuth();
@@ -90,6 +102,16 @@ export default function InvoicesPage() {
     setPagination((current) => ({ ...current, pageIndex: 0 }));
   }
 
+  function handleDialogOpenChange(open: boolean) {
+    if (!open) {
+      closeDialog();
+    }
+  }
+
+  if (invoicesQuery.isLoading && !invoicesPage) {
+    return <InvoicesPageSkeleton />;
+  }
+
   return (
     <div className="space-y-4">
       <InvoicesToolbar
@@ -138,55 +160,47 @@ export default function InvoicesPage() {
         totalCount={invoicesPage?.totalCount ?? 0}
       />
 
-      <CreateInvoiceDialog
-        open={dialogMode === "create"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+      <Suspense fallback={null}>
+        {dialogMode === "create" ? (
+          <CreateInvoiceDialog
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
 
-      <BulkCreateInvoicesDialog
-        open={dialogMode === "bulk"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+        {dialogMode === "bulk" ? (
+          <BulkCreateInvoicesDialog
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
 
-      <InvoiceDetailsSheet
-        invoiceId={selectedInvoice?.id ?? null}
-        open={dialogMode === "view"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-        onPayClick={() => openDialog("pay", selectedInvoice)}
-      />
+        {dialogMode === "view" ? (
+          <InvoiceDetailsSheet
+            invoiceId={selectedInvoice?.id ?? null}
+            open
+            onOpenChange={handleDialogOpenChange}
+            onPayClick={() => openDialog("pay", selectedInvoice)}
+          />
+        ) : null}
 
-      <RecordPaymentDialog
-        invoiceId={selectedInvoice?.id ?? null}
-        open={dialogMode === "pay"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+        {dialogMode === "pay" ? (
+          <RecordPaymentDialog
+            invoiceId={selectedInvoice?.id ?? null}
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
 
-      <DeleteInvoiceDialog
-        invoiceId={selectedInvoice?.id ?? null}
-        invoiceNumber={selectedInvoice?.invoiceNumber ?? null}
-        open={dialogMode === "delete"}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeDialog();
-          }
-        }}
-      />
+        {dialogMode === "delete" ? (
+          <DeleteInvoiceDialog
+            invoiceId={selectedInvoice?.id ?? null}
+            invoiceNumber={selectedInvoice?.invoiceNumber ?? null}
+            open
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }
