@@ -1,5 +1,6 @@
 import { ApiError, apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
 import type {
+  BulkCreatePlanType,
   FixedKilowattCalculation,
   InvoiceCustomerOption,
   InvoiceCustomerPlan,
@@ -79,6 +80,7 @@ export interface CreateInvoicePayload {
   paymentAmount?: number;
   kilowattAmount?: number;
   paymentMethod?: PaymentMethod;
+  billedDays?: number;
 }
 
 export interface FixedKilowattCalculatePayload {
@@ -211,9 +213,13 @@ export function createInvoice(payload: CreateInvoicePayload, token: string) {
   );
 }
 
-export function bulkCreateInvoices(token: string) {
+export function bulkCreateInvoices(token: string, planType?: BulkCreatePlanType) {
+  const url = planType
+    ? `/api/v1/invoices/bulk?planType=${planType}`
+    : "/api/v1/invoices/bulk";
+
   return apiRequest<BulkCreateInvoiceResponse>(
-    "/api/v1/invoices/bulk",
+    url,
     {
       method: "POST",
       headers: {

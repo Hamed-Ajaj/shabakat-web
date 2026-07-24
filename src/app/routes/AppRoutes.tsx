@@ -21,6 +21,7 @@ const TriggerDatePage = lazy(() => import("../features/settings/pages/TriggerDat
 const LanguageSettingPage = lazy(() => import("../features/settings/pages/LanguageSettingPage"));
 const CompanyLogoPage = lazy(() => import("../features/settings/pages/CompanyLogoPage"));
 const AmpereSchedulePricingPage = lazy(() => import("../features/settings/pages/AmpereSchedulePricingPage"));
+const AmpereProrationPage = lazy(() => import("../features/settings/pages/AmpereProrationPage"));
 const WhatsAppConnectionPage = lazy(() => import("../features/settings/pages/WhatsAppConnectionPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 
@@ -98,6 +99,7 @@ export function AppRoutes() {
           <Route path="/settings/language" element={<LanguageSettingPage />} />
           <Route path="/settings/company-logo" element={<CompanyLogoPage />} />
           <Route path="/settings/ampere-schedule-pricing" element={<AmpereSchedulePricingPage />} />
+          <Route path="/settings/ampere-proration" element={<AmpereProrationPage />} />
           <Route path="/settings/whatsapp" element={<WhatsAppConnectionPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

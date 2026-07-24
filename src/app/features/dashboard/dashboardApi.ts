@@ -18,8 +18,12 @@ interface InvoicePageResponse {
   data: InvoiceSummaryResponse[];
 }
 
-export function fetchDashboardSummary(token: string) {
-  return apiRequest<DashboardSummary>("/api/v1/dashboard/summary", undefined, token);
+export function fetchDashboardSummary(token: string, year?: number, month?: number) {
+  const params = year !== undefined && month !== undefined
+    ? `?year=${year}&month=${month}`
+    : "";
+
+  return apiRequest<DashboardSummary>(`/api/v1/dashboard/summary${params}`, undefined, token);
 }
 
 export async function fetchPaidInvoices(token: string): Promise<DashboardInvoiceItem[]> {

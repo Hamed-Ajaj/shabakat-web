@@ -2,6 +2,7 @@ import type { CompanyPreferences } from "./types";
 
 export const defaultCompanyPreferences: CompanyPreferences = {
   ampereSchedulePricingEnabled: false,
+  ampereProrateByDaysEnabled: false,
   language: "en",
   dueDate: 31,
   triggerDate: 1,

@@ -10,6 +10,7 @@ import {
   type CreateInvoicePayload,
 } from "./invoicesApi";
 import { invoiceQueryKeys } from "./queries";
+import type { BulkCreatePlanType } from "./types";
 
 export function useCreateInvoiceMutation() {
   const { session } = useAuth();
@@ -37,12 +38,12 @@ export function useBulkCreateInvoicesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (planType?: BulkCreatePlanType) => {
       if (!session?.token) {
         throw new Error("You must be logged in to create invoices.");
       }
 
-      return bulkCreateInvoices(session.token);
+      return bulkCreateInvoices(session.token, planType);
     },
     onSuccess: async () =>
       Promise.all([

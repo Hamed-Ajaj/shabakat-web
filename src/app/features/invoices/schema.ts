@@ -15,6 +15,8 @@ export const createInvoiceSchema = z
       .max(500, "Notes must be 500 characters or fewer.")
       .optional()
       .or(z.literal("")),
+    billedFrom: z.string().optional(),
+    billedTo: z.string().optional(),
   })
   .superRefine((values, context) => {
     if (values.customerPlan !== "FixedKilowatt") {
@@ -54,6 +56,23 @@ export const createInvoiceSchema = z
         code: z.ZodIssueCode.custom,
         message: "Payment method is required.",
         path: ["paymentMethod"],
+      });
+    }
+  })
+  .superRefine((values, context) => {
+    if (!values.billedFrom || !values.billedTo) {
+      return;
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(values.billedFrom) || !/^\d{4}-\d{2}-\d{2}$/.test(values.billedTo)) {
+      return;
+    }
+
+    if (new Date(values.billedTo) < new Date(values.billedFrom)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "The 'To' date must be on or after the 'From' date.",
+        path: ["billedTo"],
       });
     }
   });

@@ -1,8 +1,15 @@
-import { Suspense, lazy, useMemo } from "react";
-import { AlertCircle, ArrowUpRight, DollarSign, UserCheck, Users } from "lucide-react";
+import { Suspense, lazy, useMemo, useState } from "react";
+import { AlertCircle, ArrowUpRight, Calendar, DollarSign, UserCheck, Users } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { MetricCard } from "../components/MetricCard";
 import { RecentPaymentsPanel, UpcomingDuePanel } from "../components/PaymentsPanels";
 import { formatCurrencyEn } from "../formatters";
@@ -13,14 +20,43 @@ const RevenueChartCard = lazy(async () => {
   return { default: module.RevenueChartCard };
 });
 
+function generateMonthOptions(locale: string) {
+  const now = new Date();
+  const monthFormat = new Intl.DateTimeFormat(locale, { year: "numeric", month: "long" });
+  const options: Array<{ value: string; label: string; year: number; month: number }> = [];
+  for (let i = 0; i < 18; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    options.push({
+      value: `${year}-${month}`,
+      label: monthFormat.format(date),
+      year,
+      month,
+    });
+  }
+  return options;
+}
+
+const MONTH_OPTIONS_EN = generateMonthOptions("en");
+const MONTH_OPTIONS_AR = generateMonthOptions("ar");
+
 export default function DashboardPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const [selectedPeriod, setSelectedPeriod] = useState("all");
+  const monthOptions = locale === "ar" ? MONTH_OPTIONS_AR : MONTH_OPTIONS_EN;
+  const filter = selectedPeriod !== "all"
+    ? (() => {
+        const option = monthOptions.find((o) => o.value === selectedPeriod);
+        return option ? { year: option.year, month: option.month } : {};
+      })()
+    : {};
   const {
     summaryQuery,
     paidInvoicesQuery,
     unpaidInvoicesQuery,
     partiallyPaidInvoicesQuery,
-  } = useDashboardQueries();
+  } = useDashboardQueries(filter);
 
   const recentPaidInvoices = useMemo(
     () =>
@@ -40,6 +76,26 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-foreground">{t("shell.route.dashboard.title")}</h1>
+        <div className="min-w-56">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="rounded-xl border-white/8 bg-card">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("dashboard.filter.allTime")}</SelectItem>
+              {monthOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {summaryQuery.isError ? (
         <SectionCard className="border-red-400/20 bg-red-400/10 p-5 text-red-200">
           <h2 className="text-lg font-semibold">{t("dashboard.error.failedToLoad")}</h2>

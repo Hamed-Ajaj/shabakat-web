@@ -2,6 +2,7 @@ export type InvoiceStatus = "Unpaid" | "PartiallyPaid" | "Paid";
 export type PaymentMethod = "Cash" | "Wish";
 export type InvoiceCustomerPlan = "Ampere" | "Kilowatt" | "FixedKilowatt";
 export type InvoiceCustomerType = "Residential" | "Commercial" | "Industrial";
+export type BulkCreatePlanType = "Ampere" | "Kilowatt";
 
 export interface InvoiceRow {
   id: string;

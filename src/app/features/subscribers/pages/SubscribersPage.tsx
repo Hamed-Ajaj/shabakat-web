@@ -1,5 +1,6 @@
-import { Suspense, lazy, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import type { PaginationState } from "@tanstack/react-table";
+import { useSearchParams } from "react-router-dom";
 import { useAreasQuery } from "../../areas/queries";
 import { SubscribersPageSkeleton } from "../components/SubscribersPageSkeleton";
 import { SubscribersTable } from "../components/SubscribersTable";
@@ -32,16 +33,28 @@ const DeleteSubscriberDialog = lazy(() =>
 
 export default function SubscribersPage() {
   const { session } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [dialogMode, setDialogMode] = useState<SubscriberDialogMode>(null);
   const [selectedSubscriber, setSelectedSubscriber] = useState<SubscriberRow | null>(null);
-  const [searchField, setSearchField] = useState<SubscriberSearchField>("name");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState<SubscriberSearchField>(
+    () => (searchParams.get("field") as SubscriberSearchField) || "name",
+  );
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
   const [areaId, setAreaId] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 400);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearchTerm) {
+      params.set("search", debouncedSearchTerm);
+      params.set("field", searchField);
+    }
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearchTerm, searchField, setSearchParams]);
   const filters = useMemo<SubscribersQueryFilters>(
     () => ({
       areaId,

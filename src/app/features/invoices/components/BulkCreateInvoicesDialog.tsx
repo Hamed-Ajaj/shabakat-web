@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
 import { useI18n } from "../../../providers/I18nProvider";
@@ -11,7 +12,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { useBulkCreateInvoicesMutation } from "../mutations";
+import type { BulkCreatePlanType } from "../types";
 
 interface BulkCreateInvoicesDialogProps {
   open: boolean;
@@ -24,9 +33,10 @@ export function BulkCreateInvoicesDialog({
 }: Readonly<BulkCreateInvoicesDialogProps>) {
   const { t } = useI18n();
   const bulkCreate = useBulkCreateInvoicesMutation();
+  const [planType, setPlanType] = useState<BulkCreatePlanType | "all">("all");
 
   async function handleConfirm() {
-    const result = await bulkCreate.mutateAsync();
+    const result = await bulkCreate.mutateAsync(planType === "all" ? undefined : planType);
     toast.success(result.message);
     onOpenChange(false);
   }
@@ -48,6 +58,20 @@ export function BulkCreateInvoicesDialog({
             {t("invoices.bulk.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">{t("invoices.bulk.planType")}</label>
+          <Select value={planType} onValueChange={(value) => setPlanType(value as BulkCreatePlanType | "all")}>
+            <SelectTrigger className="rounded-xl border-white/8 bg-card">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("invoices.bulk.planTypeAll")}</SelectItem>
+              <SelectItem value="Ampere">{t("invoices.bulk.planTypeAmpere")}</SelectItem>
+              <SelectItem value="Kilowatt">{t("invoices.bulk.planTypeKilowatt")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         {bulkCreate.error instanceof Error ? <p className="text-sm text-red-300">{bulkCreate.error.message}</p> : null}
 

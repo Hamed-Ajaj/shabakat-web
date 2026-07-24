@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, CirclePercent, Clock3, Image, Languages, MessageCircle, MessageSquareText, Package, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
+import { Bell, CalendarDays, CirclePercent, Clock3, Image, Languages, MessageCircle, MessageSquareText, Package, Percent, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
 import { useAuth } from "../../../providers/AuthProvider";
 import packageJson from "../../../../../package.json";
 import { useI18n } from "../../../providers/I18nProvider";
@@ -110,6 +110,16 @@ export default function SettingsPage() {
                 companyPreferences?.ampereSchedulePricingEnabled
                   ? "settings.row.ampereSchedulePricingEnabled"
                   : "settings.row.ampereSchedulePricingDisabled",
+              )}
+            />
+            <SettingRowLink
+              to="/settings/ampere-proration"
+              icon={<Percent className="h-4 w-4" />}
+              label={t("settings.row.ampereProration")}
+              value={t(
+                companyPreferences?.ampereProrateByDaysEnabled
+                  ? "settings.row.ampereProrationEnabled"
+                  : "settings.row.ampereProrationDisabled",
               )}
             />
             <SettingRowLink

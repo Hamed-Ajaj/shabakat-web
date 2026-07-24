@@ -1,5 +1,6 @@
+import { type FormEvent, useState } from "react";
 import { Search } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "../../components/ui/sidebar";
 import { useAuth } from "../../providers/AuthProvider";
 import { useI18n } from "../../providers/I18nProvider";
@@ -10,7 +11,16 @@ export function TopNavigation() {
   const { session } = useAuth();
   const { t } = useI18n();
   const location = useLocation();
+  const navigate = useNavigate();
   const current = routeTitles[location.pathname] ?? routeTitles["/dashboard"];
+  const [quickSearch, setQuickSearch] = useState("");
+
+  function handleQuickSearchSubmit(event: FormEvent) {
+    event.preventDefault();
+    const trimmed = quickSearch.trim();
+    if (!trimmed) return;
+    navigate(`/subscribers?search=${encodeURIComponent(trimmed)}&field=name`);
+  }
 
   return (
     <header
@@ -31,11 +41,15 @@ export function TopNavigation() {
       <div className="ms-auto flex items-center gap-2">
         <div className="relative hidden md:block">
           <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder={t("common.labels.quickSearch")}
-            className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pe-4 ps-9 text-sm text-foreground outline-none transition focus:border-primary"
-          />
+          <form onSubmit={handleQuickSearchSubmit}>
+            <input
+              type="text"
+              value={quickSearch}
+              onChange={(e) => setQuickSearch(e.target.value)}
+              placeholder={t("common.labels.quickSearch")}
+              className="w-60 rounded-xl border border-white/8 bg-secondary py-2 pe-4 ps-9 text-sm text-foreground outline-none transition focus:border-primary"
+            />
+          </form>
         </div>
         <Avatar name={session?.fullName ?? t("common.workspaceUser")} />
       </div>

@@ -19,6 +19,7 @@ interface GetPreferencesResponse {
   industrialFixedCharge: number;
   industrialTVA: number;
   ampereSchedulePricingEnabled: boolean;
+  ampereProrateByDaysEnabled: boolean;
   language: "en" | "ar";
   dueDate: number;
   triggerDate: number;
@@ -124,6 +125,7 @@ export function mapPreferencesToPayload(preferences: CompanyPreferences): Compan
     industrialFixedCharge: preferences.pricing.fixedCharge.industrial,
     industrialTVA: preferences.pricing.tva.industrial,
     ampereSchedulePricingEnabled: preferences.ampereSchedulePricingEnabled,
+    ampereProrateByDaysEnabled: preferences.ampereProrateByDaysEnabled,
     language: preferences.language,
     dueDate: preferences.dueDate,
     triggerDate: preferences.triggerDate,
@@ -134,6 +136,7 @@ export function mapPreferencesToPayload(preferences: CompanyPreferences): Compan
 export function mapPreferencesResponse(response: GetPreferencesResponse): CompanyPreferences {
   return {
     ampereSchedulePricingEnabled: response.ampereSchedulePricingEnabled,
+    ampereProrateByDaysEnabled: response.ampereProrateByDaysEnabled,
     language: response.language,
     dueDate: response.dueDate,
     triggerDate: response.triggerDate,

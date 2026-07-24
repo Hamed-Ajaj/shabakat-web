@@ -11,23 +11,29 @@ import type { DashboardInvoiceItem, DashboardSummary } from "./types";
 
 export const dashboardQueryKeys = {
   all: ["dashboard"] as const,
-  summary: (companyId?: string) => ["dashboard", companyId, "summary"] as const,
+  summary: (companyId?: string, year?: number, month?: number) => ["dashboard", companyId, "summary", year, month] as const,
   paidInvoices: (companyId?: string) => ["dashboard", companyId, "paid-invoices"] as const,
   unpaidInvoices: (companyId?: string) => ["dashboard", companyId, "unpaid-invoices"] as const,
   partiallyPaidInvoices: (companyId?: string) => ["dashboard", companyId, "partially-paid-invoices"] as const,
 };
 
-export function useDashboardQueries() {
+export interface DashboardFilter {
+  year?: number;
+  month?: number;
+}
+
+export function useDashboardQueries(filter: DashboardFilter = {}) {
   const { session } = useAuth();
   const token = session?.token ?? "";
   const companyId = session?.companyId;
   const enabled = Boolean(session?.token);
+  const { year, month } = filter;
 
   const queries = useQueries({
     queries: [
       {
-        queryKey: dashboardQueryKeys.summary(companyId),
-        queryFn: () => fetchDashboardSummary(token),
+        queryKey: dashboardQueryKeys.summary(companyId, year, month),
+        queryFn: () => fetchDashboardSummary(token, year, month),
         enabled,
         staleTime: 1000 * 60,
       },

@@ -28,6 +28,25 @@ import { useCreateInvoiceMutation } from "../mutations";
 import { useFixedKilowattCalculationQuery, useInvoiceCustomerOptionsQuery } from "../queries";
 import { createInvoiceSchema, type CreateInvoiceFormInput, type CreateInvoiceFormValues } from "../schema";
 import { formatCurrency } from "../utils";
+import { useCompanyPreferencesQuery } from "../../settings/queries";
+
+function getDefaultEndOfMonth() {
+  const now = new Date();
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return endOfMonth.toISOString().split("T")[0];
+}
+
+function toDateInputValue(date: Date) {
+  return date.toISOString().split("T")[0];
+}
+
+function calcBilledDays(from: string, to: string): number {
+  const fromDate = new Date(from);
+  const toDate = new Date(to);
+  const utcFrom = Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth(), fromDate.getUTCDate());
+  const utcTo = Date.UTC(toDate.getUTCFullYear(), toDate.getUTCMonth(), toDate.getUTCDate());
+  return Math.floor((utcTo - utcFrom) / (1000 * 60 * 60 * 24)) + 1;
+}
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -41,6 +60,10 @@ export function CreateInvoiceDialog({
   const { t } = useI18n();
   const createInvoice = useCreateInvoiceMutation();
   const customersQuery = useInvoiceCustomerOptionsQuery();
+  const preferencesQuery = useCompanyPreferencesQuery();
+  const companyPreferences = preferencesQuery.data;
+  const todayInput = toDateInputValue(new Date());
+  const endOfMonthInput = getDefaultEndOfMonth();
   const form = useForm<CreateInvoiceFormInput, undefined, CreateInvoiceFormValues>({
     resolver: standardSchemaResolver(createInvoiceSchema),
     defaultValues: {
@@ -51,6 +74,8 @@ export function CreateInvoiceDialog({
       paymentAmount: Number.NaN,
       kilowattAmount: Number.NaN,
       paymentMethod: undefined,
+      billedFrom: todayInput,
+      billedTo: endOfMonthInput,
     },
   });
   const customerId = form.watch("customerId");
@@ -59,6 +84,11 @@ export function CreateInvoiceDialog({
   const kilowattAmount = toFiniteNumber(form.watch("kilowattAmount"));
   const selectedCustomer = (customersQuery.data ?? []).find((item) => item.id === customerId);
   const isFixedKilowatt = selectedCustomer?.plan === "FixedKilowatt";
+  const isAmpere = selectedCustomer?.plan === "Ampere";
+  const showBilledDays = isAmpere && companyPreferences?.ampereProrateByDaysEnabled === true;
+  const billedFrom = form.watch("billedFrom") ?? "";
+  const billedTo = form.watch("billedTo") ?? "";
+  const billedDays = billedFrom && billedTo ? calcBilledDays(billedFrom, billedTo) : 0;
   const debouncedPaymentAmount = useDebouncedValue(paymentAmount, 350);
   const debouncedKilowattAmount = useDebouncedValue(kilowattAmount, 350);
   const fixedKilowattCalculationPayload =
@@ -99,6 +129,7 @@ export function CreateInvoiceDialog({
         selectedCustomer?.plan === "FixedKilowatt"
           ? values.paymentMethod
           : undefined,
+      billedDays: showBilledDays && billedDays > 0 ? billedDays : undefined,
     });
     toast.success(t("invoices.create.success"));
     onOpenChange(false);
@@ -110,6 +141,8 @@ export function CreateInvoiceDialog({
       paymentAmount: Number.NaN,
       kilowattAmount: Number.NaN,
       paymentMethod: undefined,
+      billedFrom: todayInput,
+      billedTo: endOfMonthInput,
     });
   }
 
@@ -128,6 +161,8 @@ export function CreateInvoiceDialog({
             paymentAmount: Number.NaN,
             kilowattAmount: Number.NaN,
             paymentMethod: undefined,
+            billedFrom: todayInput,
+            billedTo: endOfMonthInput,
           });
         }
       }}
@@ -178,6 +213,40 @@ export function CreateInvoiceDialog({
               </Select>
               {form.formState.errors.customerId ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.customerId.message}</p> : null}
             </div>
+
+            {showBilledDays ? (
+              <SectionCard className="space-y-3 p-4">
+                <p className="text-sm font-medium text-foreground">{t("invoices.create.billedDaysTitle")}</p>
+                <p className="text-xs text-muted-foreground">{t("invoices.create.billedDaysDescription")}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.billedFrom")}</label>
+                    <Input
+                      type="date"
+                      value={billedFrom}
+                      onChange={(event) => form.setValue("billedFrom", event.target.value)}
+                      className="rounded-xl border-white/8 bg-card"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.billedTo")}</label>
+                    <Input
+                      type="date"
+                      value={billedTo}
+                      onChange={(event) => form.setValue("billedTo", event.target.value)}
+                      className="rounded-xl border-white/8 bg-card"
+                    />
+                  </div>
+                </div>
+                {billedDays > 0 ? (
+                  <p className="text-sm text-foreground">
+                    {t("invoices.create.billedDaysCount", { days: billedDays })}
+                  </p>
+                ) : billedFrom && billedTo ? (
+                  <p className="text-sm text-red-300">{t("invoices.create.billedDaysInvalid")}</p>
+                ) : null}
+              </SectionCard>
+            ) : null}
 
             {isFixedKilowatt ? (
               <>
@@ -309,6 +378,9 @@ export function CreateInvoiceDialog({
 
             {customersQuery.error instanceof Error ? (
               <p className="text-sm text-red-300">{customersQuery.error.message}</p>
+            ) : null}
+            {preferencesQuery.error instanceof Error ? (
+              <p className="text-sm text-red-300">{preferencesQuery.error.message}</p>
             ) : null}
             {createInvoice.error instanceof Error ? (
               <p className="text-sm text-red-300">{createInvoice.error.message}</p>

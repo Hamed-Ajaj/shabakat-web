@@ -14,6 +14,7 @@ export interface PricingValues {
 
 export interface CompanyPreferences {
   ampereSchedulePricingEnabled: boolean;
+  ampereProrateByDaysEnabled: boolean;
   language: CompanyLanguage;
   dueDate: number;
   triggerDate: number;
@@ -44,6 +45,7 @@ export interface CompanyPreferencesPayload {
   industrialFixedCharge: number;
   industrialTVA: number;
   ampereSchedulePricingEnabled: boolean;
+  ampereProrateByDaysEnabled: boolean;
   language: CompanyLanguage;
   dueDate: number;
   triggerDate: number;
