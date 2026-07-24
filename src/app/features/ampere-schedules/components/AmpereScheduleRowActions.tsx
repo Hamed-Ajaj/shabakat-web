@@ -10,6 +10,7 @@ import { useI18n } from "../../../providers/I18nProvider";
 
 interface AmpereScheduleRowActionsProps {
   canManage: boolean;
+  canBeDeleted: boolean;
   onDelete: () => void;
   onEdit: () => void;
   onView: () => void;
@@ -17,6 +18,7 @@ interface AmpereScheduleRowActionsProps {
 
 export function AmpereScheduleRowActions({
   canManage,
+  canBeDeleted,
   onDelete,
   onEdit,
   onView,
@@ -46,7 +48,7 @@ export function AmpereScheduleRowActions({
             {t("ampereSchedules.actions.edit")}
           </DropdownMenuItem>
         ) : null}
-        {canManage ? (
+        {canManage && canBeDeleted ? (
           <DropdownMenuItem variant="destructive" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
             {t("ampereSchedules.actions.delete")}

@@ -26,21 +26,23 @@ export function EditAmpereScheduleSheet({
         name: "",
         hoursPerDay: 14,
         pricePerAmp: 0,
+        residentialPricePerAmp: 0,
+        commercialPricePerAmp: 0,
+        industrialPricePerAmp: 0,
       };
     }
-
     return {
       name: schedule.name,
       hoursPerDay: schedule.hoursPerDay,
       pricePerAmp: schedule.pricePerAmp,
+      residentialPricePerAmp: schedule.residentialPricePerAmp,
+      commercialPricePerAmp: schedule.commercialPricePerAmp,
+      industrialPricePerAmp: schedule.industrialPricePerAmp,
     };
   }, [schedule]);
 
   async function handleSubmit(values: AmpereScheduleFormOutput) {
-    if (!schedule) {
-      return;
-    }
-
+    if (!schedule) return;
     await updateAmpereSchedule.mutateAsync(values);
     toast.success(t("ampereSchedules.toast.updated"));
     onOpenChange(false);
@@ -57,9 +59,7 @@ export function EditAmpereScheduleSheet({
       values={initialValues}
       onOpenChange={(nextOpen) => {
         onOpenChange(nextOpen);
-        if (!nextOpen) {
-          updateAmpereSchedule.reset();
-        }
+        if (!nextOpen) updateAmpereSchedule.reset();
       }}
       onSubmit={handleSubmit}
     />

@@ -6,7 +6,11 @@ interface AmpereScheduleResponse {
   name: string;
   hoursPerDay: number;
   pricePerAmp: number;
+  residentialPricePerAmp: number;
+  commercialPricePerAmp: number;
+  industrialPricePerAmp: number;
   customerCount: number;
+  canBeDeleted: boolean;
   createdAt: string;
 }
 
@@ -14,6 +18,9 @@ export interface AmpereSchedulePayload {
   name: string;
   hoursPerDay: number;
   pricePerAmp: number;
+  residentialPricePerAmp: number;
+  commercialPricePerAmp: number;
+  industrialPricePerAmp: number;
 }
 
 export async function fetchAmpereSchedules(token: string): Promise<AmpereScheduleRecord[]> {
@@ -28,7 +35,11 @@ export async function fetchAmpereSchedules(token: string): Promise<AmpereSchedul
     name: schedule.name,
     hoursPerDay: schedule.hoursPerDay,
     pricePerAmp: schedule.pricePerAmp,
+    residentialPricePerAmp: schedule.residentialPricePerAmp,
+    commercialPricePerAmp: schedule.commercialPricePerAmp,
+    industrialPricePerAmp: schedule.industrialPricePerAmp,
     customerCount: schedule.customerCount,
+    canBeDeleted: schedule.canBeDeleted,
     createdAt: schedule.createdAt,
   }));
 }

@@ -1,4 +1,4 @@
-import { Calendar, Clock3, UsersRound, Zap } from "lucide-react";
+import { Calendar, Clock3, UsersRound } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -36,7 +36,7 @@ export function AmpereScheduleDetailsSheet({
           <SheetDescription>{t("ampereSchedules.details.description")}</SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-4 px-6 py-5">
+          <div className="space-y-4 px-6 py-5">
           {schedule ? (
             <>
               <div className="grid gap-4 md:grid-cols-2">
@@ -50,14 +50,23 @@ export function AmpereScheduleDetailsSheet({
                   )}
                 />
                 <MetricCard
-                  label={t("ampereSchedules.details.pricePerAmp")}
-                  value={t("ampereSchedules.pricePerAmpValue", { value: schedule.pricePerAmp })}
+                  label={t("ampereSchedules.details.hoursPerDay")}
+                  value={t("ampereSchedules.hoursPerDayValue", { count: schedule.hoursPerDay })}
                 />
               </div>
 
+              <SectionCard className="space-y-3 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{t("ampereSchedules.details.pricingTitle")}</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <PricingTile label={t("ampereSchedules.form.pricingTierBase")} value={schedule.pricePerAmp} />
+                  <PricingTile label={t("ampereSchedules.form.pricingTierResidential")} value={schedule.residentialPricePerAmp} />
+                  <PricingTile label={t("ampereSchedules.form.pricingTierCommercial")} value={schedule.commercialPricePerAmp} />
+                  <PricingTile label={t("ampereSchedules.form.pricingTierIndustrial")} value={schedule.industrialPricePerAmp} />
+                </div>
+              </SectionCard>
+
               <SectionCard className="space-y-4 p-5">
                 <DetailRow icon={Clock3} label={t("ampereSchedules.details.hoursPerDay")} value={t("ampereSchedules.hoursPerDayValue", { count: schedule.hoursPerDay })} />
-                <DetailRow icon={Zap} label={t("ampereSchedules.details.pricePerAmp")} value={t("ampereSchedules.pricePerAmpValue", { value: schedule.pricePerAmp })} />
                 <DetailRow
                   icon={UsersRound}
                   label={t("ampereSchedules.details.assignedCustomers")}
@@ -103,6 +112,15 @@ function DetailRow({
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
         <p className="mt-1 text-sm text-foreground">{value}</p>
       </div>
+    </div>
+  );
+}
+
+function PricingTile({ label, value }: Readonly<{ label: string; value: number }>) {
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{value.toFixed(2)}</p>
     </div>
   );
 }

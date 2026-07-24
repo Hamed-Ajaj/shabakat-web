@@ -128,6 +128,7 @@ export function AmpereSchedulesList({
 
             <AmpereScheduleRowActions
               canManage={canManage}
+              canBeDeleted={schedule.canBeDeleted}
               onDelete={() => onDelete(schedule)}
               onEdit={() => onEdit(schedule)}
               onView={() => onView(schedule)}
