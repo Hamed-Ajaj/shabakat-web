@@ -130,6 +130,18 @@ export async function fetchSubscribers(
     params.set("areaId", filters.areaId);
   }
 
+  if (filters.planType) {
+    params.set("planType", filters.planType);
+  }
+
+  if (filters.customerRelation) {
+    params.set("customerRelation", filters.customerRelation);
+  }
+
+  if (filters.customerStatus) {
+    params.set("customerStatus", filters.customerStatus);
+  }
+
   const response = await apiRequest<PagedResponse<CustomerSummaryResponse>>(
     `/api/v1/customers?${params.toString()}`,
     undefined,

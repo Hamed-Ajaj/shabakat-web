@@ -7,6 +7,8 @@ import { SubscribersTable } from "../components/SubscribersTable";
 import { SubscribersToolbar } from "../components/SubscribersToolbar";
 import {
   useSubscribersQuery,
+  useSubscriberCustomerRelationsQuery,
+  useSubscriberPlanTypesQuery,
 } from "../queries";
 import type {
   SubscriberRow,
@@ -41,6 +43,9 @@ export default function SubscribersPage() {
   );
   const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
   const [areaId, setAreaId] = useState("");
+  const [planType, setPlanType] = useState("");
+  const [customerRelation, setCustomerRelation] = useState("");
+  const [customerStatus, setCustomerStatus] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -58,16 +63,22 @@ export default function SubscribersPage() {
   const filters = useMemo<SubscribersQueryFilters>(
     () => ({
       areaId,
+      customerRelation,
+      customerStatus,
       pageIndex: pagination.pageIndex,
       pageSize: pagination.pageSize,
+      planType,
       searchField,
       searchTerm: debouncedSearchTerm,
     }),
     [
       areaId,
+      customerRelation,
+      customerStatus,
       debouncedSearchTerm,
       pagination.pageIndex,
       pagination.pageSize,
+      planType,
       searchField,
     ],
   );
@@ -78,6 +89,8 @@ export default function SubscribersPage() {
     isLoading,
   } = useSubscribersQuery(filters);
   const areasQuery = useAreasQuery();
+  const planTypesQuery = useSubscriberPlanTypesQuery();
+  const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
   const canDelete = session?.role === "Owner" || session?.role === "Admin";
   const subscribers = subscribersPage?.data ?? [];
 
@@ -125,7 +138,12 @@ export default function SubscribersPage() {
       <SubscribersToolbar
         areaId={areaId}
         areas={areasQuery.data ?? []}
+        customerRelation={customerRelation}
+        customerRelations={customerRelationsQuery.data ?? []}
+        customerStatus={customerStatus}
         isFetching={isFetching}
+        planType={planType}
+        planTypes={planTypesQuery.data ?? []}
         searchField={searchField}
         searchTerm={searchTerm}
         total={subscribersPage?.totalCount ?? 0}
@@ -134,6 +152,18 @@ export default function SubscribersPage() {
           resetToFirstPage();
         }}
         onCreateClick={() => openDialog("create")}
+        onCustomerRelationChange={(value) => {
+          setCustomerRelation(value);
+          resetToFirstPage();
+        }}
+        onCustomerStatusChange={(value) => {
+          setCustomerStatus(value === "all" ? "" : value);
+          resetToFirstPage();
+        }}
+        onPlanTypeChange={(value) => {
+          setPlanType(value);
+          resetToFirstPage();
+        }}
         onSearchFieldChange={(value) => {
           setSearchField(value);
           resetToFirstPage();

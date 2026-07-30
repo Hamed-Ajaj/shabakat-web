@@ -59,8 +59,11 @@ export interface MeterReadingRecord {
 
 export interface SubscribersQueryFilters {
   areaId: string;
+  customerRelation: string;
+  customerStatus: string;
   pageIndex: number;
   pageSize: number;
+  planType: string;
   searchField: SubscriberSearchField;
   searchTerm: string;
 }
