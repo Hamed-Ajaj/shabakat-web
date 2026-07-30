@@ -51,7 +51,7 @@ export interface InvoiceCustomerOption {
   name: string;
   plan: InvoiceCustomerPlan;
   customerType: InvoiceCustomerType;
-  planValue: number;
+  planValue: number | null;
 }
 
 export interface FixedKilowattCalculation {
@@ -60,7 +60,7 @@ export interface FixedKilowattCalculation {
   unitPrice: number;
   fixedCharge: number;
   tva: number;
-  planValue: number;
+  planValue: number | null;
   customerType: InvoiceCustomerType;
 }
 

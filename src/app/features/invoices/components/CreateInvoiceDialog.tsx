@@ -359,7 +359,7 @@ export function CreateInvoiceDialog({
                       <PreviewMetric label="Unit Price" value={formatCurrency(calculationQuery.data.unitPrice)} />
                       <PreviewMetric label="Fixed Charge" value={formatCurrency(calculationQuery.data.fixedCharge)} />
                       <PreviewMetric label="TVA" value={`${calculationQuery.data.tva}%`} />
-                      <PreviewMetric label="Plan Value" value={`${calculationQuery.data.planValue}`} />
+                      <PreviewMetric label="Plan Value" value={calculationQuery.data.planValue !== null ? `${calculationQuery.data.planValue}` : "—"} />
                     </div>
                   ) : calculationQuery.isSuccess ? (
                     <p className="text-sm text-muted-foreground">
