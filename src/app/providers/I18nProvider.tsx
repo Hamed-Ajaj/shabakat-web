@@ -78,7 +78,8 @@ export function I18nProvider({ children }: Readonly<{ children: React.ReactNode 
         new Intl.NumberFormat(localeTag, {
           style: "currency",
           currency: "USD",
-          maximumFractionDigits: 0,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         }).format(amount),
       formatCompactCurrency: (amount) =>
         new Intl.NumberFormat(localeTag, {

@@ -32,6 +32,7 @@ export interface InvoicePayment {
 export interface InvoiceDetail {
   id: string;
   invoiceNumber: number;
+  customerId: string;
   customerName: string;
   invoiceStatus: InvoiceStatus;
   issueDate: string;

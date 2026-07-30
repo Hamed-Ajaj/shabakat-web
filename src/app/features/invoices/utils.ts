@@ -19,7 +19,7 @@ export function formatDateTime(value: string) {
 }
 
 export function formatCurrency(value: number) {
-  return `$${Math.round(value).toLocaleString()}`;
+  return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function printInvoiceHtml(html: string) {
@@ -70,4 +70,92 @@ export function mapInvoiceStatusToBadge(status: InvoiceStatus): "paid" | "unpaid
   }
 
   return "unpaid";
+}
+
+export interface InvoiceBreakdown {
+  charge: number;
+  fixedCharge: number;
+  tvaAmount: number;
+  tvaRate: number;
+}
+
+export interface BreakdownCustomer {
+  plan: "Ampere" | "Kilowatt" | "FixedKilowatt";
+  planValue: number | null;
+}
+
+export interface BreakdownSibling {
+  id: string;
+  invoiceNumber: number;
+  issueDate: string;
+  createdAt: string;
+}
+
+function isEarlierSibling(a: BreakdownSibling, b: BreakdownSibling): boolean {
+  if (a.invoiceNumber !== b.invoiceNumber) {
+    return a.invoiceNumber < b.invoiceNumber;
+  }
+  return a.createdAt < b.createdAt;
+}
+
+export function computeInvoiceBreakdown(
+  totalAmount: number,
+  fixedCharge: number,
+  tva: number,
+  customer: BreakdownCustomer | null,
+  currentInvoiceId: string,
+  currentInvoiceNumber: number,
+  currentInvoiceCreatedAt: string,
+  currentIssueDate: string,
+  siblingInvoices: BreakdownSibling[],
+): InvoiceBreakdown {
+  let includePlanValue = false;
+
+  if (customer) {
+    if (customer.plan === "Kilowatt") {
+      includePlanValue = true;
+    } else if (customer.plan === "FixedKilowatt") {
+      const currentSibling: BreakdownSibling = {
+        id: currentInvoiceId,
+        invoiceNumber: currentInvoiceNumber,
+        issueDate: currentIssueDate,
+        createdAt: currentInvoiceCreatedAt,
+      };
+
+      const issueDate = new Date(currentIssueDate);
+      const yearMonth = `${issueDate.getFullYear()}-${issueDate.getMonth()}`;
+
+      const hasEarlier = siblingInvoices.some((s) => {
+        if (s.id === currentInvoiceId) return false;
+        const sDate = new Date(s.issueDate);
+        if (`${sDate.getFullYear()}-${sDate.getMonth()}` !== yearMonth) return false;
+        return isEarlierSibling(s, currentSibling);
+      });
+
+      includePlanValue = !hasEarlier;
+    }
+  }
+
+  const planValue = includePlanValue ? (customer?.planValue ?? 0) : 0;
+  const taxableTotal = totalAmount - planValue;
+
+  let charge: number;
+  let tvaAmount: number;
+
+  if (tva <= 0) {
+    charge = taxableTotal - fixedCharge;
+    tvaAmount = 0;
+  } else {
+    const rate = tva / 100;
+    const subtotal = taxableTotal / (1 + rate);
+    charge = subtotal - fixedCharge;
+    tvaAmount = subtotal * rate;
+  }
+
+  return {
+    charge: charge + planValue,
+    fixedCharge,
+    tvaAmount,
+    tvaRate: tva,
+  };
 }

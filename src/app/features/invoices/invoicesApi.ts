@@ -17,6 +17,7 @@ import type {
 interface InvoiceSummaryResponse {
   id: string;
   invoiceNumber: number;
+  customerId: string;
   customerName: string;
   invoiceStatus: InvoiceStatus;
   issueDate: string;
@@ -146,6 +147,7 @@ export async function fetchInvoiceDetail(id: string, token: string): Promise<Inv
   return {
     id: response.id,
     invoiceNumber: response.invoiceNumber,
+    customerId: response.customerId,
     customerName: response.customerName,
     invoiceStatus: response.invoiceStatus,
     issueDate: response.issueDate,
@@ -159,6 +161,35 @@ export async function fetchInvoiceDetail(id: string, token: string): Promise<Inv
     updatedAt: response.updatedAt,
     payments: response.payments.map(mapPayment),
   };
+}
+
+export async function fetchCustomerMonthInvoices(
+  customerId: string,
+  year: number,
+  month: number,
+  token: string,
+): Promise<import("./types").InvoiceRow[]> {
+  const firstDay = new Date(Date.UTC(year, month - 1, 1));
+  const lastDay = new Date(Date.UTC(year, month, 0));
+  const issueDateFrom = firstDay.toISOString().split("T")[0] ?? "";
+  const issueDateTo = lastDay.toISOString().split("T")[0] ?? "";
+
+  const params = new URLSearchParams({
+    pageNumber: "1",
+    pageSize: "100",
+    customerId,
+  });
+
+  params.set("issueDateFrom", issueDateFrom);
+  params.set("issueDateTo", issueDateTo);
+
+  const response = await apiRequest<PagedResponse<InvoiceSummaryResponse>>(
+    `/api/v1/invoices?${params.toString()}`,
+    undefined,
+    token,
+  );
+
+  return response.data.map(mapInvoiceRow);
 }
 
 export async function fetchInvoiceCustomerOptions(token: string): Promise<InvoiceCustomerOption[]> {

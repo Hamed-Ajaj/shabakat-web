@@ -1,4 +1,5 @@
-import { Calendar, CircleDollarSign, CreditCard, ReceiptText } from "lucide-react";
+import { useMemo } from "react";
+import { Calendar, CircleDollarSign, CreditCard, Gauge, ReceiptText } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../../../components/ui/button";
 import { Skeleton } from "../../../components/ui/skeleton";
@@ -6,11 +7,13 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useI18n } from "../../../providers/I18nProvider";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useCompanyPreferencesQuery } from "../../settings/queries";
-import { fetchPrintableInvoiceHtml } from "../invoicesApi";
+import { useSubscriberDetailQuery } from "../../subscribers/queries";
+import { fetchPrintableInvoiceHtml, fetchCustomerMonthInvoices } from "../invoicesApi";
 import { invoiceQueryKeys, useInvoiceDetailQuery } from "../queries";
-import { formatCurrency, printInvoiceHtml } from "../utils";
+import { computeInvoiceBreakdown, formatCurrency, printInvoiceHtml } from "../utils";
+import type { BreakdownSibling } from "../utils";
 import { getPaymentMethodLabel } from "../invoiceLabels";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 
@@ -34,6 +37,50 @@ export function InvoiceDetailsSheet({
   const detailQuery = useInvoiceDetailQuery(invoiceId ?? undefined);
   const invoice = detailQuery.data;
   const printLanguage = preferencesQuery.data?.language ?? "en";
+
+  const customerQuery = useSubscriberDetailQuery(invoice?.customerId);
+
+  const issueDate = invoice?.issueDate ?? "";
+  const issueDateObj = useMemo(() => {
+    if (!issueDate) return null;
+    return new Date(issueDate);
+  }, [issueDate]);
+  const year = issueDateObj?.getFullYear();
+  const month = issueDateObj ? issueDateObj.getMonth() + 1 : undefined;
+
+  const siblingsQuery = useQuery({
+    queryKey: invoiceQueryKeys.detail(invoice?.id ? `${invoice.id}-siblings` : undefined),
+    queryFn: () =>
+      fetchCustomerMonthInvoices(invoice!.customerId, year!, month!, session?.token ?? ""),
+    enabled: Boolean(
+      session?.token &&
+        invoice &&
+        year &&
+        month &&
+        customerQuery.data?.plan === "FixedKilowatt",
+    ),
+  });
+
+  const breakdown = useMemo(() => {
+    if (!invoice || !customerQuery.data) return null;
+
+    const siblingInvoices: BreakdownSibling[] = siblingsQuery.data ?? [];
+
+    return computeInvoiceBreakdown(
+      invoice.totalAmount,
+      invoice.fixedCharge,
+      invoice.tva,
+      {
+        plan: customerQuery.data.plan,
+        planValue: customerQuery.data.planValue,
+      },
+      invoice.id,
+      invoice.invoiceNumber,
+      invoice.createdAt,
+      invoice.issueDate,
+      siblingInvoices,
+    );
+  }, [invoice, customerQuery.data, siblingsQuery.data]);
 
   async function handlePrint() {
     if (!invoice || !session?.token) {
@@ -98,12 +145,33 @@ export function InvoiceDetailsSheet({
                 <MetricCard label={t("invoices.details.amountDue")} value={formatCurrency(invoice.amountDue)} />
               </div>
 
+              {breakdown ? (
+                <SectionCard className="space-y-4 p-5">
+                  <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {t("invoices.details.breakdown")}
+                  </h3>
+                  <DetailRow
+                    icon={Gauge}
+                    label={t("invoices.details.charge")}
+                    value={formatCurrency(breakdown.charge)}
+                  />
+                  <DetailRow
+                    icon={CircleDollarSign}
+                    label={t("invoices.details.fixedCharge")}
+                    value={formatCurrency(breakdown.fixedCharge)}
+                  />
+                  <DetailRow
+                    icon={ReceiptText}
+                    label={t("invoices.details.tvaAmount", { rate: breakdown.tvaRate })}
+                    value={formatCurrency(breakdown.tvaAmount)}
+                  />
+                </SectionCard>
+              ) : null}
+
               <SectionCard className="space-y-4 p-5">
                 <DetailRow icon={ReceiptText} label={t("invoices.details.invoiceNumber")} value={`#${invoice.invoiceNumber}`} />
                 <DetailRow icon={Calendar} label={t("invoices.details.issueDate")} value={formatDate(invoice.issueDate)} />
                 <DetailRow icon={Calendar} label={t("invoices.details.dueDate")} value={formatDate(invoice.dueDate)} />
-                <DetailRow icon={CircleDollarSign} label={t("invoices.details.fixedCharge")} value={formatCurrency(invoice.fixedCharge)} />
-                <DetailRow icon={ReceiptText} label={t("invoices.details.tva")} value={`${invoice.tva}%`} />
                 <DetailRow icon={Calendar} label={t("invoices.details.lastUpdated")} value={formatDate(invoice.updatedAt)} />
               </SectionCard>
 
