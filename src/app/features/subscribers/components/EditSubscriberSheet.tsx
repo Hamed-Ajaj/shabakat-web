@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useI18n } from "../../../providers/I18nProvider";
 import { useAreasQuery } from "../../areas/queries";
 import { mapFormValuesToSubscriberPayload, mapSubscriberDetailToFormInput } from "../formMappers";
-import { useSubscriberDetailQuery } from "../queries";
+import { useSubscriberDetailQuery, useSubscriberMeterReadingsQuery } from "../queries";
 import { useUpdateSubscriberMutation } from "../mutations";
 import { defaultSubscriberFormValues, type CreateSubscriberFormInput, type CreateSubscriberFormValues } from "../schema";
 import { SubscriberFormSheet } from "./SubscriberFormSheet";
@@ -23,14 +23,25 @@ export function EditSubscriberSheet({
   const detailQuery = useSubscriberDetailQuery(subscriberId ?? undefined);
   const areasQuery = useAreasQuery();
   const updateSubscriber = useUpdateSubscriberMutation(subscriberId ?? "");
+  const subscriber = detailQuery.data;
+
+  const meterReadingsQuery = useSubscriberMeterReadingsQuery(
+    subscriberId ?? undefined,
+    open && subscriber?.plan === "Kilowatt",
+  );
+
+  const hasMeterReadings = (meterReadingsQuery.data?.length ?? 0) > 0;
+  const showInitialMeterReading =
+    (subscriber?.plan === "Kilowatt" || subscriber?.plan === "FixedKilowatt") &&
+    !hasMeterReadings;
 
   const initialValues = useMemo<CreateSubscriberFormInput>(() => {
-    if (!detailQuery.data) {
+    if (!subscriber) {
       return defaultSubscriberFormValues;
     }
 
-    return mapSubscriberDetailToFormInput(detailQuery.data, areasQuery.data ?? []);
-  }, [areasQuery.data, detailQuery.data]);
+    return mapSubscriberDetailToFormInput(subscriber, areasQuery.data ?? []);
+  }, [areasQuery.data, subscriber]);
 
   async function handleSubmit(values: CreateSubscriberFormValues) {
     await updateSubscriber.mutateAsync(mapFormValuesToSubscriberPayload(values, { preserveClears: true }));
@@ -52,6 +63,7 @@ export function EditSubscriberSheet({
       error={error}
       open={open}
       pending={detailQuery.isLoading || updateSubscriber.isPending}
+      showInitialMeterReading={showInitialMeterReading}
       submitLabel={t("subscribers.actions.saveChanges")}
       title={t("subscribers.form.title.edit")}
       values={initialValues}

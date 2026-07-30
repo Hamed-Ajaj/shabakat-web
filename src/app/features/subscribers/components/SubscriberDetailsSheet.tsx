@@ -59,6 +59,19 @@ export function SubscriberDetailsSheet({
     [meterReadingsQuery.data],
   );
 
+  const isOnlyInitialReading = useMemo(() => {
+    const readings = meterReadingsQuery.data ?? [];
+    return (
+      readings.length === 1 &&
+      subscriber?.initialMeterReading != null &&
+      readings[0].readingValue === subscriber.initialMeterReading
+    );
+  }, [meterReadingsQuery.data, subscriber]);
+
+  const showAddMeterButton =
+    canManageMeterReadings &&
+    (!currentMonthReading || isOnlyInitialReading);
+
   function handleOpenChange(nextOpen: boolean) {
     onOpenChange(nextOpen);
 
@@ -204,14 +217,13 @@ export function SubscriberDetailsSheet({
                         {t("subscribers.details.monthlyReadingHint")}
                       </p>
                     </div>
-                    <Button
-                      disabled={
-                        !canManageMeterReadings || Boolean(currentMonthReading)
-                      }
-                      onClick={() => setIsCreateMeterDialogOpen(true)}
-                    >
-                      {t("subscribers.actions.addMeterReading")}
-                    </Button>
+                    {showAddMeterButton ? (
+                      <Button
+                        onClick={() => setIsCreateMeterDialogOpen(true)}
+                      >
+                        {t("subscribers.actions.addMeterReading")}
+                      </Button>
+                    ) : null}
                   </div>
 
                   {!canManageMeterReadings ? (
@@ -220,7 +232,7 @@ export function SubscriberDetailsSheet({
                     </p>
                   ) : null}
 
-                  {currentMonthReading ? (
+                  {currentMonthReading && !isOnlyInitialReading ? (
                     <p className="text-sm text-amber-300">
                       {t("subscribers.details.thisMonthExists")}
                     </p>

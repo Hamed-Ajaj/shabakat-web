@@ -40,6 +40,7 @@ interface SubscriberDetailsSectionProps {
     CreateSubscriberFormValues
   >;
   planTypes: LookupOption[];
+  showInitialMeterReading?: boolean;
 }
 
 export function SubscriberDetailsSection({
@@ -51,6 +52,7 @@ export function SubscriberDetailsSection({
   customerTypes,
   form,
   planTypes,
+  showInitialMeterReading = false,
 }: Readonly<SubscriberDetailsSectionProps>) {
   const { t } = useI18n();
   const selectedPlan = useWatch({
@@ -205,6 +207,36 @@ export function SubscriberDetailsSection({
                 {ampereSchedules.length > 0
                   ? t("subscribers.form.ampereScheduleHelp")
                   : t("subscribers.form.ampereScheduleEmpty")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      ) : null}
+
+      {showInitialMeterReading &&
+      (selectedPlan === "Kilowatt" || selectedPlan === "FixedKilowatt") ? (
+        <FormField
+          control={form.control}
+          name="initialMeterReading"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("subscribers.form.initialMeterReading")}</FormLabel>
+              <FormControl>
+                <Input
+                  inputMode="decimal"
+                  step="0.01"
+                  type="number"
+                  placeholder="0"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                  name={field.name}
+                />
+              </FormControl>
+              <FormDescription>
+                {t("subscribers.form.initialMeterReadingHelp")}
               </FormDescription>
               <FormMessage />
             </FormItem>

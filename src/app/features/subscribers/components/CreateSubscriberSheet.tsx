@@ -30,6 +30,7 @@ export function CreateSubscriberSheet({
       error={createSubscriber.error instanceof Error ? createSubscriber.error.message : ""}
       open={open}
       pending={createSubscriber.isPending}
+      showInitialMeterReading
       submitLabel={t("subscribers.actions.create")}
       title={t("subscribers.form.title.create")}
       onOpenChange={(nextOpen) => {

@@ -47,6 +47,7 @@ export interface SubscriberDetail {
   totalPaid: number;
   totalOutstanding: number;
   paidThisMonth: boolean;
+  initialMeterReading: number | null;
 }
 
 export interface MeterReadingRecord {

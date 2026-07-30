@@ -31,6 +31,9 @@ export function mapFormValuesToSubscriberPayload(
     planValue: values.planValue,
     subscriptionDate: values.subscriptionDate || undefined,
     customerRelation: values.customerRelation || undefined,
+    initialMeterReading: values.initialMeterReading?.trim()
+      ? Number(values.initialMeterReading.trim())
+      : undefined,
     pricingOverride: values.usePricingOverride
       ? {
           price: values.overridePrice,
@@ -67,5 +70,8 @@ export function mapSubscriberDetailToFormInput(
     overridePrice: subscriber.pricingOverride?.price ?? Number.NaN,
     overrideFixedCharge: subscriber.pricingOverride?.fixedCharge ?? Number.NaN,
     overrideTva: subscriber.pricingOverride?.tva ?? Number.NaN,
+    initialMeterReading: subscriber.initialMeterReading !== null
+      ? String(subscriber.initialMeterReading)
+      : "",
   };
 }

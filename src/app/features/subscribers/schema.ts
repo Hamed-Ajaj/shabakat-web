@@ -27,6 +27,7 @@ export const createSubscriberSchema = z
     overridePrice: z.union([z.coerce.number(), z.nan()]).optional(),
     overrideFixedCharge: z.union([z.coerce.number(), z.nan()]).optional(),
     overrideTva: z.union([z.coerce.number(), z.nan()]).optional(),
+    initialMeterReading: z.string().optional().or(z.literal("")),
   })
   .superRefine((values, context) => {
     if (values.plan === "Ampere" && values.ampereSchedulePricingEnabled && !values.ampereScheduleId) {
@@ -107,4 +108,5 @@ export const defaultSubscriberFormValues: CreateSubscriberFormInput = {
   overridePrice: Number.NaN,
   overrideFixedCharge: Number.NaN,
   overrideTva: Number.NaN,
+  initialMeterReading: "",
 };

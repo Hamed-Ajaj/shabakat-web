@@ -61,6 +61,7 @@ export interface CreateSubscriberPayload {
   planValue: number;
   subscriptionDate?: string;
   customerRelation?: "Friend" | "Family" | "Owner" | "Other";
+  initialMeterReading?: number;
   pricingOverride?: {
     price: number;
     fixedCharge: number;
@@ -103,6 +104,7 @@ interface CustomerDetailResponse {
   totalPaid: number;
   totalOutstanding: number;
   paidThisMonth: boolean;
+  initialMeterReading: number | null;
 }
 
 interface DistributionBoxResponse {
@@ -202,6 +204,7 @@ export function createSubscriber(payload: CreateSubscriberPayload, token: string
         planValue: payload.planValue,
         subscriptionDate: payload.subscriptionDate,
         customerRelation: payload.customerRelation,
+        initialMeterReading: payload.initialMeterReading,
         pricingOverride: mapPricingOverride(payload.pricingOverride),
       }),
     },
@@ -244,6 +247,7 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
     totalPaid: subscriber.totalPaid,
     totalOutstanding: subscriber.totalOutstanding,
     paidThisMonth: subscriber.paidThisMonth,
+    initialMeterReading: subscriber.initialMeterReading,
   };
 }
 
@@ -269,6 +273,7 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         plan: payload.plan,
         planValue: payload.planValue,
         customerRelation: payload.customerRelation,
+        initialMeterReading: payload.initialMeterReading,
         pricingOverride: mapPricingOverride(payload.pricingOverride),
       }),
     },

@@ -40,6 +40,7 @@ interface SubscriberFormSheetProps {
   error: string;
   open: boolean;
   pending: boolean;
+  showInitialMeterReading?: boolean;
   submitLabel: string;
   title: string;
   values?: CreateSubscriberFormInput;
@@ -52,6 +53,7 @@ export function SubscriberFormSheet({
   error,
   open,
   pending,
+  showInitialMeterReading = false,
   submitLabel,
   title,
   values,
@@ -147,6 +149,7 @@ export function SubscriberFormSheet({
                 customerTypes={customerTypesQuery.data ?? []}
                 form={form}
                 planTypes={planTypesQuery.data ?? []}
+                showInitialMeterReading={showInitialMeterReading}
               />
 
               <SubscriberPricingOverrideSection form={form} />
