@@ -684,6 +684,7 @@ export const messages = {
     "shell.route.subscribers.title": "Subscribers",
     "status.overdue": "Overdue",
     "status.paid": "Paid",
+    "status.partiallyPaid": "Partially Paid",
     "status.unpaid": "Unpaid",
   },
   ar: {
@@ -1371,6 +1372,7 @@ export const messages = {
     "shell.route.subscribers.title": "المشتركون",
     "status.overdue": "متأخرة",
     "status.paid": "مدفوعة",
+    "status.partiallyPaid": "مدفوعة جزئياً",
     "status.unpaid": "غير مدفوعة",
   },
 } as const;

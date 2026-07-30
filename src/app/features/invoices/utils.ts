@@ -60,13 +60,13 @@ export function printInvoiceHtml(html: string) {
   }, 150);
 }
 
-export function mapInvoiceStatusToBadge(status: InvoiceStatus): "paid" | "unpaid" | "overdue" {
+export function mapInvoiceStatusToBadge(status: InvoiceStatus): "paid" | "unpaid" | "overdue" | "partiallyPaid" {
   if (status === "Paid") {
     return "paid";
   }
 
   if (status === "PartiallyPaid") {
-    return "overdue";
+    return "partiallyPaid";
   }
 
   return "unpaid";

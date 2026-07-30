@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { TranslationKey } from "../i18n/messages";
 
-export type Status = "paid" | "unpaid" | "overdue";
+export type Status = "paid" | "unpaid" | "overdue" | "partiallyPaid";
 
 export interface Subscriber {
   id: number;

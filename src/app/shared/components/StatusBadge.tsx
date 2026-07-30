@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle, CircleDot, Clock } from "lucide-react";
 import { useI18n } from "../../providers/I18nProvider";
 import type { Status } from "../types/domain";
 
@@ -12,6 +12,7 @@ export function StatusBadge({ status }: Readonly<StatusBadgeProps>) {
     paid: { className: "border-emerald-400/20 bg-emerald-400/10 text-emerald-400", icon: CheckCircle, label: t("status.paid") },
     unpaid: { className: "border-amber-400/20 bg-amber-400/10 text-amber-400", icon: Clock, label: t("status.unpaid") },
     overdue: { className: "border-red-400/20 bg-red-400/10 text-red-400", icon: AlertCircle, label: t("status.overdue") },
+    partiallyPaid: { className: "border-blue-400/20 bg-blue-400/10 text-blue-400", icon: CircleDot, label: t("status.partiallyPaid") },
   }[status];
 
   const Icon = styles.icon;
