@@ -130,6 +130,10 @@ export async function fetchSubscribers(
     params.set("areaId", filters.areaId);
   }
 
+  if (filters.boxId) {
+    params.set("boxId", filters.boxId);
+  }
+
   if (filters.planType) {
     params.set("planType", filters.planType);
   }
@@ -148,8 +152,12 @@ export async function fetchSubscribers(
     token,
   );
 
+  const customers = filters.boxId
+    ? response.data.filter((customer) => customer.boxId === filters.boxId)
+    : response.data;
+
   return {
-    data: response.data.map(mapCustomerSummaryToSubscriberRow),
+    data: customers.map(mapCustomerSummaryToSubscriberRow),
     hasNextPage: response.hasNextPage,
     hasPreviousPage: response.hasPreviousPage,
     pageCount: response.totalPages,

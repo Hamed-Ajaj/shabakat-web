@@ -1,4 +1,5 @@
-import { Calendar, MapPinned, NotebookPen, Package2, UsersRound } from "lucide-react";
+import { Calendar, MapPinned, NotebookPen, Package2, Phone, UsersRound } from "lucide-react";
+import { Badge } from "../../../components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -7,7 +8,11 @@ import {
   SheetTitle,
 } from "../../../components/ui/sheet";
 import { useI18n } from "../../../providers/I18nProvider";
+import { Avatar } from "../../../shared/components/Avatar";
 import { SectionCard } from "../../../shared/components/SectionCard";
+import { StatusBadge } from "../../../shared/components/StatusBadge";
+import { getSubscriberPlanLabel } from "../../subscribers/subscriberLabels";
+import { useBoxSubscribersQuery } from "../../subscribers/queries";
 import type { BoxRecord } from "../types";
 
 interface BoxDetailsSheetProps {
@@ -21,7 +26,13 @@ export function BoxDetailsSheet({
   open,
   onOpenChange,
 }: Readonly<BoxDetailsSheetProps>) {
-  const { formatDate, isRtl, t } = useI18n();
+  const { formatCurrency, formatDate, isRtl, t } = useI18n();
+  const subscribersQuery = useBoxSubscribersQuery(
+    box?.id,
+    box?.customerCount ?? 0,
+    open && Boolean(box),
+  );
+  const subscribers = subscribersQuery.data?.data ?? [];
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -67,6 +78,83 @@ export function BoxDetailsSheet({
                 />
                 <DetailRow icon={Calendar} label={t("boxes.details.createdAt")} value={formatDate(box.createdAt)} />
               </SectionCard>
+
+              <SectionCard className="space-y-4 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      {t("boxes.details.assignedSubscribers")}
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {t("boxes.details.assignedSubscribersDescription")}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
+                    {t(subscribers.length === 1 ? "boxes.subscriberCount" : "boxes.subscriberCount_plural", {
+                      count: subscribers.length,
+                    })}
+                  </Badge>
+                </div>
+
+                {subscribersQuery.isLoading ? <BoxSubscribersSkeleton /> : null}
+                {subscribersQuery.error instanceof Error ? (
+                  <p className="text-sm text-red-300">{subscribersQuery.error.message}</p>
+                ) : null}
+                {!subscribersQuery.isLoading && !subscribers.length ? (
+                  <p className="text-sm text-muted-foreground">
+                    {t("boxes.details.noSubscribers")}
+                  </p>
+                ) : null}
+
+                {subscribers.length ? (
+                  <div className="space-y-3">
+                    {subscribers.map((subscriber) => (
+                      <div
+                        key={subscriber.id}
+                        className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <Avatar name={subscriber.name} />
+                            <div className="space-y-2">
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">
+                                  {subscriber.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {t(getSubscriberPlanLabel(subscriber.plan))} · {subscriber.planValue}
+                                </p>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <StatusBadge status={subscriber.status} />
+                                <Badge variant="outline" className="rounded-full px-2.5 py-1 text-xs">
+                                  {formatDate(subscriber.subscriptionDate)}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="text-right">
+                            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                              {t("subscribers.table.amountDue")}
+                            </p>
+                            <p className="mt-2 text-base font-semibold text-foreground">
+                              {formatCurrency(subscriber.amountDue)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                          <Phone className="h-4 w-4 text-primary" />
+                          <span className="font-mono">
+                            {subscriber.phone ?? t("subscribers.notSet")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </SectionCard>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -106,3 +194,31 @@ function DetailRow({
   );
 }
 
+function BoxSubscribersSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="h-8 w-8 animate-pulse rounded-full bg-white/10" />
+              <div className="space-y-2">
+                <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
+                <div className="h-3 w-24 animate-pulse rounded-full bg-white/10" />
+                <div className="h-5 w-28 animate-pulse rounded-full bg-white/10" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 w-16 animate-pulse rounded-full bg-white/10" />
+              <div className="h-5 w-20 animate-pulse rounded-full bg-white/10" />
+            </div>
+          </div>
+          <div className="mt-4 h-4 w-28 animate-pulse rounded-full bg-white/10" />
+        </div>
+      ))}
+    </div>
+  );
+}
