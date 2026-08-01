@@ -49,7 +49,7 @@ export function InvoiceDetailsSheet({
   const month = issueDateObj ? issueDateObj.getMonth() + 1 : undefined;
 
   const siblingsQuery = useQuery({
-    queryKey: invoiceQueryKeys.detail(invoice?.id ? `${invoice.id}-siblings` : undefined),
+    queryKey: ["invoice-month-siblings", invoice?.customerId, year, month],
     queryFn: () =>
       fetchCustomerMonthInvoices(invoice!.customerId, year!, month!, session?.token ?? ""),
     enabled: Boolean(
@@ -61,8 +61,11 @@ export function InvoiceDetailsSheet({
     ),
   });
 
+  const shouldWaitForCustomer = Boolean(invoice?.customerId && customerQuery.isLoading);
+  const shouldWaitForSiblings = customerQuery.data?.plan === "FixedKilowatt" && siblingsQuery.isLoading;
+
   const breakdown = useMemo(() => {
-    if (!invoice || !customerQuery.data) return null;
+    if (!invoice || shouldWaitForCustomer || shouldWaitForSiblings) return null;
 
     const siblingInvoices: BreakdownSibling[] = siblingsQuery.data ?? [];
 
@@ -70,17 +73,19 @@ export function InvoiceDetailsSheet({
       invoice.totalAmount,
       invoice.fixedCharge,
       invoice.tva,
-      {
-        plan: customerQuery.data.plan,
-        planValue: customerQuery.data.planValue,
-      },
+      customerQuery.data
+        ? {
+            plan: customerQuery.data.plan,
+            planValue: customerQuery.data.planValue,
+          }
+        : null,
       invoice.id,
       invoice.invoiceNumber,
       invoice.createdAt,
       invoice.issueDate,
       siblingInvoices,
     );
-  }, [invoice, customerQuery.data, siblingsQuery.data]);
+  }, [invoice, customerQuery.data, shouldWaitForCustomer, shouldWaitForSiblings, siblingsQuery.data]);
 
   async function handlePrint() {
     if (!invoice || !session?.token) {
