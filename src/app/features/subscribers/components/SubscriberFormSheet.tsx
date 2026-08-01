@@ -77,10 +77,13 @@ export function SubscriberFormSheet({
   const companyPreferencesQuery = useCompanyPreferencesQuery();
   const selectedAreaId = form.watch("areaId");
   const selectedPlan = form.watch("plan");
+  const usePricingOverride = form.watch("usePricingOverride");
   const customerTypesQuery = useSubscriberCustomerTypesQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
   const ampereSchedulePricingEnabled = companyPreferencesQuery.data?.ampereSchedulePricingEnabled ?? false;
+  const defaultOverrideFixedCharge = companyPreferencesQuery.data?.pricing.fixedCharge.base;
+  const defaultOverrideTva = companyPreferencesQuery.data?.pricing.tva.base;
   const shouldFetchAmpereSchedules = ampereSchedulePricingEnabled && selectedPlan === "Ampere";
   const ampereSchedulesQuery = useSubscriberAmpereSchedulesQuery(shouldFetchAmpereSchedules);
   const boxesQuery = useSubscriberDistributionBoxesQuery(selectedAreaId || undefined);
@@ -88,6 +91,23 @@ export function SubscriberFormSheet({
   useEffect(() => {
     form.setValue("ampereSchedulePricingEnabled", ampereSchedulePricingEnabled);
   }, [ampereSchedulePricingEnabled, form]);
+
+  useEffect(() => {
+    if (!usePricingOverride) {
+      return;
+    }
+
+    const currentFixedCharge = form.getValues("overrideFixedCharge");
+    const currentTva = form.getValues("overrideTva");
+
+    if (defaultOverrideFixedCharge !== undefined && !Number.isFinite(currentFixedCharge)) {
+      form.setValue("overrideFixedCharge", defaultOverrideFixedCharge);
+    }
+
+    if (defaultOverrideTva !== undefined && !Number.isFinite(currentTva)) {
+      form.setValue("overrideTva", defaultOverrideTva);
+    }
+  }, [defaultOverrideFixedCharge, defaultOverrideTva, form, usePricingOverride]);
 
   const isOptionsLoading =
     areasQuery.isLoading ||

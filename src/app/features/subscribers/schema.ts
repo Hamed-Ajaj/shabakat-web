@@ -55,34 +55,6 @@ export const createSubscriberSchema = z
         path: ["overridePrice"],
       });
     }
-
-    if (!Number.isFinite(values.overrideFixedCharge)) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Override fixed charge is required.",
-        path: ["overrideFixedCharge"],
-      });
-    } else if (values.overrideFixedCharge <= 0) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Override fixed charge must be greater than 0.",
-        path: ["overrideFixedCharge"],
-      });
-    }
-
-    if (!Number.isFinite(values.overrideTva)) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Override TVA is required.",
-        path: ["overrideTva"],
-      });
-    } else if (values.overrideTva <= 0 || values.overrideTva > 100) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Override TVA must be between 1 and 100.",
-        path: ["overrideTva"],
-      });
-    }
   });
 
 export type CreateSubscriberFormInput = z.input<typeof createSubscriberSchema>;

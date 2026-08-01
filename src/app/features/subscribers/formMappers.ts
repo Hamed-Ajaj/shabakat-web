@@ -37,8 +37,8 @@ export function mapFormValuesToSubscriberPayload(
     pricingOverride: values.usePricingOverride
       ? {
           price: values.overridePrice,
-          fixedCharge: values.overrideFixedCharge,
-          tva: values.overrideTva,
+          fixedCharge: Number.isFinite(values.overrideFixedCharge) ? values.overrideFixedCharge : 0,
+          tva: Number.isFinite(values.overrideTva) ? values.overrideTva : 0,
         }
       : undefined,
   };
