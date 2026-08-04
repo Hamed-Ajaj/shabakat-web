@@ -134,6 +134,10 @@ export async function fetchSubscribers(
     params.set("boxId", filters.boxId);
   }
 
+  if (filters.ampereScheduleId) {
+    params.set("ampereScheduleId", filters.ampereScheduleId);
+  }
+
   if (filters.planType) {
     params.set("planType", filters.planType);
   }

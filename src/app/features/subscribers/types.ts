@@ -59,6 +59,7 @@ export interface MeterReadingRecord {
 
 export interface SubscribersQueryFilters {
   areaId: string;
+  ampereScheduleId?: string;
   boxId?: string;
   customerRelation: string;
   customerStatus: string;

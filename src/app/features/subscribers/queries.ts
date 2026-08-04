@@ -18,6 +18,8 @@ export const subscriberQueryKeys = {
     ["subscribers", companyId, filters] as const,
   byBox: (companyId?: string, boxId?: string, count?: number) =>
     ["subscribers", companyId, "box", boxId, count] as const,
+  byAmpereSchedule: (companyId?: string, scheduleId?: string, count?: number) =>
+    ["subscribers", companyId, "ampere-schedule", scheduleId, count] as const,
   detail: (id?: string) => ["subscriber-detail", id] as const,
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
@@ -48,6 +50,7 @@ export function useBoxSubscribersQuery(boxId?: string, count = 0, enabled = true
       fetchSubscribers(
         {
           areaId: "",
+          ampereScheduleId: undefined,
           boxId,
           customerRelation: "",
           customerStatus: "",
@@ -60,6 +63,31 @@ export function useBoxSubscribersQuery(boxId?: string, count = 0, enabled = true
         session?.token ?? "",
       ),
     enabled: Boolean(session?.token && boxId && enabled),
+    staleTime: 60_000,
+  });
+}
+
+export function useAmpereScheduleSubscribersQuery(scheduleId?: string, count = 0, enabled = true) {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: subscriberQueryKeys.byAmpereSchedule(session?.companyId, scheduleId, count),
+    queryFn: () =>
+      fetchSubscribers(
+        {
+          areaId: "",
+          ampereScheduleId: scheduleId,
+          customerRelation: "",
+          customerStatus: "",
+          pageIndex: 0,
+          pageSize: Math.max(count, 100),
+          planType: "",
+          searchField: "name",
+          searchTerm: "",
+        },
+        session?.token ?? "",
+      ),
+    enabled: Boolean(session?.token && scheduleId && enabled),
     staleTime: 60_000,
   });
 }
