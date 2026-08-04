@@ -54,6 +54,7 @@ export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey
   "/boxes": { titleKey: "shell.route.boxes.title", subtitleKey: "shell.route.boxes.subtitle" },
   "/subscribers": { titleKey: "shell.route.subscribers.title", subtitleKey: "shell.route.subscribers.subtitle" },
   "/invoices": { titleKey: "shell.route.invoices.title", subtitleKey: "shell.route.invoices.subtitle" },
+  "/calculator": { titleKey: "calculator.title", subtitleKey: "calculator.subtitle" },
   "/expenses": { titleKey: "shell.route.expenses.title", subtitleKey: "shell.route.expenses.subtitle" },
   "/settings": { titleKey: "shell.route.settings.title", subtitleKey: "shell.route.settings.subtitle" },
   "/settings/pricing/price-per-kilowatt": { titleKey: "shell.route.settingsPricePerKilowatt.title", subtitleKey: "shell.route.settingsPricePerKilowatt.subtitle" },

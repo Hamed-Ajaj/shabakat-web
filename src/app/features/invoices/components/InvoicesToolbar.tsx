@@ -1,5 +1,7 @@
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { Calculator } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useI18n } from "../../../providers/I18nProvider";
 import {
   Select,
@@ -103,6 +105,13 @@ export function InvoicesToolbar({
             {t("invoices.actions.bulkGenerate")}
           </Button>
         ) : null}
+
+        <Button asChild type="button" variant="outline">
+          <Link to="/calculator">
+            <Calculator />
+            {t("calculator.title")}
+          </Link>
+        </Button>
 
         <Button type="button" onClick={onCreateClick} className="rounded-xl px-4 py-2.5 text-sm font-medium" style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}>
           {t("invoices.actions.create")}

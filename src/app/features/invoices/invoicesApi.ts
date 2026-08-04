@@ -86,7 +86,7 @@ export interface CreateInvoicePayload {
 
 export interface FixedKilowattCalculatePayload {
   customerType: InvoiceCustomerType;
-  planValue?: number;
+  planValue?: number | null;
   paymentAmount?: number;
   kilowattAmount?: number;
 }

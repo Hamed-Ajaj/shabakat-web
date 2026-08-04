@@ -12,6 +12,7 @@ const AmpereSchedulesPage = lazy(() => import("../features/ampere-schedules/page
 const BoxesPage = lazy(() => import("../features/boxes/pages/BoxesPage"));
 const SubscribersPage = lazy(() => import("../features/subscribers/pages/SubscribersPage"));
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
+const FixedKilowattCalculatorPage = lazy(() => import("../features/invoices/pages/FixedKilowattCalculatorPage"));
 const ExpensesPage = lazy(() => import("../features/expenses/pages/ExpensesPage"));
 const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
 const PricingSettingPage = lazy(() => import("../features/settings/pages/PricingSettingPage"));
@@ -90,6 +91,7 @@ export function AppRoutes() {
           <Route path="/boxes" element={<BoxesPage />} />
           <Route path="/subscribers" element={<SubscribersPage />} />
           <Route path="/invoices" element={<InvoicesPage />} />
+          <Route path="/calculator" element={<FixedKilowattCalculatorPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/pricing/:field" element={<PricingSettingPage />} />
