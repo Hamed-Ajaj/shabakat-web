@@ -84,59 +84,13 @@ export interface BreakdownCustomer {
   planValue: number | null;
 }
 
-export interface BreakdownSibling {
-  id: string;
-  invoiceNumber: number;
-  issueDate: string;
-  createdAt: string;
-}
-
-function isEarlierSibling(a: BreakdownSibling, b: BreakdownSibling): boolean {
-  if (a.invoiceNumber !== b.invoiceNumber) {
-    return a.invoiceNumber < b.invoiceNumber;
-  }
-  return a.createdAt < b.createdAt;
-}
-
 export function computeInvoiceBreakdown(
   totalAmount: number,
   fixedCharge: number,
   tva: number,
   customer: BreakdownCustomer | null,
-  currentInvoiceId: string,
-  currentInvoiceNumber: number,
-  currentInvoiceCreatedAt: string,
-  currentIssueDate: string,
-  siblingInvoices: BreakdownSibling[],
 ): InvoiceBreakdown {
-  let includePlanValue = false;
-
-  if (customer) {
-    if (customer.plan === "Kilowatt") {
-      includePlanValue = true;
-    } else if (customer.plan === "FixedKilowatt") {
-      const currentSibling: BreakdownSibling = {
-        id: currentInvoiceId,
-        invoiceNumber: currentInvoiceNumber,
-        issueDate: currentIssueDate,
-        createdAt: currentInvoiceCreatedAt,
-      };
-
-      const issueDate = new Date(currentIssueDate);
-      const yearMonth = `${issueDate.getFullYear()}-${issueDate.getMonth()}`;
-
-      const hasEarlier = siblingInvoices.some((s) => {
-        if (s.id === currentInvoiceId) return false;
-        const sDate = new Date(s.issueDate);
-        if (`${sDate.getFullYear()}-${sDate.getMonth()}` !== yearMonth) return false;
-        return isEarlierSibling(s, currentSibling);
-      });
-
-      includePlanValue = !hasEarlier;
-    }
-  }
-
-  const planValue = includePlanValue ? (customer?.planValue ?? 0) : 0;
+  const planValue = customer?.plan === "Kilowatt" ? (customer.planValue ?? 0) : 0;
   const taxableTotal = totalAmount - planValue;
 
   let charge: number;

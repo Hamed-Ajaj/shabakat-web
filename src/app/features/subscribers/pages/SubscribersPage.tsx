@@ -16,7 +16,10 @@ import type {
   SubscribersQueryFilters,
 } from "../types";
 import { useAuth } from "../../../providers/AuthProvider";
+import { useI18n } from "../../../providers/I18nProvider";
 import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
+import { exportCustomers } from "../../areas/areasApi";
+import { toast } from "sonner";
 
 type SubscriberDialogMode = "create" | "delete" | "edit" | "view" | null;
 
@@ -35,6 +38,7 @@ const DeleteSubscriberDialog = lazy(() =>
 
 export default function SubscribersPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dialogMode, setDialogMode] = useState<SubscriberDialogMode>(null);
   const [selectedSubscriber, setSelectedSubscriber] = useState<SubscriberRow | null>(null);
@@ -50,6 +54,7 @@ export default function SubscribersPage() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [isExporting, setIsExporting] = useState(false);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 400);
 
   useEffect(() => {
@@ -129,6 +134,19 @@ export default function SubscribersPage() {
     }
   }
 
+  async function handleExport() {
+    if (!session?.token) return;
+
+    setIsExporting(true);
+    try {
+      await exportCustomers(session.token, areaId || undefined);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("subscribers.export.failed"));
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   if (isLoading && !subscribersPage) {
     return <SubscribersPageSkeleton />;
   }
@@ -138,9 +156,11 @@ export default function SubscribersPage() {
       <SubscribersToolbar
         areaId={areaId}
         areas={areasQuery.data ?? []}
+        canExport={session?.role === "Owner"}
         customerRelation={customerRelation}
         customerRelations={customerRelationsQuery.data ?? []}
         customerStatus={customerStatus}
+        isExporting={isExporting}
         isFetching={isFetching}
         planType={planType}
         planTypes={planTypesQuery.data ?? []}
@@ -160,6 +180,7 @@ export default function SubscribersPage() {
           setCustomerStatus(value === "all" ? "" : value);
           resetToFirstPage();
         }}
+        onExportClick={handleExport}
         onPlanTypeChange={(value) => {
           setPlanType(value);
           resetToFirstPage();

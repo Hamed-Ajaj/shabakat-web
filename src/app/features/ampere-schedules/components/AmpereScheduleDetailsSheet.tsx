@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Calendar, Clock3, Phone, UsersRound } from "lucide-react";
 import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -27,9 +29,15 @@ export function AmpereScheduleDetailsSheet({
   onOpenChange,
 }: Readonly<AmpereScheduleDetailsSheetProps>) {
   const { formatCurrency, formatDate, isRtl, t } = useI18n();
+  const [pageIndex, setPageIndex] = useState(0);
+
+  useEffect(() => {
+    setPageIndex(0);
+  }, [schedule?.id]);
+
   const subscribersQuery = useAmpereScheduleSubscribersQuery(
     schedule?.id,
-    schedule?.customerCount ?? 0,
+    pageIndex,
     open && Boolean(schedule),
   );
   const subscribers = subscribersQuery.data?.data ?? [];
@@ -102,8 +110,8 @@ export function AmpereScheduleDetailsSheet({
                     </p>
                   </div>
                   <Badge variant="outline" className="rounded-full px-3 py-1 text-xs">
-                    {t(subscribers.length === 1 ? "ampereSchedules.customerCount" : "ampereSchedules.customerCount_plural", {
-                      count: subscribers.length,
+                    {t(subscribersQuery.data?.totalCount === 1 ? "ampereSchedules.customerCount" : "ampereSchedules.customerCount_plural", {
+                      count: subscribersQuery.data?.totalCount ?? 0,
                     })}
                   </Badge>
                 </div>
@@ -141,6 +149,25 @@ export function AmpereScheduleDetailsSheet({
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : null}
+
+                {subscribersQuery.data && subscribersQuery.data.pageCount > 1 ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-4">
+                    <span className="text-sm text-muted-foreground">
+                      {t("subscribers.pageNumber", {
+                        page: subscribersQuery.data.pageNumber,
+                        count: subscribersQuery.data.pageCount,
+                      })}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button type="button" variant="outline" disabled={!subscribersQuery.data.hasPreviousPage} onClick={() => setPageIndex((current) => current - 1)}>
+                        {t("subscribers.actions.previous")}
+                      </Button>
+                      <Button type="button" variant="outline" disabled={!subscribersQuery.data.hasNextPage} onClick={() => setPageIndex((current) => current + 1)}>
+                        {t("subscribers.actions.next")}
+                      </Button>
+                    </div>
                   </div>
                 ) : null}
               </SectionCard>

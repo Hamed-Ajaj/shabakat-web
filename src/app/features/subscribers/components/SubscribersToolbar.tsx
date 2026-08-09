@@ -1,3 +1,4 @@
+import { Download, LoaderCircle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,9 +23,11 @@ const STATUS_OPTIONS = [
 export interface SubscribersToolbarProps {
   areaId: string;
   areas: AreaRecord[];
+  canExport: boolean;
   customerRelation: string;
   customerRelations: LookupOption[];
   customerStatus: string;
+  isExporting: boolean;
   isFetching: boolean;
   planType: string;
   planTypes: LookupOption[];
@@ -35,6 +38,7 @@ export interface SubscribersToolbarProps {
   onCreateClick: () => void;
   onCustomerRelationChange: (value: string) => void;
   onCustomerStatusChange: (value: string) => void;
+  onExportClick: () => void;
   onPlanTypeChange: (value: string) => void;
   onSearchFieldChange: (value: SubscriberSearchField) => void;
   onSearchTermChange: (value: string) => void;
@@ -43,9 +47,11 @@ export interface SubscribersToolbarProps {
 export function SubscribersToolbar({
   areaId,
   areas,
+  canExport,
   customerRelation,
   customerRelations,
   customerStatus,
+  isExporting,
   isFetching,
   planType,
   planTypes,
@@ -56,6 +62,7 @@ export function SubscribersToolbar({
   onCreateClick,
   onCustomerRelationChange,
   onCustomerStatusChange,
+  onExportClick,
   onPlanTypeChange,
   onSearchFieldChange,
   onSearchTermChange,
@@ -116,13 +123,21 @@ export function SubscribersToolbar({
           </Select>
         </div>
 
-        <Button
-          onClick={onCreateClick}
-          className="rounded-xl px-4 py-2.5 text-sm font-medium"
-          style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}
-        >
-          {t("subscribers.actions.add")}
-        </Button>
+        <div className="flex gap-2">
+          {canExport ? (
+            <Button variant="outline" onClick={onExportClick} disabled={isExporting} className="rounded-xl px-4 py-2.5 text-sm font-medium">
+              {isExporting ? <LoaderCircle className="animate-spin" /> : <Download />}
+              {t("subscribers.actions.export")}
+            </Button>
+          ) : null}
+          <Button
+            onClick={onCreateClick}
+            className="rounded-xl px-4 py-2.5 text-sm font-medium"
+            style={{ boxShadow: "0 0 16px rgba(245,192,0,0.25)" }}
+          >
+            {t("subscribers.actions.add")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

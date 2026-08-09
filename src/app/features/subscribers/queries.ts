@@ -16,10 +16,10 @@ export const subscriberQueryKeys = {
   all: ["subscribers"] as const,
   company: (companyId?: string, filters?: SubscribersQueryFilters) =>
     ["subscribers", companyId, filters] as const,
-  byBox: (companyId?: string, boxId?: string, count?: number) =>
-    ["subscribers", companyId, "box", boxId, count] as const,
-  byAmpereSchedule: (companyId?: string, scheduleId?: string, count?: number) =>
-    ["subscribers", companyId, "ampere-schedule", scheduleId, count] as const,
+  byBox: (companyId?: string, boxId?: string, pageIndex = 0) =>
+    ["subscribers", companyId, "box", boxId, pageIndex] as const,
+  byAmpereSchedule: (companyId?: string, scheduleId?: string, pageIndex = 0) =>
+    ["subscribers", companyId, "ampere-schedule", scheduleId, pageIndex] as const,
   detail: (id?: string) => ["subscriber-detail", id] as const,
   customerTypes: ["subscriber-customer-types"] as const,
   planTypes: ["subscriber-plan-types"] as const,
@@ -41,11 +41,11 @@ export function useSubscribersQuery(filters: SubscribersQueryFilters) {
   });
 }
 
-export function useBoxSubscribersQuery(boxId?: string, count = 0, enabled = true) {
+export function useBoxSubscribersQuery(boxId?: string, pageIndex = 0, enabled = true) {
   const { session } = useAuth();
 
   return useQuery({
-    queryKey: subscriberQueryKeys.byBox(session?.companyId, boxId, count),
+    queryKey: subscriberQueryKeys.byBox(session?.companyId, boxId, pageIndex),
     queryFn: () =>
       fetchSubscribers(
         {
@@ -54,8 +54,8 @@ export function useBoxSubscribersQuery(boxId?: string, count = 0, enabled = true
           boxId,
           customerRelation: "",
           customerStatus: "",
-          pageIndex: 0,
-          pageSize: Math.max(count, 100),
+          pageIndex,
+          pageSize: 10,
           planType: "",
           searchField: "name",
           searchTerm: "",
@@ -67,11 +67,11 @@ export function useBoxSubscribersQuery(boxId?: string, count = 0, enabled = true
   });
 }
 
-export function useAmpereScheduleSubscribersQuery(scheduleId?: string, count = 0, enabled = true) {
+export function useAmpereScheduleSubscribersQuery(scheduleId?: string, pageIndex = 0, enabled = true) {
   const { session } = useAuth();
 
   return useQuery({
-    queryKey: subscriberQueryKeys.byAmpereSchedule(session?.companyId, scheduleId, count),
+    queryKey: subscriberQueryKeys.byAmpereSchedule(session?.companyId, scheduleId, pageIndex),
     queryFn: () =>
       fetchSubscribers(
         {
@@ -79,8 +79,8 @@ export function useAmpereScheduleSubscribersQuery(scheduleId?: string, count = 0
           ampereScheduleId: scheduleId,
           customerRelation: "",
           customerStatus: "",
-          pageIndex: 0,
-          pageSize: Math.max(count, 100),
+          pageIndex,
+          pageSize: 10,
           planType: "",
           searchField: "name",
           searchTerm: "",

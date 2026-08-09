@@ -1,4 +1,4 @@
-import { apiRequest } from "../../shared/api/client";
+import { apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
 import type { AreaRecord } from "./types";
 
 interface AreaResponse {
@@ -63,4 +63,26 @@ export function deleteArea(id: string, token: string) {
     },
     token,
   );
+}
+
+export async function exportCustomers(token: string, areaId?: string) {
+  const query = areaId ? `?areaIds=${encodeURIComponent(areaId)}` : "";
+  const response = await fetch(`${apiBaseUrl}/api/v1/areas/export${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw await toApiErrorResponse(response);
+  }
+
+  const fileName = response.headers.get("content-disposition")?.match(/filename="?([^";]+)"?/)?.[1]
+    ?? "customers.xlsx";
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

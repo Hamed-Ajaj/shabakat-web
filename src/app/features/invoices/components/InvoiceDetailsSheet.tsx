@@ -7,13 +7,12 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useI18n } from "../../../providers/I18nProvider";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCompanyPreferencesQuery } from "../../settings/queries";
 import { useSubscriberDetailQuery } from "../../subscribers/queries";
-import { fetchPrintableInvoiceHtml, fetchCustomerMonthInvoices } from "../invoicesApi";
+import { fetchPrintableInvoiceHtml } from "../invoicesApi";
 import { invoiceQueryKeys, useInvoiceDetailQuery } from "../queries";
 import { computeInvoiceBreakdown, formatCurrency, printInvoiceHtml } from "../utils";
-import type { BreakdownSibling } from "../utils";
 import { getPaymentMethodLabel } from "../invoiceLabels";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 
@@ -40,34 +39,10 @@ export function InvoiceDetailsSheet({
 
   const customerQuery = useSubscriberDetailQuery(invoice?.customerId);
 
-  const issueDate = invoice?.issueDate ?? "";
-  const issueDateObj = useMemo(() => {
-    if (!issueDate) return null;
-    return new Date(issueDate);
-  }, [issueDate]);
-  const year = issueDateObj?.getFullYear();
-  const month = issueDateObj ? issueDateObj.getMonth() + 1 : undefined;
-
-  const siblingsQuery = useQuery({
-    queryKey: ["invoice-month-siblings", invoice?.customerId, year, month],
-    queryFn: () =>
-      fetchCustomerMonthInvoices(invoice!.customerId, year!, month!, session?.token ?? ""),
-    enabled: Boolean(
-      session?.token &&
-        invoice &&
-        year &&
-        month &&
-        customerQuery.data?.plan === "FixedKilowatt",
-    ),
-  });
-
   const shouldWaitForCustomer = Boolean(invoice?.customerId && customerQuery.isLoading);
-  const shouldWaitForSiblings = customerQuery.data?.plan === "FixedKilowatt" && siblingsQuery.isLoading;
 
   const breakdown = useMemo(() => {
-    if (!invoice || shouldWaitForCustomer || shouldWaitForSiblings) return null;
-
-    const siblingInvoices: BreakdownSibling[] = siblingsQuery.data ?? [];
+    if (!invoice || shouldWaitForCustomer) return null;
 
     return computeInvoiceBreakdown(
       invoice.totalAmount,
@@ -79,13 +54,8 @@ export function InvoiceDetailsSheet({
             planValue: customerQuery.data.planValue,
           }
         : null,
-      invoice.id,
-      invoice.invoiceNumber,
-      invoice.createdAt,
-      invoice.issueDate,
-      siblingInvoices,
     );
-  }, [invoice, customerQuery.data, shouldWaitForCustomer, shouldWaitForSiblings, siblingsQuery.data]);
+  }, [invoice, customerQuery.data, shouldWaitForCustomer]);
 
   async function handlePrint() {
     if (!invoice || !session?.token) {
