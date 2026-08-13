@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, CirclePercent, Clock3, Image, Languages, MessageCircle, MessageSquareText, Package, Percent, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
+import { Bell, CalendarDays, CirclePercent, Clock3, FileSpreadsheet, Image, Languages, MessageCircle, MessageSquareText, Package, Percent, Settings2, SunMoon, Wallet, Zap } from "lucide-react";
 import { useAuth } from "../../../providers/AuthProvider";
 import packageJson from "../../../../../package.json";
 import { useI18n } from "../../../providers/I18nProvider";
@@ -139,6 +139,12 @@ export default function SettingsPage() {
               icon={<MessageCircle className="h-4 w-4" />}
               label={t("settings.row.whatsapp")}
               value={t("settings.row.whatsappValue")}
+            />
+            <SettingRowLink
+              to="/settings/excel-export"
+              icon={<FileSpreadsheet className="h-4 w-4" />}
+              label={t("settings.row.excelExport")}
+              value={t("settings.row.excelExportValue")}
             />
           </>
         )}

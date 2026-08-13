@@ -3,6 +3,7 @@ import { useAuth } from "../../providers/AuthProvider";
 import {
   createSubscriber,
   deleteSubscriber,
+  suspendSubscriber,
   updateSubscriber,
   type CreateSubscriberPayload,
   type UpdateSubscriberPayload,
@@ -71,6 +72,27 @@ export function useDeleteSubscriberMutation() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: subscriberQueryKeys.all }),
         queryClient.removeQueries({ queryKey: subscriberQueryKeys.detail(id) }),
+      ]);
+    },
+  });
+}
+
+export function useSuspendSubscriberMutation() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!session?.token) {
+        throw new Error("You must be signed in to suspend a subscriber.");
+      }
+
+      return suspendSubscriber(id, session.token);
+    },
+    onSuccess: async (_, id) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: subscriberQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: subscriberQueryKeys.detail(id) }),
       ]);
     },
   });

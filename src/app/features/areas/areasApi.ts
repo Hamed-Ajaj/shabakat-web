@@ -1,4 +1,5 @@
 import { apiBaseUrl, apiRequest, toApiErrorResponse } from "../../shared/api/client";
+import { getCustomerExportColumns } from "../../shared/export/customerExportColumns";
 import type { AreaRecord } from "./types";
 
 interface AreaResponse {
@@ -65,8 +66,11 @@ export function deleteArea(id: string, token: string) {
   );
 }
 
-export async function exportCustomers(token: string, areaId?: string) {
-  const query = areaId ? `?areaIds=${encodeURIComponent(areaId)}` : "";
+export async function exportCustomers(token: string, areaId?: string, companyId?: string) {
+  const params = new URLSearchParams();
+  if (areaId) params.append("areaIds", areaId);
+  getCustomerExportColumns(companyId).forEach((column) => params.append("columns", column));
+  const query = params.size ? `?${params.toString()}` : "";
   const response = await fetch(`${apiBaseUrl}/api/v1/areas/export${query}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

@@ -24,12 +24,14 @@ import { createSubscriberColumns } from "./subscriberColumns";
 
 export interface SubscribersTableProps {
   canDelete: boolean;
+  canSuspend: boolean;
   data: SubscriberRow[];
   error: string;
   isFetching: boolean;
   isLoading: boolean;
   onDelete: (subscriber: SubscriberRow) => void;
   onEdit: (subscriber: SubscriberRow) => void;
+  onSuspend: (subscriber: SubscriberRow) => void;
   onPaginationChange: OnChangeFn<PaginationState>;
   onPageSizeChange: (value: number) => void;
   onView: (subscriber: SubscriberRow) => void;
@@ -43,8 +45,10 @@ export function SubscribersTable({
   isFetching,
   isLoading,
   canDelete,
+  canSuspend,
   onDelete,
   onEdit,
+  onSuspend,
   onPaginationChange,
   onPageSizeChange,
   onView,
@@ -57,13 +61,15 @@ export function SubscribersTable({
     () =>
       createSubscriberColumns({
         canDelete,
+        canSuspend,
         formatDate,
         onDelete,
         onEdit,
+        onSuspend,
         onView,
         t,
       }),
-    [canDelete, formatDate, onDelete, onEdit, onView, t],
+    [canDelete, canSuspend, formatDate, onDelete, onEdit, onSuspend, onView, t],
   );
 
   const table = useReactTable({

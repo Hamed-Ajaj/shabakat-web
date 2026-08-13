@@ -1,6 +1,6 @@
 import { apiRequest } from "../../shared/api/client";
 import type {
-  SubscriberBillingStatus,
+  CustomerStatus,
   SubscriberDetail,
   SubscribersPageData,
   SubscribersQueryFilters,
@@ -255,7 +255,7 @@ export async function fetchSubscriberDetail(id: string, token: string): Promise<
     customerType: subscriber.customerType,
     plan: subscriber.plan,
     planValue: subscriber.planValue,
-    customerStatus: subscriber.customerStatus,
+    customerStatus: subscriber.customerStatus as CustomerStatus,
     subscriptionDate: subscriber.subscriptionDate,
     createdAt: subscriber.createdAt,
     customerRelation: subscriber.customerRelation || "",
@@ -315,6 +315,20 @@ export function deleteSubscriber(id: string, token: string) {
   );
 }
 
+export function suspendSubscriber(id: string, token: string) {
+  return apiRequest(
+    "/api/v1/customers/suspend",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ customerIds: [id] }),
+    },
+    token,
+  );
+}
+
 function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): SubscriberRow {
   return {
     id: customer.id,
@@ -324,23 +338,11 @@ function mapCustomerSummaryToSubscriberRow(customer: CustomerSummaryResponse): S
     plan: customer.plan as SubscriberRow["plan"],
     planValue: customer.planValue,
     subscriptionDate: customer.subscriptionDate,
-    status: resolveBillingStatus(customer.customerStatus, customer.amountDue),
+    status: customer.customerStatus as CustomerStatus,
     amountDue: customer.amountDue,
-    customerStatus: customer.customerStatus,
+    customerStatus: customer.customerStatus as CustomerStatus,
     customerType: customer.customerType,
   };
-}
-
-function resolveBillingStatus(customerStatus: string, amountDue: number): SubscriberBillingStatus {
-  if (amountDue <= 0) {
-    return "paid";
-  }
-
-  if (customerStatus === "Suspended" || customerStatus === "Terminated") {
-    return "overdue";
-  }
-
-  return "unpaid";
 }
 
 function mapPricingOverride(pricingOverride: CreateSubscriberPayload["pricingOverride"]) {

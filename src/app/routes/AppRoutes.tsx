@@ -14,6 +14,7 @@ const SubscribersPage = lazy(() => import("../features/subscribers/pages/Subscri
 const InvoicesPage = lazy(() => import("../features/invoices/pages/InvoicesPage"));
 const FixedKilowattCalculatorPage = lazy(() => import("../features/invoices/pages/FixedKilowattCalculatorPage"));
 const ExpensesPage = lazy(() => import("../features/expenses/pages/ExpensesPage"));
+const AuditLogsPage = lazy(() => import("../features/audit-logs/pages/AuditLogsPage"));
 const SettingsPage = lazy(() => import("../features/settings/pages/SettingsPage"));
 const PricingSettingPage = lazy(() => import("../features/settings/pages/PricingSettingPage"));
 const DueDatePage = lazy(() => import("../features/settings/pages/DueDatePage"));
@@ -24,6 +25,7 @@ const CompanyLogoPage = lazy(() => import("../features/settings/pages/CompanyLog
 const AmpereSchedulePricingPage = lazy(() => import("../features/settings/pages/AmpereSchedulePricingPage"));
 const AmpereProrationPage = lazy(() => import("../features/settings/pages/AmpereProrationPage"));
 const WhatsAppConnectionPage = lazy(() => import("../features/settings/pages/WhatsAppConnectionPage"));
+const ExcelExportColumnsPage = lazy(() => import("../features/settings/pages/ExcelExportColumnsPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
 
 function ShellLayout() {
@@ -93,6 +95,7 @@ export function AppRoutes() {
           <Route path="/invoices" element={<InvoicesPage />} />
           <Route path="/calculator" element={<FixedKilowattCalculatorPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/notifications" element={<AuditLogsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/pricing/:field" element={<PricingSettingPage />} />
           <Route path="/settings/due-date" element={<DueDatePage />} />
@@ -103,6 +106,7 @@ export function AppRoutes() {
           <Route path="/settings/ampere-schedule-pricing" element={<AmpereSchedulePricingPage />} />
           <Route path="/settings/ampere-proration" element={<AmpereProrationPage />} />
           <Route path="/settings/whatsapp" element={<WhatsAppConnectionPage />} />
+          <Route path="/settings/excel-export" element={<ExcelExportColumnsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

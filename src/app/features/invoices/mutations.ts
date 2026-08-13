@@ -48,6 +48,7 @@ export function useBulkCreateInvoicesMutation() {
     onSuccess: async () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: invoiceQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: invoiceQueryKeys.skipped() }),
         queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: subscriberQueryKeys.all }),
       ]),

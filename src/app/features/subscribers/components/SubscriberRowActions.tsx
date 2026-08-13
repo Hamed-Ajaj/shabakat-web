@@ -1,4 +1,4 @@
-import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Ban, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { useI18n } from "../../../providers/I18nProvider";
 import {
@@ -10,15 +10,21 @@ import {
 
 interface SubscriberRowActionsProps {
   canDelete: boolean;
+  canSuspend: boolean;
+  isSuspended: boolean;
   onDelete: () => void;
   onEdit: () => void;
+  onSuspend: () => void;
   onView: () => void;
 }
 
 export function SubscriberRowActions({
   canDelete,
+  canSuspend,
+  isSuspended,
   onDelete,
   onEdit,
+  onSuspend,
   onView,
 }: Readonly<SubscriberRowActionsProps>) {
   const { isRtl, t } = useI18n();
@@ -44,6 +50,12 @@ export function SubscriberRowActions({
           <Pencil className="h-4 w-4" />
           {t("subscribers.actions.edit")}
         </DropdownMenuItem>
+        {canSuspend && !isSuspended ? (
+          <DropdownMenuItem onClick={onSuspend}>
+            <Ban className="h-4 w-4" />
+            {t("subscribers.actions.suspend")}
+          </DropdownMenuItem>
+        ) : null}
         {canDelete ? (
           <DropdownMenuItem variant="destructive" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />

@@ -56,6 +56,7 @@ export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey
   "/invoices": { titleKey: "shell.route.invoices.title", subtitleKey: "shell.route.invoices.subtitle" },
   "/calculator": { titleKey: "calculator.title", subtitleKey: "calculator.subtitle" },
   "/expenses": { titleKey: "shell.route.expenses.title", subtitleKey: "shell.route.expenses.subtitle" },
+  "/notifications": { titleKey: "audit.title", subtitleKey: "audit.subtitle" },
   "/settings": { titleKey: "shell.route.settings.title", subtitleKey: "shell.route.settings.subtitle" },
   "/settings/pricing/price-per-kilowatt": { titleKey: "shell.route.settingsPricePerKilowatt.title", subtitleKey: "shell.route.settingsPricePerKilowatt.subtitle" },
   "/settings/pricing/price-per-amp": { titleKey: "shell.route.settingsPricePerAmp.title", subtitleKey: "shell.route.settingsPricePerAmp.subtitle" },
@@ -67,4 +68,5 @@ export const routeTitles: Record<string, { titleKey: TranslationKey; subtitleKey
   "/settings/language": { titleKey: "shell.route.settingsLanguage.title", subtitleKey: "shell.route.settingsLanguage.subtitle" },
   "/settings/ampere-schedule-pricing": { titleKey: "shell.route.settingsAmpereSchedulePricing.title", subtitleKey: "shell.route.settingsAmpereSchedulePricing.subtitle" },
   "/settings/whatsapp": { titleKey: "shell.route.settingsWhatsapp.title", subtitleKey: "shell.route.settingsWhatsapp.subtitle" },
+  "/settings/excel-export": { titleKey: "settings.title.excelExport", subtitleKey: "export.description" },
 };

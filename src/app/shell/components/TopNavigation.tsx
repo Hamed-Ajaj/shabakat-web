@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
-import { Search } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Bell, Search } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "../../components/ui/button";
 import { SidebarTrigger } from "../../components/ui/sidebar";
 import { useAuth } from "../../providers/AuthProvider";
 import { useI18n } from "../../providers/I18nProvider";
@@ -51,6 +52,11 @@ export function TopNavigation() {
             />
           </form>
         </div>
+        {session?.role === "Owner" ? (
+          <Button asChild aria-label={t("audit.title")} size="icon" title={t("audit.title")} variant="ghost">
+            <Link to="/notifications"><Bell /></Link>
+          </Button>
+        ) : null}
         <Avatar name={session?.fullName ?? t("common.workspaceUser")} />
       </div>
     </header>

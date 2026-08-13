@@ -5,6 +5,7 @@ import {
   fetchInvoiceCustomerOptions,
   fetchInvoiceDetail,
   fetchInvoices,
+  fetchSkippedInvoiceCustomers,
   type FixedKilowattCalculatePayload,
 } from "./invoicesApi";
 import type { InvoicesQueryFilters } from "./types";
@@ -17,6 +18,7 @@ export const invoiceQueryKeys = {
   customers: (companyId?: string) => ["invoice-customers", companyId] as const,
   fixedKilowattCalculation: (companyId?: string, payload?: FixedKilowattCalculatePayload) =>
     ["invoice-fixed-kilowatt-calculation", companyId, payload] as const,
+  skipped: (companyId?: string) => ["invoice-skipped", companyId] as const,
 };
 
 export function useInvoicesQuery(filters: InvoicesQueryFilters) {
@@ -60,5 +62,15 @@ export function useFixedKilowattCalculationQuery(payload?: FixedKilowattCalculat
     enabled: Boolean(session?.token && payload),
     placeholderData: keepPreviousData,
     retry: false,
+  });
+}
+
+export function useSkippedInvoiceCustomersQuery(enabled: boolean) {
+  const { session } = useAuth();
+
+  return useQuery({
+    queryKey: invoiceQueryKeys.skipped(session?.companyId),
+    queryFn: () => fetchSkippedInvoiceCustomers(session?.token ?? ""),
+    enabled: Boolean(session?.token && enabled),
   });
 }

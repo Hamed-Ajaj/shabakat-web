@@ -65,6 +65,13 @@ export interface FixedKilowattCalculation {
   customerType: InvoiceCustomerType;
 }
 
+export interface SkippedInvoiceCustomer {
+  customerId: string;
+  customerName: string;
+  reason: string;
+  skippedAt: string;
+}
+
 export interface InvoicesQueryFilters {
   customerId: string;
   invoiceStatus: "" | InvoiceStatus;

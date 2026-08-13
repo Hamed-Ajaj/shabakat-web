@@ -1,4 +1,4 @@
-export type SubscriberBillingStatus = "paid" | "unpaid" | "overdue";
+export type CustomerStatus = "Active" | "Suspended" | "Terminated";
 
 export type SubscriberSearchField = "name" | "phone";
 export type SubscriberPlan = "Ampere" | "Kilowatt" | "FixedKilowatt";
@@ -11,10 +11,10 @@ export interface SubscriberRow {
   plan: SubscriberPlan;
   planValue: number;
   subscriptionDate: string;
-  status: SubscriberBillingStatus;
+  status: CustomerStatus;
   amountDue: number;
   customerType: string;
-  customerStatus: string;
+  customerStatus: CustomerStatus;
 }
 
 export interface SubscriberDetail {
@@ -33,7 +33,7 @@ export interface SubscriberDetail {
   customerType: "Residential" | "Commercial" | "Industrial";
   plan: SubscriberPlan;
   planValue: number;
-  customerStatus: string;
+  customerStatus: CustomerStatus;
   subscriptionDate: string;
   createdAt: string;
   customerRelation: "Friend" | "Family" | "Owner" | "Other" | "";

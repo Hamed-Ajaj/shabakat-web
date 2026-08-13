@@ -12,7 +12,7 @@ import {
 import { useI18n } from "../../../providers/I18nProvider";
 import { Avatar } from "../../../shared/components/Avatar";
 import { SectionCard } from "../../../shared/components/SectionCard";
-import { StatusBadge } from "../../../shared/components/StatusBadge";
+import { CustomerStatusBadge } from "../../../shared/components/CustomerStatusBadge";
 import { getSubscriberPlanLabel } from "../../subscribers/subscriberLabels";
 import { useBoxSubscribersQuery } from "../../subscribers/queries";
 import type { BoxRecord } from "../types";
@@ -134,7 +134,7 @@ export function BoxDetailsSheet({
                                 </p>
                               </div>
                               <div className="flex flex-wrap items-center gap-2">
-                                <StatusBadge status={subscriber.status} />
+                                <CustomerStatusBadge status={subscriber.status} />
                                 <Badge variant="outline" className="rounded-full px-2.5 py-1 text-xs">
                                   {formatDate(subscriber.subscriptionDate)}
                                 </Badge>

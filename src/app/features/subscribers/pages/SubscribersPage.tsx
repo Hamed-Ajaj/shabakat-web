@@ -21,7 +21,7 @@ import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
 import { exportCustomers } from "../../areas/areasApi";
 import { toast } from "sonner";
 
-type SubscriberDialogMode = "create" | "delete" | "edit" | "view" | null;
+type SubscriberDialogMode = "create" | "delete" | "edit" | "suspend" | "view" | null;
 
 const CreateSubscriberSheet = lazy(() =>
   import("../components/CreateSubscriberSheet").then((module) => ({ default: module.CreateSubscriberSheet })),
@@ -34,6 +34,9 @@ const SubscriberDetailsSheet = lazy(() =>
 );
 const DeleteSubscriberDialog = lazy(() =>
   import("../components/DeleteSubscriberDialog").then((module) => ({ default: module.DeleteSubscriberDialog })),
+);
+const SuspendSubscriberDialog = lazy(() =>
+  import("../components/SuspendSubscriberDialog").then((module) => ({ default: module.SuspendSubscriberDialog })),
 );
 
 export default function SubscribersPage() {
@@ -121,6 +124,10 @@ export default function SubscribersPage() {
     openDialog("delete", subscriber);
   }
 
+  function handleSuspend(subscriber: SubscriberRow) {
+    openDialog("suspend", subscriber);
+  }
+
   function resetToFirstPage() {
     setPagination((current) => ({
       ...current,
@@ -139,7 +146,7 @@ export default function SubscribersPage() {
 
     setIsExporting(true);
     try {
-      await exportCustomers(session.token, areaId || undefined);
+      await exportCustomers(session.token, areaId || undefined, session.companyId);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("subscribers.export.failed"));
     } finally {
@@ -196,12 +203,14 @@ export default function SubscribersPage() {
       />
       <SubscribersTable
         canDelete={canDelete}
+        canSuspend={session?.role === "Owner"}
         data={subscribers}
         error={error instanceof Error ? error.message : ""}
         isFetching={isFetching}
         isLoading={isLoading}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onSuspend={handleSuspend}
         onPaginationChange={setPagination}
         onPageSizeChange={(value) => {
           setPagination({
@@ -236,6 +245,14 @@ export default function SubscribersPage() {
         ) : null}
         {dialogMode === "delete" ? (
           <DeleteSubscriberDialog
+            open
+            subscriberId={selectedSubscriber?.id ?? null}
+            subscriberName={selectedSubscriber?.name ?? ""}
+            onOpenChange={handleDialogOpenChange}
+          />
+        ) : null}
+        {dialogMode === "suspend" ? (
+          <SuspendSubscriberDialog
             open
             subscriberId={selectedSubscriber?.id ?? null}
             subscriberName={selectedSubscriber?.name ?? ""}

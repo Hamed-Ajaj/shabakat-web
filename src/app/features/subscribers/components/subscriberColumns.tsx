@@ -1,7 +1,7 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Avatar } from "../../../shared/components/Avatar";
-import { StatusBadge } from "../../../shared/components/StatusBadge";
+import { CustomerStatusBadge } from "../../../shared/components/CustomerStatusBadge";
 import type { SubscriberRow } from "../types";
 import { SubscriberRowActions } from "./SubscriberRowActions";
 
@@ -9,18 +9,22 @@ const columnHelper = createColumnHelper<SubscriberRow>();
 
 interface SubscriberColumnsOptions {
   canDelete: boolean;
+  canSuspend: boolean;
   formatDate: (value: string) => string;
   onDelete: (subscriber: SubscriberRow) => void;
   onEdit: (subscriber: SubscriberRow) => void;
+  onSuspend: (subscriber: SubscriberRow) => void;
   onView: (subscriber: SubscriberRow) => void;
   t: (key: any, values?: Record<string, string | number>) => string;
 }
 
 export function createSubscriberColumns({
   canDelete,
+  canSuspend,
   formatDate,
   onDelete,
   onEdit,
+  onSuspend,
   onView,
   t,
 }: Readonly<SubscriberColumnsOptions>) {
@@ -66,7 +70,7 @@ export function createSubscriberColumns({
   }),
   columnHelper.accessor("status", {
     header: t("subscribers.table.status"),
-    cell: (info) => <StatusBadge status={info.getValue()} />,
+    cell: (info) => <CustomerStatusBadge status={info.getValue()} />,
   }),
   columnHelper.accessor("amountDue", {
     header: ({ column }) => (
@@ -83,8 +87,11 @@ export function createSubscriberColumns({
     cell: ({ row }) => (
       <SubscriberRowActions
         canDelete={canDelete}
+        canSuspend={canSuspend}
+        isSuspended={row.original.customerStatus === "Suspended"}
         onDelete={() => onDelete(row.original)}
         onEdit={() => onEdit(row.original)}
+        onSuspend={() => onSuspend(row.original)}
         onView={() => onView(row.original)}
       />
     ),

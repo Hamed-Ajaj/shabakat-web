@@ -10,6 +10,7 @@ import type {
   InvoicesPageData,
   InvoicesQueryFilters,
   InvoiceRow,
+  SkippedInvoiceCustomer,
   InvoiceStatus,
   PaymentMethod,
 } from "./types";
@@ -231,6 +232,10 @@ export function bulkCreateInvoices(token: string, planType?: BulkCreatePlanType)
     },
     token,
   );
+}
+
+export function fetchSkippedInvoiceCustomers(token: string) {
+  return apiRequest<SkippedInvoiceCustomer[]>("/api/v1/invoices/skipped", undefined, token);
 }
 
 export function recordInvoicePayment(id: string, payload: RecordPaymentPayload, token: string) {
