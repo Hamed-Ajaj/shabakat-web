@@ -70,6 +70,7 @@ export interface CreateSubscriberPayload {
 }
 
 export interface UpdateSubscriberPayload extends CreateSubscriberPayload {
+  clearPricingOverride: boolean;
   customerStatus: CustomerStatus;
 }
 
@@ -301,6 +302,7 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         customerStatus: payload.customerStatus,
         customerRelation: payload.customerRelation,
         initialMeterReading: payload.initialMeterReading,
+        clearPricingOverride: payload.clearPricingOverride,
         pricingOverride: mapPricingOverride(payload.pricingOverride),
       }),
     },

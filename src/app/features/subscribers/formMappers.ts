@@ -32,6 +32,7 @@ export function mapFormValuesToSubscriberPayload(
     subscriptionDate: values.subscriptionDate || undefined,
     customerRelation: values.customerRelation || undefined,
     customerStatus: values.customerStatus,
+    clearPricingOverride: !values.usePricingOverride,
     initialMeterReading: values.initialMeterReading?.trim()
       ? Number(values.initialMeterReading.trim())
       : undefined,
