@@ -63,6 +63,7 @@ export function EditSubscriberSheet({
       error={error}
       open={open}
       pending={detailQuery.isLoading || updateSubscriber.isPending}
+      showCustomerStatus
       showInitialMeterReading={showInitialMeterReading}
       submitLabel={t("subscribers.actions.saveChanges")}
       title={t("subscribers.form.title.edit")}

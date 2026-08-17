@@ -40,6 +40,7 @@ interface SubscriberFormSheetProps {
   error: string;
   open: boolean;
   pending: boolean;
+  showCustomerStatus?: boolean;
   showInitialMeterReading?: boolean;
   submitLabel: string;
   title: string;
@@ -53,6 +54,7 @@ export function SubscriberFormSheet({
   error,
   open,
   pending,
+  showCustomerStatus = false,
   showInitialMeterReading = false,
   submitLabel,
   title,
@@ -169,6 +171,7 @@ export function SubscriberFormSheet({
                 customerTypes={customerTypesQuery.data ?? []}
                 form={form}
                 planTypes={planTypesQuery.data ?? []}
+                showCustomerStatus={showCustomerStatus}
                 showInitialMeterReading={showInitialMeterReading}
               />
 

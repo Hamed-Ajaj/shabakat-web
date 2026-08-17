@@ -1,12 +1,12 @@
 import type { AreaRecord } from "../areas/types";
-import type { CreateSubscriberPayload } from "./subscribersApi";
+import type { UpdateSubscriberPayload } from "./subscribersApi";
 import type { CreateSubscriberFormInput, CreateSubscriberFormValues } from "./schema";
 import type { SubscriberDetail } from "./types";
 
 export function mapFormValuesToSubscriberPayload(
   values: CreateSubscriberFormValues,
   options?: { preserveClears?: boolean },
-): CreateSubscriberPayload {
+): UpdateSubscriberPayload {
   const preserveClears = options?.preserveClears ?? false;
   const trimmedBuilding = values.building?.trim() ?? "";
   const trimmedFloor = values.floor?.trim() ?? "";
@@ -31,6 +31,8 @@ export function mapFormValuesToSubscriberPayload(
     planValue: values.planValue,
     subscriptionDate: values.subscriptionDate || undefined,
     customerRelation: values.customerRelation || undefined,
+    customerStatus: values.customerStatus,
+    clearPricingOverride: !values.usePricingOverride,
     initialMeterReading: values.initialMeterReading?.trim()
       ? Number(values.initialMeterReading.trim())
       : undefined,
@@ -65,6 +67,7 @@ export function mapSubscriberDetailToFormInput(
     planValue: subscriber.planValue,
     subscriptionDate: "",
     customerRelation: subscriber.customerRelation,
+    customerStatus: subscriber.customerStatus,
     ampereSchedulePricingEnabled: false,
     usePricingOverride: subscriber.hasPricingOverride,
     overridePrice: subscriber.pricingOverride?.price ?? Number.NaN,
