@@ -40,6 +40,7 @@ interface SubscriberDetailsSectionProps {
     CreateSubscriberFormValues
   >;
   planTypes: LookupOption[];
+  showCustomerStatus?: boolean;
   showInitialMeterReading?: boolean;
 }
 
@@ -52,6 +53,7 @@ export function SubscriberDetailsSection({
   customerTypes,
   form,
   planTypes,
+  showCustomerStatus = false,
   showInitialMeterReading = false,
 }: Readonly<SubscriberDetailsSectionProps>) {
   const { t } = useI18n();
@@ -368,6 +370,32 @@ export function SubscriberDetailsSection({
           </FormItem>
         )}
       />
+
+      {showCustomerStatus ? (
+        <FormField
+          control={form.control}
+          name="customerStatus"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("subscribers.form.status")}</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("subscribers.form.statusPlaceholder")} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Active">{t("subscribers.status.active")}</SelectItem>
+                  <SelectItem value="Suspended">{t("subscribers.status.suspended")}</SelectItem>
+                  <SelectItem value="Terminated">{t("subscribers.status.terminated")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>{t("subscribers.form.statusHelp")}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      ) : null}
 
       <FormField
         control={form.control}

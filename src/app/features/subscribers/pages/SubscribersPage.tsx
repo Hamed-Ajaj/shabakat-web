@@ -8,6 +8,7 @@ import { SubscribersToolbar } from "../components/SubscribersToolbar";
 import {
   useSubscribersQuery,
   useSubscriberCustomerRelationsQuery,
+  useSubscriberAmpereSchedulesQuery,
   useSubscriberPlanTypesQuery,
 } from "../queries";
 import type {
@@ -53,6 +54,7 @@ export default function SubscribersPage() {
   const [planType, setPlanType] = useState("");
   const [customerRelation, setCustomerRelation] = useState("");
   const [customerStatus, setCustomerStatus] = useState("");
+  const [ampereScheduleId, setAmpereScheduleId] = useState("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -71,6 +73,7 @@ export default function SubscribersPage() {
   const filters = useMemo<SubscribersQueryFilters>(
     () => ({
       areaId,
+      ampereScheduleId: ampereScheduleId || undefined,
       customerRelation,
       customerStatus,
       pageIndex: pagination.pageIndex,
@@ -81,6 +84,7 @@ export default function SubscribersPage() {
     }),
     [
       areaId,
+      ampereScheduleId,
       customerRelation,
       customerStatus,
       debouncedSearchTerm,
@@ -99,6 +103,7 @@ export default function SubscribersPage() {
   const areasQuery = useAreasQuery();
   const planTypesQuery = useSubscriberPlanTypesQuery();
   const customerRelationsQuery = useSubscriberCustomerRelationsQuery();
+  const ampereSchedulesQuery = useSubscriberAmpereSchedulesQuery();
   const canDelete = session?.role === "Owner" || session?.role === "Admin";
   const subscribers = subscribersPage?.data ?? [];
 
@@ -161,6 +166,8 @@ export default function SubscribersPage() {
   return (
     <div className="space-y-4">
       <SubscribersToolbar
+        ampereScheduleId={ampereScheduleId}
+        ampereSchedules={ampereSchedulesQuery.data ?? []}
         areaId={areaId}
         areas={areasQuery.data ?? []}
         canExport={session?.role === "Owner"}
@@ -174,24 +181,19 @@ export default function SubscribersPage() {
         searchField={searchField}
         searchTerm={searchTerm}
         total={subscribersPage?.totalCount ?? 0}
+        onAdvancedFiltersChange={(nextFilters) => {
+          setAmpereScheduleId(nextFilters.ampereScheduleId);
+          setCustomerRelation(nextFilters.customerRelation);
+          setCustomerStatus(nextFilters.customerStatus);
+          setPlanType(nextFilters.planType);
+          resetToFirstPage();
+        }}
         onAreaChange={(value) => {
           setAreaId(value);
           resetToFirstPage();
         }}
         onCreateClick={() => openDialog("create")}
-        onCustomerRelationChange={(value) => {
-          setCustomerRelation(value);
-          resetToFirstPage();
-        }}
-        onCustomerStatusChange={(value) => {
-          setCustomerStatus(value === "all" ? "" : value);
-          resetToFirstPage();
-        }}
         onExportClick={handleExport}
-        onPlanTypeChange={(value) => {
-          setPlanType(value);
-          resetToFirstPage();
-        }}
         onSearchFieldChange={(value) => {
           setSearchField(value);
           resetToFirstPage();

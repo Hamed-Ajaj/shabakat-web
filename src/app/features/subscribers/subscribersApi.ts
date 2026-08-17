@@ -69,7 +69,9 @@ export interface CreateSubscriberPayload {
   };
 }
 
-export type UpdateSubscriberPayload = CreateSubscriberPayload;
+export interface UpdateSubscriberPayload extends CreateSubscriberPayload {
+  customerStatus: CustomerStatus;
+}
 
 interface CustomerPricingOverrideResponse {
   price: number | null;
@@ -296,6 +298,7 @@ export function updateSubscriber(id: string, payload: UpdateSubscriberPayload, t
         customerType: payload.customerType,
         plan: payload.plan,
         planValue: payload.planValue,
+        customerStatus: payload.customerStatus,
         customerRelation: payload.customerRelation,
         initialMeterReading: payload.initialMeterReading,
         pricingOverride: mapPricingOverride(payload.pricingOverride),
