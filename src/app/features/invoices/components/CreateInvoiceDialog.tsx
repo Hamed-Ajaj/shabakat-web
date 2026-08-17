@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -25,9 +26,12 @@ import {
 } from "../../../components/ui/select";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { useCreateInvoiceMutation } from "../mutations";
-import { useFixedKilowattCalculationQuery, useInvoiceCustomerOptionsQuery } from "../queries";
+import { useFixedKilowattCalculationQuery } from "../queries";
 import { createInvoiceSchema, type CreateInvoiceFormInput, type CreateInvoiceFormValues } from "../schema";
 import { formatCurrency } from "../utils";
+import { CustomerSearchSelect } from "./CustomerSearchSelect";
+import type { InvoiceCustomerType } from "../types";
+import type { SubscriberRow } from "../../subscribers/types";
 import { useCompanyPreferencesQuery } from "../../settings/queries";
 
 function getDefaultEndOfMonth() {
@@ -59,7 +63,7 @@ export function CreateInvoiceDialog({
 }: Readonly<CreateInvoiceDialogProps>) {
   const { t } = useI18n();
   const createInvoice = useCreateInvoiceMutation();
-  const customersQuery = useInvoiceCustomerOptionsQuery();
+  const [selectedCustomer, setSelectedCustomer] = useState<SubscriberRow | null>(null);
   const preferencesQuery = useCompanyPreferencesQuery();
   const companyPreferences = preferencesQuery.data;
   const todayInput = toDateInputValue(new Date());
@@ -78,11 +82,9 @@ export function CreateInvoiceDialog({
       billedTo: endOfMonthInput,
     },
   });
-  const customerId = form.watch("customerId");
   const fixedKilowattMode = form.watch("fixedKilowattMode");
   const paymentAmount = toFiniteNumber(form.watch("paymentAmount"));
   const kilowattAmount = toFiniteNumber(form.watch("kilowattAmount"));
-  const selectedCustomer = (customersQuery.data ?? []).find((item) => item.id === customerId);
   const isFixedKilowatt = selectedCustomer?.plan === "FixedKilowatt";
   const isAmpere = selectedCustomer?.plan === "Ampere";
   const showBilledDays = isAmpere && companyPreferences?.ampereProrateByDaysEnabled === true;
@@ -96,14 +98,14 @@ export function CreateInvoiceDialog({
       ? fixedKilowattMode === "payment"
         ? debouncedPaymentAmount !== undefined && debouncedPaymentAmount > 0
           ? {
-              customerType: selectedCustomer.customerType,
+              customerType: selectedCustomer.customerType as InvoiceCustomerType,
               planValue: selectedCustomer.planValue,
               paymentAmount: debouncedPaymentAmount,
             }
           : undefined
         : debouncedKilowattAmount !== undefined && debouncedKilowattAmount > 0
           ? {
-              customerType: selectedCustomer.customerType,
+              customerType: selectedCustomer.customerType as InvoiceCustomerType,
               planValue: selectedCustomer.planValue,
               kilowattAmount: debouncedKilowattAmount,
             }
@@ -133,6 +135,7 @@ export function CreateInvoiceDialog({
     });
     toast.success(t("invoices.create.success"));
     onOpenChange(false);
+    setSelectedCustomer(null);
     form.reset({
       customerId: "",
       customerPlan: undefined,
@@ -153,6 +156,7 @@ export function CreateInvoiceDialog({
         onOpenChange(nextOpen);
         if (!nextOpen) {
           createInvoice.reset();
+          setSelectedCustomer(null);
           form.reset({
             customerId: "",
             customerPlan: undefined,
@@ -179,14 +183,13 @@ export function CreateInvoiceDialog({
           <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.create.customer")}</label>
-              <Select
-                value={form.watch("customerId") || undefined}
-                onValueChange={(value) => {
-                  const customer = (customersQuery.data ?? []).find(
-                    (item) => item.id === value,
-                  );
-
-                  form.setValue("customerId", value, { shouldValidate: true });
+              <CustomerSearchSelect
+                value={form.watch("customerId") || ""}
+                onValueChange={(value) =>
+                  form.setValue("customerId", value, { shouldValidate: true })
+                }
+                onSelectedChange={(customer) => {
+                  setSelectedCustomer(customer);
                   form.setValue("customerPlan", customer?.plan, {
                     shouldValidate: true,
                   });
@@ -199,18 +202,8 @@ export function CreateInvoiceDialog({
                     form.setValue("fixedKilowattMode", "payment");
                   }
                 }}
-              >
-                <SelectTrigger className="rounded-xl border-white/8 bg-card">
-                  <SelectValue placeholder={customersQuery.isLoading ? t("invoices.create.loadingCustomers") : t("invoices.create.customerPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {(customersQuery.data ?? []).map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder={t("invoices.create.customerPlaceholder")}
+              />
               {form.formState.errors.customerId ? <p className="mt-2 text-sm text-red-300">{form.formState.errors.customerId.message}</p> : null}
             </div>
 
@@ -376,9 +369,6 @@ export function CreateInvoiceDialog({
               </>
             ) : null}
 
-            {customersQuery.error instanceof Error ? (
-              <p className="text-sm text-red-300">{customersQuery.error.message}</p>
-            ) : null}
             {preferencesQuery.error instanceof Error ? (
               <p className="text-sm text-red-300">{preferencesQuery.error.message}</p>
             ) : null}
@@ -390,7 +380,7 @@ export function CreateInvoiceDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t("invoices.actions.cancel")}
               </Button>
-              <Button type="submit" disabled={createInvoice.isPending || customersQuery.isLoading}>
+              <Button type="submit" disabled={createInvoice.isPending}>
                 {createInvoice.isPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : null}
                 {t("invoices.actions.create")}
               </Button>
