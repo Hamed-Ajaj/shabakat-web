@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, RefreshCw } from "lucide-react";
 import { useDebouncedValue } from "../../../../hooks/use-debounced-value";
 import { useI18n } from "../../../providers/I18nProvider";
 import { Button } from "../../../components/ui/button";
@@ -65,7 +65,8 @@ export function CustomerSearchSelect({
     ? (emptyLabel ?? t("invoices.filters.allCustomers"))
     : (placeholder ?? t("invoices.create.customerPlaceholder"));
   const displayLabel = resolved?.name ?? fallbackLabel;
-  const isLoading = customersQuery.isLoading;
+  const isLoading = customersQuery.isLoading || customersQuery.isFetching;
+  const isError = customersQuery.isError;
 
   function selectCustomer(customer: SubscriberRow) {
     setSelected(customer);
@@ -126,6 +127,24 @@ export function CustomerSearchSelect({
                 {Array.from({ length: 4 }).map((_, index) => (
                   <Skeleton key={index} className="h-8 w-full rounded-lg" />
                 ))}
+              </div>
+            ) : isError ? (
+              <div className="flex flex-col items-center gap-2 px-3 py-4 text-center">
+                <p className="text-sm text-destructive">
+                  {t("invoices.customerSearch.error")}
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => customersQuery.refetch()}
+                  disabled={customersQuery.isFetching}
+                >
+                  <RefreshCw
+                    className={customersQuery.isFetching ? "animate-spin" : ""}
+                  />
+                  {t("invoices.customerSearch.retry")}
+                </Button>
               </div>
             ) : customers.length === 0 ? (
               <p className="px-3 py-4 text-sm text-muted-foreground">
