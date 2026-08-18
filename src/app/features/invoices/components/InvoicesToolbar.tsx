@@ -10,12 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import type { InvoiceCustomerOption, InvoiceStatus } from "../types";
+import type { InvoiceStatus } from "../types";
+import { CustomerSearchSelect } from "./CustomerSearchSelect";
 
 interface InvoicesToolbarProps {
   canBulkCreate: boolean;
   customerId: string;
-  customers: InvoiceCustomerOption[];
   invoiceStatus: "" | InvoiceStatus;
   issueDateFrom: string;
   issueDateTo: string;
@@ -33,7 +33,6 @@ interface InvoicesToolbarProps {
 export function InvoicesToolbar({
   canBulkCreate,
   customerId,
-  customers,
   invoiceStatus,
   issueDateFrom,
   issueDateTo,
@@ -48,7 +47,6 @@ export function InvoicesToolbar({
   onStatusChange,
 }: Readonly<InvoicesToolbarProps>) {
   const { t } = useI18n();
-  const customerValue = customerId || "all";
   const statusValue = invoiceStatus || "all";
 
   return (
@@ -56,19 +54,12 @@ export function InvoicesToolbar({
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-64 flex-1">
           <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("invoices.filters.customer")}</label>
-          <Select value={customerValue} onValueChange={(value) => onCustomerChange(value === "all" ? "" : value)}>
-            <SelectTrigger className="rounded-xl border-white/8 bg-card">
-              <SelectValue placeholder={t("invoices.filters.allCustomers")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("invoices.filters.allCustomers")}</SelectItem>
-              {customers.map((customer) => (
-                <SelectItem key={customer.id} value={customer.id}>
-                  {customer.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CustomerSearchSelect
+            value={customerId}
+            onValueChange={onCustomerChange}
+            allowEmpty
+            emptyLabel={t("invoices.filters.allCustomers")}
+          />
         </div>
 
         <div className="min-w-48">

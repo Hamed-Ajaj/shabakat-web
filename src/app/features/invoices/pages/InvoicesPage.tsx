@@ -10,26 +10,36 @@ import { InvoicesPageSkeleton } from "../components/InvoicesPageSkeleton";
 import { InvoicesTable } from "../components/InvoicesTable";
 import { InvoicesToolbar } from "../components/InvoicesToolbar";
 import type { InvoiceRow, InvoiceStatus } from "../types";
-import { useInvoiceCustomerOptionsQuery, invoiceQueryKeys } from "../queries";
+import { invoiceQueryKeys } from "../queries";
 import { fetchPrintableInvoiceHtml } from "../invoicesApi";
 import { printInvoiceHtml } from "../utils";
 
 type InvoiceDialogMode = "bulk" | "create" | "delete" | "pay" | "view" | null;
 
 const CreateInvoiceDialog = lazy(() =>
-  import("../components/CreateInvoiceDialog").then((module) => ({ default: module.CreateInvoiceDialog })),
+  import("../components/CreateInvoiceDialog").then((module) => ({
+    default: module.CreateInvoiceDialog,
+  })),
 );
 const BulkCreateInvoicesDialog = lazy(() =>
-  import("../components/BulkCreateInvoicesDialog").then((module) => ({ default: module.BulkCreateInvoicesDialog })),
+  import("../components/BulkCreateInvoicesDialog").then((module) => ({
+    default: module.BulkCreateInvoicesDialog,
+  })),
 );
 const RecordPaymentDialog = lazy(() =>
-  import("../components/RecordPaymentDialog").then((module) => ({ default: module.RecordPaymentDialog })),
+  import("../components/RecordPaymentDialog").then((module) => ({
+    default: module.RecordPaymentDialog,
+  })),
 );
 const DeleteInvoiceDialog = lazy(() =>
-  import("../components/DeleteInvoiceDialog").then((module) => ({ default: module.DeleteInvoiceDialog })),
+  import("../components/DeleteInvoiceDialog").then((module) => ({
+    default: module.DeleteInvoiceDialog,
+  })),
 );
 const InvoiceDetailsSheet = lazy(() =>
-  import("../components/InvoiceDetailsSheet").then((module) => ({ default: module.InvoiceDetailsSheet })),
+  import("../components/InvoiceDetailsSheet").then((module) => ({
+    default: module.InvoiceDetailsSheet,
+  })),
 );
 
 export default function InvoicesPage() {
@@ -38,7 +48,9 @@ export default function InvoicesPage() {
   const preferencesQuery = useCompanyPreferencesQuery();
   const queryClient = useQueryClient();
   const [dialogMode, setDialogMode] = useState<InvoiceDialogMode>(null);
-  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRow | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRow | null>(
+    null,
+  );
   const [customerId, setCustomerId] = useState("");
   const [invoiceStatus, setInvoiceStatus] = useState<"" | InvoiceStatus>("");
   const [issueDateFrom, setIssueDateFrom] = useState("");
@@ -57,13 +69,14 @@ export default function InvoicesPage() {
     pageIndex: pagination.pageIndex,
     pageSize: pagination.pageSize,
   });
-  const customersQuery = useInvoiceCustomerOptionsQuery();
-
   const invoicesPage = invoicesQuery.data;
   const invoices = invoicesPage?.data ?? [];
   const printLanguage = preferencesQuery.data?.language ?? "en";
 
-  function openDialog(mode: Exclude<InvoiceDialogMode, null>, invoice: InvoiceRow | null = null) {
+  function openDialog(
+    mode: Exclude<InvoiceDialogMode, null>,
+    invoice: InvoiceRow | null = null,
+  ) {
     setSelectedInvoice(invoice);
     setDialogMode(mode);
   }
@@ -80,8 +93,13 @@ export default function InvoicesPage() {
       }
 
       const html = await queryClient.fetchQuery({
-        queryKey: [...invoiceQueryKeys.detail(invoice.id), "print-html", printLanguage],
-        queryFn: () => fetchPrintableInvoiceHtml(invoice.id, session.token, printLanguage),
+        queryKey: [
+          ...invoiceQueryKeys.detail(invoice.id),
+          "print-html",
+          printLanguage,
+        ],
+        queryFn: () =>
+          fetchPrintableInvoiceHtml(invoice.id, session.token, printLanguage),
       });
 
       if (!html) {
@@ -90,7 +108,11 @@ export default function InvoicesPage() {
 
       printInvoiceHtml(html);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t("invoices.error.printFailed"));
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("invoices.error.printFailed"),
+      );
     }
   }
 
@@ -117,7 +139,6 @@ export default function InvoicesPage() {
       <InvoicesToolbar
         canBulkCreate={canManage}
         customerId={customerId}
-        customers={customersQuery.data ?? []}
         invoiceStatus={invoiceStatus}
         issueDateFrom={issueDateFrom}
         issueDateTo={issueDateTo}
@@ -147,11 +168,17 @@ export default function InvoicesPage() {
       <InvoicesTable
         canDelete={canManage}
         data={invoices}
-        error={invoicesQuery.error instanceof Error ? invoicesQuery.error.message : ""}
+        error={
+          invoicesQuery.error instanceof Error
+            ? invoicesQuery.error.message
+            : ""
+        }
         isFetching={invoicesQuery.isFetching}
         isLoading={invoicesQuery.isLoading}
         onDelete={(invoice) => openDialog("delete", invoice)}
-        onPageSizeChange={(value) => setPagination({ pageIndex: 0, pageSize: value })}
+        onPageSizeChange={(value) =>
+          setPagination({ pageIndex: 0, pageSize: value })
+        }
         onPaginationChange={setPagination}
         onPay={(invoice) => openDialog("pay", invoice)}
         onPrint={handlePrint}
@@ -162,10 +189,7 @@ export default function InvoicesPage() {
 
       <Suspense fallback={null}>
         {dialogMode === "create" ? (
-          <CreateInvoiceDialog
-            open
-            onOpenChange={handleDialogOpenChange}
-          />
+          <CreateInvoiceDialog open onOpenChange={handleDialogOpenChange} />
         ) : null}
 
         {dialogMode === "bulk" ? (
