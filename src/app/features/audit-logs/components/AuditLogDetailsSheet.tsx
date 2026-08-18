@@ -9,7 +9,7 @@ import {
 } from "../../../components/ui/sheet";
 import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
-import { getAuditSummary, readableLabel } from "../auditLogDisplay";
+import { getAuditActionLabel, getAuditEntityLabel, getAuditParamLabel, getAuditSummary } from "../auditLogDisplay";
 import type { AuditLog } from "../types";
 
 export function AuditLogDetailsSheet({
@@ -46,7 +46,7 @@ export function AuditLogDetailsSheet({
               <DetailItem label={t("audit.details.summary")} value={getAuditSummary(log, t)} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <DetailItem label={t("audit.details.when")} value={formatDateTime(log.createdAt, locale)} />
-                <DetailItem label={t("audit.table.entity")} value={log.entityType ?? t("audit.notSet")} />
+                <DetailItem label={t("audit.table.entity")} value={log.entityType ? getAuditEntityLabel(log.entityType, t) : t("audit.notSet")} />
               </div>
               <DetailItem label={t("audit.details.entityId")} value={log.entityId ?? t("audit.notSet")} mono />
               {log.userEmail ? <DetailItem label={t("audit.details.user")} value={log.userEmail} /> : null}
@@ -62,7 +62,7 @@ export function AuditLogDetailsSheet({
                 <dl className="divide-y divide-white/8">
                   {detailEntries.map(([key, value]) => (
                     <div className="grid gap-2 py-3 sm:grid-cols-2" key={key}>
-                      <dt className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{readableLabel(key)}</dt>
+                      <dt className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{getAuditParamLabel(key, t)}</dt>
                       <dd className="wrap-break-word text-sm text-foreground sm:text-right">{formatParameter(value, locale)}</dd>
                     </div>
                   ))}
@@ -77,7 +77,8 @@ export function AuditLogDetailsSheet({
 }
 
 function ActionBadge({ action }: Readonly<{ action: string }>) {
-  return <Badge className="border-white/10 bg-muted/40 text-foreground" variant="outline">{readableLabel(action)}</Badge>;
+  const { t } = useI18n();
+  return <Badge className="border-white/10 bg-muted/40 text-foreground" variant="outline">{getAuditActionLabel(action, t)}</Badge>;
 }
 
 function StatusBadge({ status }: Readonly<{ status: AuditLog["status"] }>) {

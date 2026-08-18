@@ -3,6 +3,9 @@
 ## Project Structure & Module Organization
 This is a Vite + React + TypeScript app. Entry starts at [`src/main.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/main.tsx) and mounts [`src/app/App.tsx`](/home/hamed-archy/work-projects/shabakat/shabakat-web/src/app/App.tsx). Keep product code under `src/app/`: `features/` for route-level domains, `routes/` for router setup, `providers/` for app state, `shell/` for layout, and `shared/` for reusable domain UI/data/types. Current feature areas include `auth`, `areas`, `dashboard`, `invoices`, `settings`, and `subscribers`. shadcn support folders and small reusable hooks live in `src/hooks/` and `src/lib/`. Shared primitives are in `src/app/components/ui/`. Global styling stays in `src/styles/`.
 
+## Localization
+All user-facing text must go through `src/app/shared/i18n/messages.ts` via the `useI18n().t(...)` helper. After every feature or prompt-based change, check and ensure localization: visible labels, placeholders, filter options, badges, empty/error/success states, and detail fields must have both `en` and `ar` entries. Do not hardcode English strings in components.
+
 ## Build, Test, and Development Commands
 Use `pnpm`.
 

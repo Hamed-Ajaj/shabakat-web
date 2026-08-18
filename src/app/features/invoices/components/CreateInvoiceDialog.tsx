@@ -171,7 +171,7 @@ export function CreateInvoiceDialog({
         }
       }}
     >
-      <DialogContent className="border-white/8 bg-background sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-y-auto border-white/8 bg-background sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("invoices.create.title")}</DialogTitle>
           <DialogDescription>
@@ -244,7 +244,7 @@ export function CreateInvoiceDialog({
             {isFixedKilowatt ? (
               <>
                 <div className="space-y-2">
-                  <label className="block text-xs font-medium text-muted-foreground">Charge Mode</label>
+                  <label className="block text-xs font-medium text-muted-foreground">{t("invoices.create.chargeMode")}</label>
                   <Tabs
                     value={fixedKilowattMode}
                     onValueChange={(value) => {
@@ -260,15 +260,15 @@ export function CreateInvoiceDialog({
                     }}
                   >
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="payment">By payment</TabsTrigger>
-                      <TabsTrigger value="kilowatt">By kWh</TabsTrigger>
+                      <TabsTrigger value="payment">{t("invoices.create.chargeModePayment")}</TabsTrigger>
+                      <TabsTrigger value="kilowatt">{t("invoices.create.chargeModeKilowatt")}</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                    {fixedKilowattMode === "payment" ? "Payment Amount" : "Kilowatt Amount"}
+                    {fixedKilowattMode === "payment" ? t("invoices.create.paymentAmount") : t("invoices.create.kilowattAmount")}
                   </label>
                   {fixedKilowattMode === "payment" ? (
                     <>
@@ -339,9 +339,9 @@ export function CreateInvoiceDialog({
 
                 <SectionCard className="space-y-3 p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-foreground">Server Calculation Preview</p>
+                    <p className="text-sm font-semibold text-foreground">{t("invoices.create.preview.title")}</p>
                     {calculationQuery.isFetching ? (
-                      <span className="text-xs text-muted-foreground">Calculating...</span>
+                      <span className="text-xs text-muted-foreground">{t("invoices.create.preview.calculating")}</span>
                     ) : null}
                   </div>
 
@@ -356,13 +356,13 @@ export function CreateInvoiceDialog({
                     </div>
                   ) : calculationQuery.isSuccess ? (
                     <p className="text-sm text-muted-foreground">
-                      Preview is unavailable on the current backend build. You can still create the prepaid invoice normally.
+                      {t("invoices.create.preview.unavailable")}
                     </p>
                   ) : calculationQuery.error instanceof Error ? (
                     <p className="text-sm text-red-300">{calculationQuery.error.message}</p>
                   ) : (
                     <p className="text-sm text-muted-foreground">
-                      Enter a payment or kWh amount to preview the exact backend calculation before creating the paid invoice.
+                      {t("invoices.create.preview.prompt")}
                     </p>
                   )}
                 </SectionCard>

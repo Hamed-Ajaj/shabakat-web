@@ -23,7 +23,7 @@ import { useAuth } from "../../../providers/AuthProvider";
 import { useI18n } from "../../../providers/I18nProvider";
 import { SectionCard } from "../../../shared/components/SectionCard";
 import { AuditLogDetailsSheet } from "../components/AuditLogDetailsSheet";
-import { getAuditSummary } from "../auditLogDisplay";
+import { getAuditActionLabel, getAuditEntityLabel, getAuditSummary } from "../auditLogDisplay";
 import { useAuditLogsQuery } from "../queries";
 import type { AuditLog, AuditLogAction, AuditLogFilters, AuditLogStatus } from "../types";
 
@@ -52,7 +52,7 @@ export default function AuditLogsPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <FilterSelect label={t("audit.filters.action")} value={filters.action || "all"} onValueChange={(value) => updateFilters({ action: value === "all" ? "" : value as AuditLogAction })}>
             <SelectItem value="all">{t("audit.filters.allActions")}</SelectItem>
-            {ACTIONS.map((action) => <SelectItem key={action} value={action}>{action.replace(/([a-z])([A-Z])/g, "$1 $2")}</SelectItem>)}
+            {ACTIONS.map((action) => <SelectItem key={action} value={action}>{getAuditActionLabel(action, t)}</SelectItem>)}
           </FilterSelect>
           <FilterSelect label={t("audit.filters.status")} value={filters.status || "all"} onValueChange={(value) => updateFilters({ status: value === "all" ? "" : value as AuditLogStatus })}>
             <SelectItem value="all">{t("audit.filters.allStatuses")}</SelectItem>
@@ -90,11 +90,12 @@ function DateFilter({ label, value, onChange }: Readonly<{ label: string; value:
 
 function AuditLogsTable({ logs, locale, onView }: Readonly<{ logs: AuditLog[]; locale: "ar" | "en"; onView: (log: AuditLog) => void }>) {
   const { t } = useI18n();
-  return <Table><TableHeader><TableRow className="hover:bg-transparent"><TableHead>{t("audit.table.event")}</TableHead><TableHead className="hidden md:table-cell">{t("audit.table.action")}</TableHead><TableHead className="hidden lg:table-cell">{t("audit.table.entity")}</TableHead><TableHead className="hidden sm:table-cell">{t("audit.table.status")}</TableHead><TableHead><span className="sr-only">{t("audit.details.view")}</span></TableHead></TableRow></TableHeader><TableBody>{logs.map((log) => <TableRow key={log.id}><TableCell className="min-w-64 whitespace-normal py-4"><p className="font-medium text-foreground">{getAuditSummary(log, t)}</p><p className="mt-1 text-xs text-muted-foreground">{new Intl.DateTimeFormat(locale === "ar" ? "ar-LB" : "en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(log.createdAt))}</p></TableCell><TableCell className="hidden md:table-cell"><ActionBadge action={log.action} /></TableCell><TableCell className="hidden lg:table-cell">{log.entityType ?? "—"}</TableCell><TableCell className="hidden sm:table-cell"><StatusBadge status={log.status} /></TableCell><TableCell><Button aria-label={t("audit.details.view")} size="icon" title={t("audit.details.view")} variant="ghost" onClick={() => onView(log)}><Eye /></Button></TableCell></TableRow>)}</TableBody></Table>;
+  return <Table><TableHeader><TableRow className="hover:bg-transparent"><TableHead>{t("audit.table.event")}</TableHead><TableHead className="hidden md:table-cell">{t("audit.table.action")}</TableHead><TableHead className="hidden lg:table-cell">{t("audit.table.entity")}</TableHead><TableHead className="hidden sm:table-cell">{t("audit.table.status")}</TableHead><TableHead><span className="sr-only">{t("audit.details.view")}</span></TableHead></TableRow></TableHeader><TableBody>{logs.map((log) => <TableRow key={log.id}><TableCell className="min-w-64 whitespace-normal py-4"><p className="font-medium text-foreground">{getAuditSummary(log, t)}</p><p className="mt-1 text-xs text-muted-foreground">{new Intl.DateTimeFormat(locale === "ar" ? "ar-LB" : "en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(log.createdAt))}</p></TableCell><TableCell className="hidden md:table-cell"><ActionBadge action={log.action} /></TableCell><TableCell className="hidden lg:table-cell">{log.entityType ? getAuditEntityLabel(log.entityType, t) : "—"}</TableCell><TableCell className="hidden sm:table-cell"><StatusBadge status={log.status} /></TableCell><TableCell><Button aria-label={t("audit.details.view")} size="icon" title={t("audit.details.view")} variant="ghost" onClick={() => onView(log)}><Eye /></Button></TableCell></TableRow>)}</TableBody></Table>;
 }
 
 function ActionBadge({ action }: Readonly<{ action: string }>) {
-  return <Badge className="border-white/10 bg-muted/40 text-foreground" variant="outline">{action.replace(/([a-z])([A-Z])/g, "$1 $2")}</Badge>;
+  const { t } = useI18n();
+  return <Badge className="border-white/10 bg-muted/40 text-foreground" variant="outline">{getAuditActionLabel(action, t)}</Badge>;
 }
 
 function StatusBadge({ status }: Readonly<{ status: AuditLog["status"] }>) {
