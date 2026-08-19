@@ -13,13 +13,7 @@ import {
   FormMessage,
 } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
+import { SearchableSelect } from "../../../shared/components/SearchableSelect";
 import {
   Sheet,
   SheetContent,
@@ -117,20 +111,16 @@ export function BoxFormSheet({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("boxes.form.area")}</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder={t("boxes.form.areaPlaceholder")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {areas.map((area) => (
-                            <SelectItem key={area.id} value={area.id}>
-                              {area.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <SearchableSelect
+                          emptyLabel={t("boxes.form.areaPlaceholder")}
+                          options={areas.map((area) => ({ label: area.name, value: area.id }))}
+                          placeholder={t("boxes.form.areaPlaceholder")}
+                          searchPlaceholder={t("boxes.search.areas")}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

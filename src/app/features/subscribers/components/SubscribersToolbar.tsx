@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { useI18n } from "../../../providers/I18nProvider";
+import { SearchableSelect } from "../../../shared/components/SearchableSelect";
 import type { AmpereScheduleRecord } from "../../ampere-schedules/types";
 import type { AreaRecord } from "../../areas/types";
 import { getSubscriberRelationLabel, getSubscriberPlanLabel } from "../subscriberLabels";
@@ -123,13 +124,14 @@ export function SubscribersToolbar({
         </div>
 
         <div className="min-w-52">
-          <Select value={areaId || "all"} onValueChange={(value) => onAreaChange(value === "all" ? "" : value)}>
-            <SelectTrigger className="h-11 rounded-xl border-white/8 bg-card"><SelectValue placeholder={t("subscribers.search.area")} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("subscribers.search.allAreas")}</SelectItem>
-              {areas.map((area) => <SelectItem key={area.id} value={area.id}>{area.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            emptyLabel={t("subscribers.search.allAreas")}
+            options={areas.map((area) => ({ label: area.name, value: area.id }))}
+            placeholder={t("subscribers.search.allAreas")}
+            searchPlaceholder={t("subscribers.search.areas")}
+            value={areaId}
+            onValueChange={onAreaChange}
+          />
         </div>
 
         <Popover open={filtersOpen} onOpenChange={openFilters}>

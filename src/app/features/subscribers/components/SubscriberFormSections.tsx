@@ -1,6 +1,7 @@
 import { useWatch, type UseFormReturn } from "react-hook-form";
 import { Checkbox } from "../../../components/ui/checkbox";
 import { useI18n } from "../../../providers/I18nProvider";
+import { SearchableSelect } from "../../../shared/components/SearchableSelect";
 import {
   FormControl,
   FormDescription,
@@ -252,26 +253,19 @@ export function SubscriberDetailsSection({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{t("subscribers.form.area")}</FormLabel>
-            <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-                form.setValue("boxId", "");
-              }}
-              value={field.value || ""}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={t("subscribers.form.areaPlaceholder")} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {areas.map((area) => (
-                  <SelectItem key={area.id} value={area.id}>
-                    {area.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <SearchableSelect
+                emptyLabel={t("subscribers.form.areaPlaceholder")}
+                options={areas.map((area) => ({ label: area.name, value: area.id }))}
+                placeholder={t("subscribers.form.areaPlaceholder")}
+                searchPlaceholder={t("subscribers.search.areas")}
+                value={field.value || ""}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  form.setValue("boxId", "");
+                }}
+              />
+            </FormControl>
             <FormDescription className="min-h-10">
               {t("subscribers.form.areaHelp")}
             </FormDescription>
@@ -286,25 +280,17 @@ export function SubscriberDetailsSection({
         render={({ field }) => (
           <FormItem>
             <FormLabel>{t("subscribers.form.box")}</FormLabel>
-            <Select
-              disabled={!hasBoxes}
-              onValueChange={(value) => field.onChange(value === "none" ? "" : value)}
-              value={field.value || "none"}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={t("subscribers.form.boxPlaceholder")} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="none">{t("subscribers.form.boxNone")}</SelectItem>
-                {boxes.map((box) => (
-                  <SelectItem key={String(box.value)} value={String(box.value)}>
-                    {box.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <SearchableSelect
+                disabled={!hasBoxes}
+                emptyLabel={t("subscribers.form.boxNone")}
+                options={boxes.map((box) => ({ label: box.label, value: String(box.value) }))}
+                placeholder={t("subscribers.form.boxPlaceholder")}
+                searchPlaceholder={t("subscribers.search.boxes")}
+                value={field.value || ""}
+                onValueChange={field.onChange}
+              />
+            </FormControl>
             <FormDescription className="min-h-10">
               {hasBoxes ? t("subscribers.form.boxHelp") : t("subscribers.form.boxEmpty")}
             </FormDescription>

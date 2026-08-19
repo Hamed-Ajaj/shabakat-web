@@ -1,12 +1,6 @@
 import { Button } from "../../../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
 import { useI18n } from "../../../providers/I18nProvider";
+import { SearchableSelect } from "../../../shared/components/SearchableSelect";
 import type { AreaRecord } from "../../areas/types";
 
 interface BoxesToolbarProps {
@@ -51,19 +45,14 @@ export function BoxesToolbar({
 
           <label className="w-full sm:w-60">
             <span className="sr-only">{t("boxes.filters.area")}</span>
-            <Select value={areaId || "all"} onValueChange={(value) => onAreaChange(value === "all" ? "" : value)}>
-              <SelectTrigger className="h-11 w-full rounded-xl border-white/8 bg-card">
-                <SelectValue placeholder={t("boxes.filters.allAreas")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("boxes.filters.allAreas")}</SelectItem>
-                {areas.map((area) => (
-                  <SelectItem key={area.id} value={area.id}>
-                    {area.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              emptyLabel={t("boxes.filters.allAreas")}
+              options={areas.map((area) => ({ label: area.name, value: area.id }))}
+              placeholder={t("boxes.filters.allAreas")}
+              searchPlaceholder={t("boxes.search.areas")}
+              value={areaId}
+              onValueChange={onAreaChange}
+            />
           </label>
         </div>
 
