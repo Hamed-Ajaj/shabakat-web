@@ -4,6 +4,7 @@ import { BoxesPageSkeleton } from "../features/boxes/components/BoxesPageSkeleto
 import { InvoicesPageSkeleton } from "../features/invoices/components/InvoicesPageSkeleton";
 import { SubscribersPageSkeleton } from "../features/subscribers/components/SubscribersPageSkeleton";
 import { AppShell } from "../shell/AppShell";
+import { MarketingLayout } from "../features/marketing/components/MarketingLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 const DashboardPage = lazy(() => import("../features/dashboard/pages/DashboardPage"));
@@ -27,6 +28,12 @@ const AmpereProrationPage = lazy(() => import("../features/settings/pages/Ampere
 const WhatsAppConnectionPage = lazy(() => import("../features/settings/pages/WhatsAppConnectionPage"));
 const ExcelExportColumnsPage = lazy(() => import("../features/settings/pages/ExcelExportColumnsPage"));
 const LoginPage = lazy(() => import("../features/auth/pages/LoginPage"));
+const LandingPage = lazy(() => import("../features/marketing/pages/LandingPage"));
+const AboutPage = lazy(() => import("../features/marketing/pages/AboutPage"));
+const ContactPage = lazy(() => import("../features/marketing/pages/ContactPage"));
+const PrivacyPolicyPage = lazy(() => import("../features/marketing/pages/PrivacyPolicyPage"));
+const TermsPage = lazy(() => import("../features/marketing/pages/TermsPage"));
+const DataDeletionPage = lazy(() => import("../features/marketing/pages/DataDeletionPage"));
 
 function ShellLayout() {
   return (
@@ -71,6 +78,15 @@ function RouteFallback() {
 export function AppRoutes() {
   return (
       <Routes>
+        <Route element={<MarketingLayout />}>
+          <Route index element={<Suspense fallback={<MarketingFallback />}><LandingPage /></Suspense>} />
+          <Route path="/about" element={<Suspense fallback={<MarketingFallback />}><AboutPage /></Suspense>} />
+          <Route path="/contact" element={<Suspense fallback={<MarketingFallback />}><ContactPage /></Suspense>} />
+          <Route path="/privacy" element={<Suspense fallback={<MarketingFallback />}><PrivacyPolicyPage /></Suspense>} />
+          <Route path="/terms" element={<Suspense fallback={<MarketingFallback />}><TermsPage /></Suspense>} />
+          <Route path="/data-deletion" element={<Suspense fallback={<MarketingFallback />}><DataDeletionPage /></Suspense>} />
+        </Route>
+
         <Route
           path="/login"
           element={(
@@ -86,7 +102,6 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/areas" element={<AreasPage />} />
           <Route path="/ampere-schedules" element={<AmpereSchedulesPage />} />
@@ -108,7 +123,11 @@ export function AppRoutes() {
           <Route path="/settings/whatsapp" element={<WhatsAppConnectionPage />} />
           <Route path="/settings/excel-export" element={<ExcelExportColumnsPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
   );
+}
+
+function MarketingFallback() {
+  return <div className="min-h-dvh bg-[#0B0B15]" />;
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://{{DOMAIN}}/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/" />
+  </url>
+  <url>
+    <loc>https://{{DOMAIN}}/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/about" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/about" />
+  </url>
+  <url>
+    <loc>https://{{DOMAIN}}/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/contact" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/contact" />
+  </url>
+  <url>
+    <loc>https://{{DOMAIN}}/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/privacy" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/privacy" />
+  </url>
+  <url>
+    <loc>https://{{DOMAIN}}/terms</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/terms" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/terms" />
+  </url>
+  <url>
+    <loc>https://{{DOMAIN}}/data-deletion</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://{{DOMAIN}}/data-deletion" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://{{DOMAIN}}/data-deletion" />
+  </url>
+</urlset>
